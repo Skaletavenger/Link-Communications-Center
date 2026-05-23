@@ -10,12 +10,29 @@ export default function DashboardPage() {
   const [query, setQuery] = useState('');
 
   useEffect(() => {
-    const data = localStorage.getItem('lcc_products');
-    if (data) setProducts(JSON.parse(data));
-    else {
-      localStorage.setItem('lcc_products', JSON.stringify(seedProducts));
-      setProducts(seedProducts);
-    }
+    let mounted = true;
+    (async () => {
+      try {
+        const res = await fetch('/api/products');
+        if (!res.ok) throw new Error('API unavailable');
+        const apiItems = await res.json();
+        if (mounted && Array.isArray(apiItems) && apiItems.length > 0) {
+          setProducts(apiItems);
+          localStorage.setItem('lcc_products', JSON.stringify(apiItems));
+          return;
+        }
+      } catch (e) {
+        // fallback to localStorage / seed
+      }
+
+      const data = localStorage.getItem('lcc_products');
+      if (data) setProducts(JSON.parse(data));
+      else {
+        localStorage.setItem('lcc_products', JSON.stringify(seedProducts));
+        setProducts(seedProducts);
+      }
+    })();
+    return () => { mounted = false };
   }, []);
 
   const save = (next: Product[]) => {
