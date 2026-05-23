@@ -14,7 +14,7 @@ export default function Hero() {
       <ParticleCanvas />
       <div className="container mx-auto px-6 relative z-10">
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8 }} className="flex items-center gap-6">
-          <LottieLoader className="w-20 h-20" />
+          <LottieLoader src="/animations/hero-security-camera.json" className="w-20 h-20" />
           <div>
             <h1 className="text-5xl font-extrabold">Link Communications Center</h1>
             

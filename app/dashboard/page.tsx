@@ -47,7 +47,12 @@ export default function DashboardPage() {
 
   return (
     <section className="container mx-auto px-6 py-12">
-      <h1 className="text-4xl font-bold mb-6">Inventory Dashboard</h1>
+      <div className="flex items-center gap-4 mb-6">
+        <div className="w-16 h-16">
+          <LottieLoader src="/animations/dashboard-inventory-box.json" className="w-16 h-16" />
+        </div>
+        <h1 className="text-4xl font-bold">Inventory Dashboard</h1>
+      </div>
 
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         <div className="flex-1">
