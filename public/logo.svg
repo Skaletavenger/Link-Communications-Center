@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">
+  <defs>
+    <linearGradient id="g" x1="0" x2="1">
+      <stop offset="0" stop-color="#00b4ff" />
+      <stop offset="1" stop-color="#0ea5e9" />
+    </linearGradient>
+  </defs>
+  <circle cx="60" cy="60" r="48" fill="url(#g)">
+    <animate attributeName="r" values="44;48;44" dur="3s" repeatCount="indefinite" />
+  </circle>
+  <text x="50%" y="55%" font-size="20" text-anchor="middle" fill="#041226" font-weight="700">LCC</text>
+</svg>

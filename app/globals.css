@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0b1226;
+  --muted: #8b9bb3;
+}
+
+html,body,#root {
+  height: 100%;
+}
+
+body {
+  @apply bg-gradient-to-b from-navy via-[#071028] to-[#020617] text-white antialiased;
+  background-color: var(--bg);
+}
+
+.glass {
+  background: rgba(255,255,255,0.03);
+  backdrop-filter: blur(6px);
+}
+
+.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-electric text-navy font-semibold }

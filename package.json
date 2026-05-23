@@ -1,0 +1,41 @@
+{
+  "name": "link-comms-center",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.0",
+    "framer-motion": "^10.12.7",
+    "lottie-react": "^2.4.0",
+    "next": "14.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "react-tsparticles": "^2.7.4",
+    "tsparticles": "^2.7.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.4.2",
+    "@types/react": "^18.2.28",
+    "autoprefixer": "^10.4.14",
+    "postcss": "^8.4.30",
+    "prisma": "^5.9.0",
+    "tailwindcss": "^3.5.2",
+    "typescript": "^5.2.2"
+  },
+  "prisma": {
+    "seed": "node prisma/seed.js"
+  },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:migrate": "prisma migrate dev --name init",
+    "prisma:generate": "prisma generate"
+  }
+}
