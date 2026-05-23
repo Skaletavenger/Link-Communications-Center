@@ -1,6 +1,5 @@
 {
-  "version": 2,
-  "builds": [
-    { "src": "next.config.mjs", "use": "@vercel/next" }
-  ]
+  "buildCommand": "next build",
+  "outputDirectory": ".next",
+  "framework": "nextjs"
 }
