@@ -1,28 +1,34 @@
-'use client';
-import { useEffect, useState } from 'react';
-import Lottie from 'lottie-react';
+'use client'
+import dynamic from 'next/dynamic'
+import { useEffect, useState } from 'react'
 
-export default function LottieLoader({ src = '/animations/hero-security-camera.json', className = 'w-24 h-24' }: { src?: string; className?: string }) {
-  const [data, setData] = useState<any | null>(null);
+const Lottie = dynamic(() => import('lottie-react'), { ssr: false })
+
+interface LottieLoaderProps {
+  src: string
+  className?: string
+}
+
+export default function LottieLoader({ src, className }: LottieLoaderProps) {
+  const [animationData, setAnimationData] = useState<any>(null)
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    let mounted = true;
-    (async () => {
+    let mounted = true
+    ;(async () => {
       try {
-        const res = await fetch(src);
-        const json = await res.json();
-        if (mounted) setData(json);
+        const res = await fetch(src)
+        const data = await res.json()
+        if (mounted) setAnimationData(data)
       } catch (e) {
-        console.warn('Failed to load lottie', src, e);
+        console.warn('Failed to load lottie animation', src, e)
+      } finally {
+        if (mounted) setLoading(false)
       }
-    })();
-    return () => { mounted = false };
-  }, [src]);
+    })()
+    return () => { mounted = false }
+  }, [src])
 
-  if (!data) return <div className={className} />;
-  return (
-    <div className={className}>
-      <Lottie animationData={data} loop autoplay />
-    </div>
-  );
+  if (loading || !animationData) return <div className={className} />
+  return <Lottie animationData={animationData} className={className} loop autoplay />
 }

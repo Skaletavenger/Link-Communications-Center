@@ -4,6 +4,7 @@ import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
 import ProductCard from '../../components/ProductCard';
 import ProductForm from '../../components/ProductForm';
+import LottieLoader from '@/components/LottieLoader';
 
 export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
