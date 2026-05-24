@@ -14,10 +14,17 @@ export default function ProductCard({ product }: { product: Product }) {
       variants={cardVariants}
       initial="hidden"
       animate="visible"
-      whileHover={{ y: -6, scale: 1.02 }}
+      whileHover={{ y: -6, scale: 1.04, boxShadow: '0 20px 40px rgba(0,180,255,0.2)' }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
-      className="bg-white/3 rounded-lg p-4 flex flex-col h-full transition-transform duration-200"
+      className="relative overflow-hidden bg-white/3 rounded-lg p-4 flex flex-col h-full"
     >
+      <motion.div
+        variants={{ hidden: { opacity: 0 }, hover: { opacity: 1 } }}
+        transition={{ duration: 0.25, ease: 'easeOut' }}
+        className="pointer-events-none absolute inset-0 flex items-center justify-center bg-[#001a38]/75 text-white text-lg font-semibold tracking-[0.08em]"
+      >
+        View Details
+      </motion.div>
       <div className="h-44 w-full bg-white/5 rounded flex items-center justify-center overflow-hidden">
         <img src={product.image || '/placeholder.svg'} alt={product.name} className="object-contain h-full" />
       </div>

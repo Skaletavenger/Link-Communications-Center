@@ -1,6 +1,14 @@
 'use client';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+
+const navItems = [
+  { href: '/products', label: 'Products' },
+  { href: '/dashboard', label: 'Dashboard' },
+  { href: '/about', label: 'About' },
+  { href: '/contact', label: 'Contact' }
+];
 
 export default function Navbar() {
   const path = usePathname();
@@ -15,10 +23,24 @@ export default function Navbar() {
         <span className="font-bold">Link Communications</span>
       </Link>
       <div className="flex gap-4">
-        <Link href="/products" className={"px-3 py-1 rounded-md transition-colors duration-150 " + (path === '/products' ? 'bg-electric text-navy' : 'text-muted hover:text-white hover:bg-white/5')}>Products</Link>
-        <Link href="/dashboard" className={"px-3 py-1 rounded-md transition-colors duration-150 " + (path === '/dashboard' ? 'bg-electric text-navy' : 'text-muted hover:text-white hover:bg-white/5')}>Dashboard</Link>
-        <Link href="/about" className="px-3 py-1 text-muted transition-colors duration-150 hover:text-white hover:bg-white/5 rounded-md">About</Link>
-        <Link href="/contact" className="px-3 py-1 text-muted transition-colors duration-150 hover:text-white hover:bg-white/5 rounded-md">Contact</Link>
+        {navItems.map((item) => {
+          const active = path === item.href;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`relative px-3 py-1 rounded-md transition-colors duration-150 ${active ? 'bg-electric text-navy' : 'text-muted hover:text-white hover:bg-white/5'}`}
+            >
+              {item.label}
+              <motion.span
+                initial={{ scaleX: 0 }}
+                whileHover={{ scaleX: 1 }}
+                transition={{ duration: 0.25, ease: 'easeOut' }}
+                className="absolute left-0 bottom-0 h-[2px] w-full origin-left bg-[#00B4FF]"
+              />
+            </Link>
+          );
+        })}
       </div>
     </nav>
   );

@@ -21,4 +21,19 @@ body {
   backdrop-filter: blur(6px);
 }
 
-.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-electric text-navy font-semibold }
+.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-electric text-navy font-semibold transition-shadow duration-300; }
+.btn:hover { box-shadow: 0 0 0 8px rgba(0,180,255,0.15); }
+
+input,
+textarea,
+select {
+  @apply border border-white/10 bg-white/5 text-white transition duration-300 ease-out;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none;
+  border-color: #00b4ff;
+  box-shadow: 0 0 0 4px rgba(0,180,255,0.24);
+}
