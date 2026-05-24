@@ -127,8 +127,11 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         </div>
 
         <div className="space-y-3">
-          <label className="block text-sm text-white/80">Category</label>
+          <label htmlFor="product-category" className="block text-sm text-white/80">Category</label>
           <select
+            id="product-category"
+            title="Select product category"
+            aria-label="Select product category"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
@@ -184,8 +187,11 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
 
       <div className="grid gap-4 md:grid-cols-2">
         <div className="space-y-3 md:col-span-2">
-          <label className="block text-sm text-white/80">Description</label>
+          <label htmlFor="product-description" className="block text-sm text-white/80">Description</label>
           <textarea
+            id="product-description"
+            title="Product description"
+            placeholder="Enter a short product description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={3}
@@ -196,9 +202,11 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
 
       <div className="grid gap-4 md:grid-cols-[1.2fr_0.8fr] items-end">
         <div className="space-y-3">
-          <label className="block text-sm text-white/80">Upload Image</label>
+          <label htmlFor="product-image-upload" className="block text-sm text-white/80">Upload Image</label>
           <input
+            id="product-image-upload"
             type="file"
+            title="Upload product image"
             accept="image/png,image/jpeg,image/webp"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
             className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"

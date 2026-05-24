@@ -1,294 +1,416 @@
-'use client';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { AnimatePresence, motion, useInView } from 'framer-motion';
-import { useRouter } from 'next/navigation';
-import type { Product } from '../../types';
-import LottieLoader from '@/components/LottieLoader';
-import ProductForm from '@/components/ProductForm';
-import { useToast } from '@/components/ToastContext';
-import { useInventory, categories } from '../../lib/useInventory';
+'use client'
+import { useState, useEffect, useRef, type ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import { useInventory, Product } from '../../lib/useInventory'
 
-const stats = [
-  { label: 'Total Products', icon: '📦', key: 'total' },
-  { label: 'In Stock', icon: '✅', key: 'inStock' },
-  { label: 'Low Stock', icon: '⚠️', key: 'lowStock' },
-  { label: 'Out of Stock', icon: '❌', key: 'outOfStock' }
-] as const;
+const CATEGORIES = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
 
-function AnimatedCount({ value }: { value: number }) {
-  const [count, setCount] = useState(0);
-
-  useEffect(() => {
-    let start = 0;
-    const duration = 500;
-    const stepTime = Math.max(20, Math.floor(duration / Math.max(value, 1)));
-    const timer = window.setInterval(() => {
-      start += 1;
-      setCount(Math.min(start, value));
-      if (start >= value) {
-        window.clearInterval(timer);
-      }
-    }, stepTime);
-
-    return () => window.clearInterval(timer);
-  }, [value]);
-
-  return <span className="text-3xl font-semibold text-white">{count}</span>;
+function CameraIcon() {
+  return (
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.5">
+      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+      <circle cx="12" cy="13" r="4"/>
+    </svg>
+  )
 }
 
+function Skeleton() {
+  return (
+    <div className="min-h-screen bg-[#0a0f1e] p-6">
+      <div className="max-w-7xl mx-auto">
+        <div className="h-10 w-64 bg-white/10 rounded-lg animate-pulse mb-8" />
+        <div className="grid grid-cols-4 gap-4 mb-8">
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-white/10 rounded-xl animate-pulse" />)}
+        </div>
+        <div className="h-64 bg-white/10 rounded-xl animate-pulse mb-6" />
+        <div className="space-y-3">
+          {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-white/10 rounded-lg animate-pulse" />)}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function StockBadge({ qty }: { qty: number }) {
+  if (qty === 0) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">Out of Stock</span>
+  if (qty <= 5) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse">Low Stock</span>
+  return <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30">In Stock</span>
+}
+
+const emptyForm = { name: '', brand: '', model: '', category: 'Surveillance Cameras', price: 0, stockQuantity: 0, description: '', image: '' }
+
 export default function DashboardPage() {
-  const { products, loaded, addProduct, updateProduct, deleteProduct } = useInventory();
-  const [search, setSearch] = useState('');
-  const [categoryFilter, setCategoryFilter] = useState('All');
-  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
-  const [authChecked, setAuthChecked] = useState(false);
-  const router = useRouter();
-  const ref = useRef<HTMLElement>(null);
-  const sectionInView = useInView(ref, { once: true, margin: '-100px' });
-  const toast = useToast();
+  const router = useRouter()
+  const { products, loaded, addProduct, updateProduct, deleteProduct } = useInventory()
+  const [search, setSearch] = useState('')
+  const [filterCat, setFilterCat] = useState('All')
+  const [showForm, setShowForm] = useState(false)
+  const [form, setForm] = useState<Omit<Product, 'id'>>(emptyForm)
+  const [editId, setEditId] = useState<string | null>(null)
+  const [imgPreview, setImgPreview] = useState('')
+  const [toast, setToast] = useState('')
+  const fileRef = useRef<HTMLInputElement>(null)
 
-  const filteredProducts = useMemo(() => {
-    return products.filter((product) => {
-      const query = search.toLowerCase();
-      const matchesSearch =
-        product.name.toLowerCase().includes(query) ||
-        product.brand.toLowerCase().includes(query) ||
-        product.category.toLowerCase().includes(query);
-      const matchesCategory = categoryFilter === 'All' || product.category === categoryFilter;
-      return matchesSearch && matchesCategory;
-    });
-  }, [products, search, categoryFilter]);
-
-  const totals = useMemo(() => {
-    const total = products.length;
-    const inStock = products.filter((product) => product.stockQuantity > 0).length;
-    const lowStock = products.filter((product) => product.stockQuantity > 0 && product.stockQuantity <= 5).length;
-    const outOfStock = products.filter((product) => product.stockQuantity === 0).length;
-    return { total, inStock, lowStock, outOfStock };
-  }, [products]);
-
+  // Auth check
   useEffect(() => {
-    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('lcc_admin_auth') : null;
-    if (stored !== 'true') {
-      router.replace('/dashboard/login');
-      return;
+    if (typeof window !== 'undefined') {
+      const auth = sessionStorage.getItem('lcc_admin_auth')
+      if (auth !== 'true') {
+        router.replace('/dashboard/login')
+      }
     }
-    setAuthChecked(true);
-  }, [router]);
+  }, [router])
 
-  const handleAddProduct = (product: Product) => {
-    const newProduct = { ...product, id: product.id || Date.now().toString() };
-    addProduct(newProduct);
-    toast.success('Product added successfully.');
-  };
-
-  const handleUpdateProduct = (product: Product) => {
-    updateProduct(product);
-    setEditingProduct(null);
-    toast.success('Product updated successfully.');
-  };
-
-  const handleDeleteProduct = (product: Product) => {
-    if (typeof window !== 'undefined' && !window.confirm(`Delete ${product.name}?`)) {
-      return;
+  // Clear session on unmount (leaving dashboard)
+  useEffect(() => {
+    return () => {
+      if (typeof window !== 'undefined') {
+        sessionStorage.removeItem('lcc_admin_auth')
+      }
     }
-    deleteProduct(product.id);
-    toast.success('Product deleted successfully.');
-  };
+  }, [])
 
-  if (!authChecked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e] text-white">
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-6 backdrop-blur-xl text-center">
-          <p className="text-lg font-semibold">Checking admin access...</p>
-        </div>
-      </div>
-    );
+  const showToast = (msg: string) => {
+    setToast(msg)
+    setTimeout(() => setToast(''), 3000)
   }
 
-  if (!loaded) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e] text-white">
-        <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-6 backdrop-blur-xl text-center">
-          <p className="text-lg font-semibold">Loading inventory...</p>
-        </div>
-      </div>
-    );
+  const handleLogout = () => {
+    sessionStorage.removeItem('lcc_admin_auth')
+    router.push('/dashboard/login')
   }
+
+  const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const reader = new FileReader()
+    reader.onload = (ev) => {
+      const b64 = ev.target?.result as string
+      setForm(f => ({ ...f, image: b64 }))
+      setImgPreview(b64)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleImageUrl = (url: string) => {
+    setForm(f => ({ ...f, image: url }))
+    setImgPreview(url)
+  }
+
+  const handleSubmit = () => {
+    if (!form.name || !form.brand || !form.price) {
+      showToast('Please fill in Name, Brand, and Price')
+      return
+    }
+    if (editId) {
+      updateProduct(editId, form)
+      showToast('Product updated!')
+    } else {
+      addProduct(form)
+      showToast('Product added!')
+    }
+    setForm(emptyForm)
+    setImgPreview('')
+    setEditId(null)
+    setShowForm(false)
+  }
+
+  const handleEdit = (p: Product) => {
+    setForm({ name: p.name, brand: p.brand, model: p.model, category: p.category, price: p.price, stockQuantity: p.stockQuantity, description: p.description, image: p.image })
+    setImgPreview(p.image)
+    setEditId(p.id)
+    setShowForm(true)
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleDelete = (id: string) => {
+    if (confirm('Delete this product?')) {
+      deleteProduct(id)
+      showToast('Product deleted.')
+    }
+  }
+
+  if (!loaded) return <Skeleton />
+
+  const filtered = products.filter(p => {
+    const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.brand.toLowerCase().includes(search.toLowerCase()) ||
+      p.model.toLowerCase().includes(search.toLowerCase())
+    const matchCat = filterCat === 'All' || p.category === filterCat
+    return matchSearch && matchCat
+  })
+
+  const total = products.length
+  const inStock = products.filter(p => p.stockQuantity > 5).length
+  const lowStock = products.filter(p => p.stockQuantity > 0 && p.stockQuantity <= 5).length
+  const outStock = products.filter(p => p.stockQuantity === 0).length
 
   return (
-    <motion.section
-      ref={ref}
-      initial={{ opacity: 0, y: 24 }}
-      animate={sectionInView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, ease: 'easeOut' }}
-      className="relative min-h-screen container mx-auto px-6 py-12"
-    >
-      <div className="mb-8 flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div className="space-y-3">
-          <h1 className="text-4xl font-bold">Inventory Dashboard</h1>
-          <p className="text-muted max-w-2xl">Manage products, stock levels, and inventory details in one secure admin portal.</p>
+    <div className="min-h-screen bg-[#0a0f1e] text-white">
+      {/* Toast */}
+      {toast && (
+        <div className="fixed top-6 right-6 z-50 bg-[#00B4FF] text-black font-bold px-6 py-3 rounded-xl shadow-2xl animate-bounce">
+          {toast}
         </div>
-        <button
-          type="button"
-          onClick={() => {
-            if (typeof window !== 'undefined') {
-              sessionStorage.removeItem('lcc_admin_auth');
-            }
-            router.replace('/dashboard/login');
-          }}
-          className="btn rounded-full bg-rose-500/95 px-5 py-3 text-white shadow-lg shadow-rose-500/20 hover:bg-rose-500"
-        >
-          Logout
-        </button>
+      )}
+
+      {/* Header */}
+      <div className="border-b border-white/10 bg-[#0d1428]/80 backdrop-blur-md sticky top-0 z-40">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <div>
+            <h1 className="text-2xl font-bold text-white">Inventory Dashboard</h1>
+            <p className="text-sm text-white/40">Link Communications Center — Admin</p>
+          </div>
+          <div className="flex gap-3">
+            <button
+              onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); setImgPreview('') }}
+              className="px-4 py-2 bg-[#00B4FF] text-black font-bold rounded-lg hover:bg-[#00d4ff] transition-all"
+            >
+              {showForm ? '✕ Cancel' : '+ Add Product'}
+            </button>
+            <button
+              onClick={handleLogout}
+              className="px-4 py-2 border border-white/20 text-white/60 rounded-lg hover:bg-white/10 transition-all"
+            >
+              Logout
+            </button>
+          </div>
+        </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4 mb-10">
-        {stats.map((stat) => (
-          <motion.div
-            key={stat.label}
-            initial={{ opacity: 0, y: 20 }}
-            animate={sectionInView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.5, delay: 0.05 }}
-            className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl"
+      <div className="max-w-7xl mx-auto px-6 py-8">
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          {[
+            { label: 'Total Products', value: total, color: '#00B4FF' },
+            { label: 'In Stock', value: inStock, color: '#00FF88' },
+            { label: 'Low Stock', value: lowStock, color: '#FFB800' },
+            { label: 'Out of Stock', value: outStock, color: '#FF4444' },
+          ].map(stat => (
+            <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
+              <p className="text-white/50 text-sm mb-1">{stat.label}</p>
+              <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
+            </div>
+          ))}
+        </div>
+
+        {/* Add / Edit Form */}
+        {showForm && (
+          <div className="bg-white/5 border border-[#00B4FF]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-[#00B4FF] mb-6">
+              {editId ? '✏️ Edit Product' : '➕ Add New Product'}
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {/* Name */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Product Name *</label>
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+                  placeholder="e.g. HIK Vision Dome Camera"
+                />
+              </div>
+              {/* Brand */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Brand *</label>
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
+                  placeholder="e.g. HIK Vision"
+                />
+              </div>
+              {/* Model */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Model Number</label>
+                <input
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.model} onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
+                  placeholder="e.g. DS-2CD2143G2-I"
+                />
+              </div>
+              {/* Category */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Category</label>
+                <select
+                  className="w-full bg-[#0a0f1e] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
+                >
+                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                </select>
+              </div>
+              {/* Price */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Price (USD) *</label>
+                <input
+                  type="number" min="0"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.price || ''} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))}
+                  placeholder="0"
+                />
+              </div>
+              {/* Stock */}
+              <div>
+                <label className="text-white/60 text-sm mb-1 block">Stock Quantity *</label>
+                <input
+                  type="number" min="0"
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  value={form.stockQuantity || ''} onChange={e => setForm(f => ({ ...f, stockQuantity: Number(e.target.value) }))}
+                  placeholder="0"
+                />
+              </div>
+              {/* Description */}
+              <div className="md:col-span-2">
+                <label className="text-white/60 text-sm mb-1 block">Description</label>
+                <textarea
+                  rows={3}
+                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all resize-none"
+                  value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+                  placeholder="Brief product description..."
+                />
+              </div>
+              {/* Image */}
+              <div className="md:col-span-2">
+                <label className="text-white/60 text-sm mb-1 block">Product Image</label>
+                <div className="flex gap-4 items-start">
+                  <div className="flex-1 space-y-2">
+                    <input
+                      type="url"
+                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                      placeholder="Paste image URL..."
+                      onChange={e => handleImageUrl(e.target.value)}
+                    />
+                    <div className="text-center text-white/30 text-xs">— or —</div>
+                    <button
+                      onClick={() => fileRef.current?.click()}
+                      className="w-full border border-dashed border-white/20 rounded-lg py-2 text-white/50 hover:border-[#00B4FF] hover:text-[#00B4FF] transition-all text-sm"
+                    >
+                      📁 Upload image file
+                    </button>
+                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageFile} />
+                  </div>
+                  {/* Preview */}
+                  <div className="w-28 h-28 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0">
+                    {imgPreview ? (
+                      <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <CameraIcon />
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div className="flex gap-3 mt-6">
+              <button
+                onClick={handleSubmit}
+                className="px-8 py-3 bg-[#00B4FF] text-black font-bold rounded-xl hover:bg-[#00d4ff] transition-all"
+              >
+                {editId ? 'Save Changes' : 'Add Product'}
+              </button>
+              <button
+                onClick={() => { setShowForm(false); setEditId(null); setForm(emptyForm); setImgPreview('') }}
+                className="px-8 py-3 border border-white/20 text-white/60 rounded-xl hover:bg-white/10 transition-all"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        )}
+
+        {/* Search + Filter */}
+        <div className="flex flex-col md:flex-row gap-3 mb-6">
+          <input
+            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00B4FF] transition-all"
+            placeholder="Search by name, brand, or model..."
+            value={search} onChange={e => setSearch(e.target.value)}
+          />
+          <select
+            className="bg-[#0a0f1e] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+            value={filterCat} onChange={e => setFilterCat(e.target.value)}
           >
-            <div className="flex items-center gap-3 text-2xl">
-              <span>{stat.icon}</span>
-              <p className="text-sm uppercase tracking-[0.24em] text-white/60">{stat.label}</p>
-            </div>
-            <div className="mt-6">
-              <AnimatedCount value={totals[stat.key]} />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-
-      <div className="grid gap-8 xl:grid-cols-[1.4fr_0.6fr]">
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-          <ProductForm onSave={handleAddProduct} />
+            <option value="All">All Categories</option>
+            {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+          </select>
         </div>
 
-        {editingProduct ? (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-            <ProductForm product={editingProduct} onSave={handleUpdateProduct} onCancel={() => setEditingProduct(null)} />
+        {/* Product Count */}
+        <p className="text-white/40 text-sm mb-4">{filtered.length} product{filtered.length !== 1 ? 's' : ''} found</p>
+
+        {/* Product Table */}
+        {filtered.length === 0 ? (
+          <div className="text-center py-20 text-white/30">
+            <div className="mb-4 flex justify-center"><CameraIcon /></div>
+            <p className="text-lg">No products found.</p>
+            <p className="text-sm mt-2">Click &quot;+ Add Product&quot; to add your first item.</p>
           </div>
         ) : (
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl text-white/70">
-            <p className="font-semibold text-white">Editing panel</p>
-            <p className="mt-3 text-sm">Click any product row edit button to open the inline update form.</p>
+          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+            {/* Table Header */}
+            <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b border-white/10 text-white/40 text-xs font-bold uppercase tracking-wider">
+              <span>Image</span>
+              <span>Name</span>
+              <span>Brand / Model</span>
+              <span>Category</span>
+              <span>Price</span>
+              <span>Stock</span>
+              <span>Status</span>
+              <span>Actions</span>
+            </div>
+            {/* Rows */}
+            {filtered.map(p => (
+              <div
+                key={p.id}
+                className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-4 border-b border-white/5 hover:bg-white/5 transition-all items-center"
+              >
+                {/* Image */}
+                <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+                  {p.image ? (
+                    <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.5">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  )}
+                </div>
+                {/* Name */}
+                <div>
+                  <p className="text-white font-medium text-sm">{p.name}</p>
+                  <p className="text-white/30 text-xs truncate max-w-[180px]">{p.description}</p>
+                </div>
+                {/* Brand/Model */}
+                <div>
+                  <p className="text-white/80 text-sm">{p.brand}</p>
+                  <p className="text-white/40 text-xs font-mono">{p.model}</p>
+                </div>
+                {/* Category */}
+                <span className="text-white/60 text-xs bg-white/10 px-2 py-1 rounded-full w-fit">{p.category}</span>
+                {/* Price */}
+                <span className="text-[#00B4FF] font-bold text-sm">${p.price}</span>
+                {/* Stock */}
+                <span className="text-white/80 text-sm font-mono">{p.stockQuantity}</span>
+                {/* Status */}
+                <StockBadge qty={p.stockQuantity} />
+                {/* Actions */}
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => handleEdit(p)}
+                    className="px-3 py-1 bg-white/10 hover:bg-[#00B4FF]/20 hover:text-[#00B4FF] text-white/60 rounded-lg text-xs transition-all"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    onClick={() => handleDelete(p.id)}
+                    className="px-3 py-1 bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-white/60 rounded-lg text-xs transition-all"
+                  >
+                    Del
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         )}
       </div>
-
-      <div className="mt-10 rounded-3xl border border-white/10 bg-white/5 p-6 backdrop-blur-xl">
-        <div className="mb-6 flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-          <div>
-            <h2 className="text-2xl font-semibold">Inventory list</h2>
-            <p className="text-sm text-white/70">Filter and search the catalog to manage stock.</p>
-          </div>
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by name, brand, or category"
-              className="w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20 sm:w-[320px]"
-            />
-            <select
-              value={categoryFilter}
-              onChange={(e) => setCategoryFilter(e.target.value)}
-              className="w-full rounded-3xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20 sm:w-[220px]"
-            >
-              <option>All</option>
-              {categories.map((category) => (
-                <option key={category} value={category}>{category}</option>
-              ))}
-            </select>
-          </div>
-        </div>
-
-        <div className="overflow-x-auto">
-          <table className="min-w-full border-separate border-spacing-0 text-left">
-            <thead>
-              <tr className="bg-white/5 text-sm uppercase tracking-[0.18em] text-white/50">
-                <th className="border-b border-white/10 px-4 py-4">Image</th>
-                <th className="border-b border-white/10 px-4 py-4">Name</th>
-                <th className="border-b border-white/10 px-4 py-4">Brand</th>
-                <th className="border-b border-white/10 px-4 py-4">Model</th>
-                <th className="border-b border-white/10 px-4 py-4">Category</th>
-                <th className="border-b border-white/10 px-4 py-4">Price</th>
-                <th className="border-b border-white/10 px-4 py-4">Stock</th>
-                <th className="border-b border-white/10 px-4 py-4">Status</th>
-                <th className="border-b border-white/10 px-4 py-4">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredProducts.length === 0 ? (
-                <tr>
-                  <td colSpan={9} className="px-4 py-8 text-center text-white/70">
-                    No matching products found. Adjust your search or add a new product.
-                  </td>
-                </tr>
-              ) : (
-                filteredProducts.map((product) => {
-                  const status = product.stockQuantity > 5 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock';
-                  const statusClass =
-                    product.stockQuantity > 5
-                      ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
-                      : product.stockQuantity > 0
-                      ? 'bg-amber-400/15 text-amber-100 border-amber-300/20'
-                      : 'bg-rose-500/15 text-rose-100 border-rose-400/20';
-
-                  return (
-                    <tr key={product.id} className="border-b border-white/10">
-                    <td className="px-4 py-4 align-middle">
-                      {product.image ? (
-                        <img src={product.image} alt={product.name} className="h-12 w-12 rounded-2xl object-cover" />
-                      ) : (
-                        <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-white/5 text-white/50">
-                          <svg viewBox="0 0 24 24" className="h-6 w-6" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                            <rect x="3" y="5" width="18" height="14" rx="2" />
-                            <path d="M8 5v4" />
-                            <path d="M16 5v4" />
-                            <path d="M12 11v6" />
-                          </svg>
-                        </div>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 align-middle">
-                      <div className="font-semibold">{product.name}</div>
-                      <div className="text-xs text-white/60">{product.description}</div>
-                    </td>
-                    <td className="px-4 py-4 align-middle">{product.brand}</td>
-                    <td className="px-4 py-4 align-middle">{product.model}</td>
-                    <td className="px-4 py-4 align-middle">{product.category}</td>
-                    <td className="px-4 py-4 align-middle text-[#00B4FF] font-semibold">${product.price}</td>
-                    <td className="px-4 py-4 align-middle">{product.stockQuantity}</td>
-                    <td className="px-4 py-4 align-middle">
-                      <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${statusClass}`}>{status}</span>
-                    </td>
-                    <td className="px-4 py-4 align-middle space-x-2">
-                      <button
-                        type="button"
-                        onClick={() => setEditingProduct(product)}
-                        className="btn rounded-full bg-white/10 px-4 py-2 text-sm text-white hover:bg-white/20"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => handleDeleteProduct(product)}
-                        className="btn rounded-full bg-rose-500/90 px-4 py-2 text-sm text-white hover:bg-rose-500"
-                      >
-                        Delete
-                      </button>
-                    </td>
-                  </tr>
-                );
-              }))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </motion.section>
-  );
+    </div>
+  )
 }
