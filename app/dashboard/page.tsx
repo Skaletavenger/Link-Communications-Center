@@ -6,7 +6,7 @@ import ProductCard from '../../components/ProductCard';
 import ProductForm from '../../components/ProductForm';
 import LottieLoader from '@/components/LottieLoader';
 
-const ADMIN_PIN = process.env.NEXT_PUBLIC_ADMIN_PIN || '1234';
+const ADMIN_PIN = process.env.NEXT_PUBLIC_ADMIN_PIN || 'LCC2026';
 
 export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
