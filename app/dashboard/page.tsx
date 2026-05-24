@@ -1,12 +1,13 @@
 'use client';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
-import { motion, useInView } from 'framer-motion';
+import { AnimatePresence, motion, useInView } from 'framer-motion';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
 import ProductCard from '../../components/ProductCard';
 import ProductForm from '../../components/ProductForm';
 import LottieLoader from '@/components/LottieLoader';
+import { useToast } from '@/components/ToastContext';
 
 const ADMIN_PIN = process.env.NEXT_PUBLIC_ADMIN_PIN || 'LCC2026';
 
@@ -15,8 +16,15 @@ const gridVariants = {
   visible: { transition: { staggerChildren: 0.15 } }
 };
 
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { type: 'spring', bounce: 0.18, damping: 18 } },
+  exit: { opacity: 0, scale: 0.95, height: 0, marginBottom: 0, transition: { duration: 0.25 } }
+};
+
 export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
+  const [loadingProducts, setLoadingProducts] = useState(true);
   const [query, setQuery] = useState('');
   const [authorized, setAuthorized] = useState(false);
   const [pin, setPin] = useState('');
@@ -28,6 +36,7 @@ export default function DashboardPage() {
   const searchParams = useSearchParams();
   const ref = useRef<HTMLElement>(null);
   const sectionInView = useInView(ref, { once: true, margin: '-100px' });
+  const toast = useToast();
 
   useEffect(() => {
     setMounted(true);
@@ -43,6 +52,7 @@ export default function DashboardPage() {
         if (mountedRequest && Array.isArray(apiItems) && apiItems.length > 0) {
           setProducts(apiItems);
           localStorage.setItem('lcc_products', JSON.stringify(apiItems));
+          setLoadingProducts(false);
           return;
         }
       } catch (e) {
@@ -55,6 +65,7 @@ export default function DashboardPage() {
         localStorage.setItem('lcc_products', JSON.stringify(seedProducts));
         setProducts(seedProducts);
       }
+      setLoadingProducts(false);
     })();
 
     return () => {
@@ -67,14 +78,20 @@ export default function DashboardPage() {
     localStorage.setItem('lcc_products', JSON.stringify(next));
   };
 
-  const handleDelete = (model: string) => saveProducts(products.filter((p) => p.model !== model));
+  const handleDelete = (model: string) => {
+    saveProducts(products.filter((p) => p.model !== model));
+    toast.success('Product deleted successfully.');
+  };
+
   const handleAddOrUpdate = (product: Product, originalModel?: string) => {
     if (originalModel) {
       const next = products.map((p) => (p.model === originalModel ? product : p));
       saveProducts(next);
       setEditingProduct(null);
+      toast.success('Product updated successfully.');
     } else {
       saveProducts([product, ...products]);
+      toast.success('Product added successfully.');
     }
   };
 
@@ -90,8 +107,10 @@ export default function DashboardPage() {
       setAuthorized(true);
       setError('');
       setPin('');
+      toast.success('Access granted.');
     } else {
       setError('Invalid PIN. Please try again.');
+      toast.error('Incorrect PIN.');
     }
   };
 
@@ -147,24 +166,49 @@ export default function DashboardPage() {
 
       <div className="flex flex-col md:flex-row gap-6 mb-6">
         <div className="flex-1">
-          <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search by name or model" className="w-full p-3 rounded bg-white/5" />
+          <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+            placeholder="Search by name or model"
+            className="w-full md:w-[200px] focus:md:w-[320px] transition-all duration-300 ease-out p-3 rounded bg-white/5"
+          />
         </div>
         <div className="w-full md:w-72">
           <ProductForm product={editingProduct ?? undefined} onSave={handleAddOrUpdate} onCancel={() => setEditingProduct(null)} />
         </div>
       </div>
 
-      <motion.div variants={gridVariants} initial="hidden" animate={sectionInView ? 'visible' : 'hidden'} className="grid md:grid-cols-3 gap-6 mb-8">
-        {filtered.map((p) => (
-          <div key={p.model} className="glass p-4 rounded">
-            <ProductCard product={p} />
-            <div className="flex gap-2 mt-4 flex-wrap">
-              <button className="btn" onClick={() => setEditingProduct(p)}>Edit</button>
-              <button className="btn" onClick={() => handleDelete(p.model)}>Delete</button>
-            </div>
+      <AnimatePresence>
+        {loadingProducts ? (
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {[1, 2, 3].map((index) => (
+              <div key={index} className="glass rounded-lg p-4 animate-pulse">
+                <div className="h-44 w-full rounded bg-white/10 mb-4" />
+                <div className="h-6 w-3/4 rounded bg-white/10 mb-2" />
+                <div className="h-4 w-1/2 rounded bg-white/10 mb-6" />
+                <div className="flex items-center justify-between gap-4">
+                  <div className="h-4 w-20 rounded bg-white/10" />
+                  <div className="h-4 w-12 rounded bg-white/10" />
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </motion.div>
+        ) : (
+          <motion.div variants={gridVariants} initial="hidden" animate={sectionInView ? 'visible' : 'hidden'} className="grid md:grid-cols-3 gap-6 mb-8">
+            {filtered.map((p) => (
+              <motion.div key={p.model} variants={itemVariants} exit="exit" layout>
+                <div className="glass p-4 rounded">
+                  <ProductCard product={p} />
+                  <div className="flex gap-2 mt-4 flex-wrap">
+                    <button className="btn" onClick={() => setEditingProduct(p)}>Edit</button>
+                    <button className="btn" onClick={() => handleDelete(p.model)}>Delete</button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
       <p className="text-sm text-muted">Manage products locally (localStorage).</p>
     </motion.section>
   );

@@ -14,6 +14,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
   const [preview, setPreview] = useState<string>('/placeholder.svg');
   const [file, setFile] = useState<File | null>(null);
   const [originalModel, setOriginalModel] = useState<string | undefined>(undefined);
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     if (product) {
@@ -46,10 +47,14 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSubmitting(true);
     const finalImage = form.image || preview || '/placeholder.svg';
     const productToSave = { ...form, image: finalImage };
 
+    await new Promise((resolve) => setTimeout(resolve, 220));
     onSave(productToSave, originalModel);
+    setSubmitting(false);
+
     if (!originalModel) {
       setForm({ name: '', model: '', category: 'Surveillance Cameras', price: 0, stockQuantity: 0, image: '/placeholder.svg' });
       setPreview('/placeholder.svg');
@@ -73,7 +78,14 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
         <img src={preview || '/placeholder.svg'} alt="Preview" className="h-full w-full object-contain" />
       </div>
       <div className="flex flex-wrap gap-3">
-        <button type="submit" className="btn">{product ? 'Save Product' : 'Add Product'}</button>
+        <button type="submit" disabled={submitting} className="btn">
+          {submitting ? (
+            <span className="inline-flex items-center gap-2">
+              <span className="inline-block h-4 w-4 animate-spin rounded-full border-2 border-white/50 border-r-transparent" />
+              Saving...
+            </span>
+          ) : product ? 'Save Product' : 'Add Product'}
+        </button>
         {product && onCancel && (
           <button type="button" onClick={onCancel} className="btn bg-white/10 text-white hover:bg-white/20">Cancel</button>
         )}

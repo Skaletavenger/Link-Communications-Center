@@ -1,6 +1,6 @@
 'use client';
 import ParticleCanvas from './ParticleCanvas';
-import { motion, useInView } from 'framer-motion';
+import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import dynamic from 'next/dynamic';
 
@@ -9,6 +9,9 @@ const LottieLoader = dynamic(() => import('./LottieLoader'), { ssr: false });
 export default function Hero() {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: '-100px' });
+  const { scrollYProgress } = useScroll();
+  const backgroundY = useTransform(scrollYProgress, [0, 1], [0, 40]);
+  const textY = useTransform(scrollYProgress, [0, 1], [0, 20]);
   const words = ['Link', 'Communications', 'Center'];
 
   return (
@@ -19,13 +22,18 @@ export default function Hero() {
       transition={{ duration: 0.8, ease: 'easeOut' }}
       className="relative h-screen flex items-center overflow-hidden"
     >
-      <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: "url('/images/hero-bg.png')" }} />
+      <motion.div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{ backgroundImage: "url('/images/hero-bg.png')", y: backgroundY }}
+      />
       <div className="absolute inset-0 bg-black/50" />
       <ParticleCanvas />
       <div className="container mx-auto px-6 relative z-10">
-        <motion.div className="max-w-3xl text-white">
-          <div className="flex flex-col md:flex-row items-center gap-6">
+        <motion.div className="max-w-3xl text-white" style={{ y: textY }}>
+          <div className="mb-6 w-20 h-20">
             <LottieLoader src="/animations/hero-security-camera.json" className="w-20 h-20" />
+          </div>
+          <div className="flex flex-col md:flex-row items-center gap-6">
             <div>
               <h1 className="text-5xl font-extrabold leading-tight">
                 {words.map((word, index) => (
