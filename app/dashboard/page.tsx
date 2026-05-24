@@ -96,8 +96,24 @@ export default function DashboardPage() {
     toast.success('Product deleted successfully.');
   };
 
-  if (!authChecked || !loaded) {
-    return null;
+  if (!authChecked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e] text-white">
+        <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-6 backdrop-blur-xl text-center">
+          <p className="text-lg font-semibold">Checking admin access...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!loaded) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-[#0a0f1e] text-white">
+        <div className="rounded-3xl border border-white/10 bg-white/5 px-8 py-6 backdrop-blur-xl text-center">
+          <p className="text-lg font-semibold">Loading inventory...</p>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -206,17 +222,24 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {filteredProducts.map((product) => {
-                const status = product.stockQuantity > 5 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock';
-                const statusClass =
-                  product.stockQuantity > 5
-                    ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
-                    : product.stockQuantity > 0
-                    ? 'bg-amber-400/15 text-amber-100 border-amber-300/20'
-                    : 'bg-rose-500/15 text-rose-100 border-rose-400/20';
+              {filteredProducts.length === 0 ? (
+                <tr>
+                  <td colSpan={9} className="px-4 py-8 text-center text-white/70">
+                    No matching products found. Adjust your search or add a new product.
+                  </td>
+                </tr>
+              ) : (
+                filteredProducts.map((product) => {
+                  const status = product.stockQuantity > 5 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock';
+                  const statusClass =
+                    product.stockQuantity > 5
+                      ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20'
+                      : product.stockQuantity > 0
+                      ? 'bg-amber-400/15 text-amber-100 border-amber-300/20'
+                      : 'bg-rose-500/15 text-rose-100 border-rose-400/20';
 
-                return (
-                  <tr key={product.id} className="border-b border-white/10">
+                  return (
+                    <tr key={product.id} className="border-b border-white/10">
                     <td className="px-4 py-4 align-middle">
                       {product.image ? (
                         <img src={product.image} alt={product.name} className="h-12 w-12 rounded-2xl object-cover" />
@@ -261,7 +284,7 @@ export default function DashboardPage() {
                     </td>
                   </tr>
                 );
-              })}
+              }))}
             </tbody>
           </table>
         </div>
