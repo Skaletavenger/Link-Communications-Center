@@ -1,7 +1,7 @@
 'use client';
 import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useInView } from 'framer-motion';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
 import ProductCard from '../../components/ProductCard';
@@ -24,6 +24,7 @@ export default function DashboardPage() {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const ref = useRef<HTMLElement>(null);
   const sectionInView = useInView(ref, { once: true, margin: '-100px' });
@@ -99,11 +100,11 @@ export default function DashboardPage() {
       return;
     }
 
-    const redirect = searchParams?.get('redirect') || '/dashboard';
-    if (redirect) {
+    const redirect = searchParams?.get('redirect');
+    if (redirect && redirect !== pathname) {
       router.push(redirect);
     }
-  }, [authorized, router, searchParams]);
+  }, [authorized, pathname, router, searchParams]);
 
   if (!mounted) {
     return null;
