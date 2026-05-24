@@ -53,10 +53,7 @@ export default function Hero() {
           <p className="text-xl mt-6 max-w-2xl">Secure, monitor, and manage your environments with enterprise surveillance and communications solutions.</p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <a href="/products" className="btn">Explore Products</a>
-            <div className="flex flex-wrap items-center gap-3">
-              <a href="/dashboard" className="btn">Inventory Dashboard</a>
-              <a href="/dashboard" className="btn bg-white/10 text-sm text-white hover:bg-white/20">Admin PIN Access</a>
-            </div>
+            <a href="/dashboard" className="btn">Inventory Dashboard</a>
           </div>
         </motion.div>
       </div>

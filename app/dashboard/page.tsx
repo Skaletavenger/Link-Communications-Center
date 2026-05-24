@@ -1,7 +1,7 @@
 'use client';
-import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { AnimatePresence, motion, useInView } from 'framer-motion';
-import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
 import ProductCard from '../../components/ProductCard';
@@ -9,7 +9,7 @@ import ProductForm from '../../components/ProductForm';
 import LottieLoader from '@/components/LottieLoader';
 import { useToast } from '@/components/ToastContext';
 
-const ADMIN_PIN = process.env.NEXT_PUBLIC_ADMIN_PIN || 'LCC2026';
+const AUTH_KEY = 'lcc_admin_auth';
 
 const gridVariants = {
   hidden: {},
@@ -27,21 +27,24 @@ export default function DashboardPage() {
   const [loadingProducts, setLoadingProducts] = useState(true);
   const [query, setQuery] = useState('');
   const [authorized, setAuthorized] = useState(false);
-  const [pin, setPin] = useState('');
-  const [error, setError] = useState('');
+  const [authChecked, setAuthChecked] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
-  const pathname = usePathname();
-  const searchParams = useSearchParams();
   const ref = useRef<HTMLElement>(null);
   const sectionInView = useInView(ref, { once: true, margin: '-100px' });
   const toast = useToast();
 
   useEffect(() => {
     setMounted(true);
-    const stored = typeof window !== 'undefined' ? sessionStorage.getItem('lcc-admin-access') : null;
-    setAuthorized(stored === 'true');
+    const stored = typeof window !== 'undefined' ? sessionStorage.getItem(AUTH_KEY) : null;
+
+    if (stored !== 'true') {
+      router.replace('/dashboard/login');
+      return;
+    }
+
+    setAuthorized(true);
 
     let mountedRequest = true;
     (async () => {
@@ -68,10 +71,12 @@ export default function DashboardPage() {
       setLoadingProducts(false);
     })();
 
+    setAuthChecked(true);
+
     return () => {
       mountedRequest = false;
     };
-  }, []);
+  }, [router]);
 
   const saveProducts = (next: Product[]) => {
     setProducts(next);
@@ -100,32 +105,16 @@ export default function DashboardPage() {
     [products, query]
   );
 
-  const handlePinSubmit = (e: FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (pin === ADMIN_PIN) {
-      sessionStorage.setItem('lcc-admin-access', 'true');
-      setAuthorized(true);
-      setError('');
-      setPin('');
-      toast.success('Access granted.');
-    } else {
-      setError('Invalid PIN. Please try again.');
-      toast.error('Incorrect PIN.');
+  const handleLogout = () => {
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem(AUTH_KEY);
     }
+    setAuthorized(false);
+    toast.success('Logged out successfully.');
+    router.replace('/dashboard/login');
   };
 
-  useEffect(() => {
-    if (!authorized) {
-      return;
-    }
-
-    const redirect = searchParams?.get('redirect');
-    if (redirect && redirect !== pathname) {
-      router.push(redirect);
-    }
-  }, [authorized, pathname, router, searchParams]);
-
-  if (!mounted) {
+  if (!mounted || !authChecked) {
     return null;
   }
 
@@ -137,31 +126,23 @@ export default function DashboardPage() {
       transition={{ duration: 0.7, ease: 'easeOut' }}
       className="relative min-h-screen container mx-auto px-6 py-12"
     >
-      {!authorized && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6">
-          <div className="w-full max-w-md rounded-3xl border border-white/10 bg-navy/95 p-8 text-white shadow-2xl">
-            <h2 className="text-3xl font-semibold mb-4">Admin PIN Required</h2>
-            <p className="text-sm text-muted mb-6">Enter the admin PIN to access the dashboard.</p>
-            <form onSubmit={handlePinSubmit} className="space-y-4">
-              <input
-                type="password"
-                value={pin}
-                onChange={(e) => setPin(e.target.value)}
-                className="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white outline-none"
-                placeholder="Enter PIN"
-              />
-              {error && <p className="text-sm text-red-400">{error}</p>}
-              <button type="submit" className="btn w-full justify-center">Unlock Dashboard</button>
-            </form>
+      <div className="flex flex-col md:flex-row items-start justify-between gap-6 mb-6">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16">
+            <LottieLoader src="/animations/dashboard-inventory-box.json" className="w-16 h-16" />
+          </div>
+          <div>
+            <h1 className="text-4xl font-bold">Inventory Dashboard</h1>
+            <p className="text-sm text-muted">Secure admin management with session protection.</p>
           </div>
         </div>
-      )}
-
-      <div className="flex items-center gap-4 mb-6">
-        <div className="w-16 h-16">
-          <LottieLoader src="/animations/dashboard-inventory-box.json" className="w-16 h-16" />
-        </div>
-        <h1 className="text-4xl font-bold">Inventory Dashboard</h1>
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="btn rounded-full bg-rose-500/90 px-5 py-3 text-white shadow-lg shadow-rose-500/20 hover:bg-rose-500"
+        >
+          Logout
+        </button>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 mb-6">
