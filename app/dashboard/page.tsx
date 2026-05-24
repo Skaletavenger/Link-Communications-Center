@@ -1,5 +1,6 @@
 'use client';
-import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { motion, useInView } from 'framer-motion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
@@ -8,6 +9,11 @@ import ProductForm from '../../components/ProductForm';
 import LottieLoader from '@/components/LottieLoader';
 
 const ADMIN_PIN = process.env.NEXT_PUBLIC_ADMIN_PIN || 'LCC2026';
+
+const gridVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } }
+};
 
 export default function DashboardPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -19,6 +25,8 @@ export default function DashboardPage() {
   const [mounted, setMounted] = useState(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const ref = useRef<HTMLElement>(null);
+  const sectionInView = useInView(ref, { once: true, margin: '-100px' });
 
   useEffect(() => {
     setMounted(true);
@@ -102,7 +110,13 @@ export default function DashboardPage() {
   }
 
   return (
-    <section className="relative min-h-screen container mx-auto px-6 py-12">
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={sectionInView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, ease: 'easeOut' }}
+      className="relative min-h-screen container mx-auto px-6 py-12"
+    >
       {!authorized && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 p-6">
           <div className="w-full max-w-md rounded-3xl border border-white/10 bg-navy/95 p-8 text-white shadow-2xl">
@@ -139,7 +153,7 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6 mb-8">
+      <motion.div variants={gridVariants} initial="hidden" animate={sectionInView ? 'visible' : 'hidden'} className="grid md:grid-cols-3 gap-6 mb-8">
         {filtered.map((p) => (
           <div key={p.model} className="glass p-4 rounded">
             <ProductCard product={p} />
@@ -149,8 +163,8 @@ export default function DashboardPage() {
             </div>
           </div>
         ))}
-      </div>
+      </motion.div>
       <p className="text-sm text-muted">Manage products locally (localStorage).</p>
-    </section>
+    </motion.section>
   );
 }

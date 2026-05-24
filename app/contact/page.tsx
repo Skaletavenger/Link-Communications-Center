@@ -1,6 +1,19 @@
+'use client';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
+
 export default function Contact() {
+  const ref = useRef<HTMLElement>(null);
+  const inView = useInView(ref, { once: true, margin: '-100px' });
+
   return (
-    <section className="container mx-auto px-6 py-12">
+    <motion.section
+      ref={ref}
+      initial={{ opacity: 0, y: 24 }}
+      animate={inView ? { opacity: 1, y: 0 } : {}}
+      transition={{ duration: 0.7, ease: 'easeOut' }}
+      className="container mx-auto px-6 py-12"
+    >
       <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
       <form className="grid gap-4 max-w-lg">
         <input className="p-3 rounded bg-white/5" placeholder="Name" />
@@ -8,6 +21,6 @@ export default function Contact() {
         <textarea className="p-3 rounded bg-white/5" placeholder="Message" rows={6} />
         <button className="btn w-40">Send</button>
       </form>
-    </section>
+    </motion.section>
   );
 }

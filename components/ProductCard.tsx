@@ -2,10 +2,22 @@
 import { Product } from '../types';
 import { motion } from 'framer-motion';
 
+const cardVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0 }
+};
+
 export default function ProductCard({ product }: { product: Product }) {
   const status = product.stockQuantity > 5 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock';
   return (
-    <motion.div whileHover={{ y: -6, scale: 1.02 }} className="bg-white/3 rounded-lg p-4 flex flex-col h-full transition-transform duration-200">
+    <motion.div
+      variants={cardVariants}
+      initial="hidden"
+      animate="visible"
+      whileHover={{ y: -6, scale: 1.02 }}
+      transition={{ duration: 0.45, ease: 'easeOut' }}
+      className="bg-white/3 rounded-lg p-4 flex flex-col h-full transition-transform duration-200"
+    >
       <div className="h-44 w-full bg-white/5 rounded flex items-center justify-center overflow-hidden">
         <img src={product.image || '/placeholder.svg'} alt={product.name} className="object-contain h-full" />
       </div>
