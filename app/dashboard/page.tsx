@@ -1,5 +1,6 @@
 'use client';
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Product } from '../../types';
 import { seedProducts } from '../../lib/seed';
 import ProductCard from '../../components/ProductCard';
@@ -16,6 +17,8 @@ export default function DashboardPage() {
   const [error, setError] = useState('');
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [mounted, setMounted] = useState(false);
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     setMounted(true);
@@ -77,10 +80,22 @@ export default function DashboardPage() {
       sessionStorage.setItem('lcc-admin-access', 'true');
       setAuthorized(true);
       setError('');
+      setPin('');
     } else {
       setError('Invalid PIN. Please try again.');
     }
   };
+
+  useEffect(() => {
+    if (!authorized) {
+      return;
+    }
+
+    const redirect = searchParams?.get('redirect') || '/dashboard';
+    if (redirect) {
+      router.push(redirect);
+    }
+  }, [authorized, router, searchParams]);
 
   if (!mounted) {
     return null;
