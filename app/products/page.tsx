@@ -2,7 +2,7 @@
 import { useState, useEffect } from 'react'
 import { Product, formatUGX } from '../../lib/useInventory'
 
-const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
+const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Phones', 'Other']
 
 function CameraPlaceholder() {
   return (
@@ -58,6 +58,14 @@ export default function ProductsPage() {
     return () => { document.body.style.overflow = '' }
   }, [selected])
 
+  const phoneProducts = products.filter(p =>
+    p.category === 'Phones' &&
+    (search === '' ||
+      p.name.toLowerCase().includes(search.toLowerCase()) ||
+      p.brand.toLowerCase().includes(search.toLowerCase()) ||
+      p.model.toLowerCase().includes(search.toLowerCase()))
+  )
+
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
       p.model.toLowerCase().includes(search.toLowerCase()) ||
@@ -65,6 +73,8 @@ export default function ProductsPage() {
     const matchCat = category === 'All' || p.category === category
     return matchSearch && matchCat
   })
+
+  const otherProducts = filtered.filter(p => p.category !== 'Phones')
 
   return (
     <div className="min-h-screen bg-[#f0f4ff] dark:bg-[#0a0f1e] text-gray-900 dark:text-white pt-24 pb-16 px-6">
@@ -102,27 +112,28 @@ export default function ProductsPage() {
         </div>
 
         {/* Grid */}
-        {!loaded ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
-          </div>
-        ) : filtered.length === 0 ? (
-          <div className="text-center py-24 text-muted">
-            <div className="flex justify-center mb-4">
-              <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
-                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                <circle cx="12" cy="13" r="4"/>
-              </svg>
+        {category !== 'Phones' && (
+          !loaded ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
             </div>
-            <p className="text-xl font-medium">No products found</p>
-            <p className="text-sm mt-2">
-              {products.length === 0 ? 'Products coming soon. Check back later.' : 'Try a different search or category.'}
-            </p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filtered.map(p => (
-              <div
+          ) : otherProducts.length === 0 ? (
+            <div className="text-center py-24 text-muted">
+              <div className="flex justify-center mb-4">
+                <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
+                  <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                  <circle cx="12" cy="13" r="4"/>
+                </svg>
+              </div>
+              <p className="text-xl font-medium">No products found</p>
+              <p className="text-sm mt-2">
+                {products.length === 0 ? 'Products coming soon. Check back later.' : 'Try a different search or category.'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {otherProducts.map(p => (
+                <div
                 key={p.id}
                 onClick={() => setSelected(p)}
                 className="cursor-pointer bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-[#00B4FF]/40 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] transition-all duration-300 hover:-translate-y-1 group"
@@ -164,6 +175,82 @@ export default function ProductsPage() {
                 </div>
               </div>
             ))}
+          </div>
+        ))}
+
+        {phoneProducts.length > 0 && (category === 'All' || category === 'Phones') && (
+          <div className="mt-16 mb-8">
+            <div className="mb-10">
+              <p className="text-sm font-semibold tracking-widest uppercase text-gray-500 dark:text-gray-400 mb-2">
+                Phones
+              </p>
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white">
+                Explore the lineup.
+              </h2>
+            </div>
+
+            <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory">
+              {phoneProducts.map(phone => (
+                <div
+                  key={phone.id}
+                  onClick={() => setSelected(phone)}
+                  className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group"
+                >
+                  <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 bg-gray-100 dark:bg-white/5">
+                    {phone.image ? (
+                      <img
+                        src={phone.image}
+                        alt={phone.name}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                      />
+                    ) : (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-3">
+                        <svg width="64" height="64" viewBox="0 0 24 24" fill="none" className="text-gray-400 dark:text-white/20" stroke="currentColor" strokeWidth="1">
+                          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"/>
+                          <line x1="12" y1="18" x2="12.01" y2="18"/>
+                        </svg>
+                        <span className="text-gray-400 dark:text-white/30 text-sm font-medium">
+                          {phone.brand}
+                        </span>
+                      </div>
+                    )}
+
+                    <span className={`absolute top-4 right-4 text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border ${
+                      phone.stockQuantity === 0
+                        ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                        : phone.stockQuantity <= 5
+                        ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                        : 'bg-green-500/20 text-green-400 border-green-500/30'
+                    }`}>
+                      {phone.stockQuantity === 0 ? 'Out of Stock' : phone.stockQuantity <= 5 ? 'Low Stock' : 'In Stock'}
+                    </span>
+                  </div>
+
+                  <div className="px-1">
+                    <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-white group-hover:text-[#0077cc] dark:group-hover:text-[#00B4FF] transition-colors duration-300">
+                      {phone.name}
+                    </h3>
+                    <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">
+                      {phone.description}
+                    </p>
+                    <p className="text-xl font-bold text-[#0077cc] dark:text-[#00B4FF]">
+                      UGX {phone.price.toLocaleString()}
+                    </p>
+                    <button
+                      onClick={(e) => { e.stopPropagation(); setSelected(phone) }}
+                      className="mt-3 text-sm font-medium text-[#0077cc] dark:text-[#00B4FF] flex items-center gap-1 hover:gap-2 transition-all duration-200"
+                    >
+                      Learn more
+                      <span className="text-lg leading-none">›</span>
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 md:hidden text-center">
+              Swipe to explore →
+            </p>
           </div>
         )}
       </div>

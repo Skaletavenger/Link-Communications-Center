@@ -18,9 +18,8 @@ export default function Navbar() {
       <Link href="/" className="flex items-center gap-3">
         <div className="flex items-center justify-center w-11 h-11 bg-[#1d70b8] dark:bg-white rounded-[12px] shadow-sm shrink-0 transition-colors duration-300">
           <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-white dark:text-[#1d70b8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M10 5l-3 7h5l-3 7" strokeWidth="2" fill="currentColor" />
-            <path d="M7 14c2.5-1.5 5.5-1.5 8 0" />
-            <path d="M5 17c4-2.5 8-2.5 12 0" />
+            <rect x="5" y="5" width="14" height="14" rx="5" fill="currentColor" />
+            <path d="M9 8h6v2h-4v6h-2V8Z" fill="white" />
           </svg>
         </div>
         <div className="flex flex-col justify-center leading-none">
