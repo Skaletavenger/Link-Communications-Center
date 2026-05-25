@@ -31,6 +31,7 @@ export default function ProductsPage() {
   const [loaded, setLoaded] = useState(false)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
+  const [selected, setSelected] = useState<Product | null>(null)
 
   useEffect(() => {
     try {
@@ -39,6 +40,23 @@ export default function ProductsPage() {
     } catch {}
     setLoaded(true)
   }, [])
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setSelected(null)
+    }
+    window.addEventListener('keydown', handleKey)
+    return () => window.removeEventListener('keydown', handleKey)
+  }, [])
+
+  useEffect(() => {
+    if (selected) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [selected])
 
   const filtered = products.filter(p => {
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
@@ -106,7 +124,8 @@ export default function ProductsPage() {
             {filtered.map(p => (
               <div
                 key={p.id}
-                className="bg-card border border-theme rounded-2xl overflow-hidden hover:border-[#00B4FF]/40 hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] group"
+                onClick={() => setSelected(p)}
+                className="cursor-pointer bg-card border border-theme rounded-2xl overflow-hidden hover:border-[#00B4FF]/40 hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] group"
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
@@ -148,6 +167,161 @@ export default function ProductsPage() {
           </div>
         )}
       </div>
+
+      {selected && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm"
+            onClick={() => setSelected(null)}
+          />
+
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl animate-slide-up"
+            style={{ background: 'var(--bg-secondary)' }}
+          >
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1.5 rounded-full bg-white/20" />
+            </div>
+
+            <div className="max-w-3xl mx-auto px-6 pb-10">
+              <div className="flex justify-end mb-4">
+                <button
+                  onClick={() => setSelected(null)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:bg-white/10"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  ✕
+                </button>
+              </div>
+
+              <div
+                className="w-full rounded-2xl overflow-hidden mb-6 border"
+                style={{ borderColor: 'var(--border-color)' }}
+              >
+                {selected.image ? (
+                  <img
+                    src={selected.image}
+                    alt={selected.name}
+                    className="w-full max-h-80 object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-full h-64 flex items-center justify-center"
+                    style={{ background: 'var(--bg-card)' }}
+                  >
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1" opacity="0.4">
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                      <circle cx="12" cy="13" r="4"/>
+                    </svg>
+                  </div>
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {selected.name}
+                  </h2>
+                  <span className={`px-3 py-1 rounded-full text-sm font-bold border ${
+                    selected.stockQuantity === 0
+                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                      : selected.stockQuantity <= 5
+                      ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      : 'bg-green-500/20 text-green-400 border-green-500/30'
+                  }`}>
+                    {selected.stockQuantity === 0
+                      ? 'Out of Stock'
+                      : selected.stockQuantity <= 5
+                      ? 'Low Stock'
+                      : 'In Stock'}
+                  </span>
+                </div>
+
+                <div className="flex flex-wrap gap-3">
+                  <span
+                    className="px-3 py-1 rounded-full text-sm border"
+                    style={{
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--text-secondary)'
+                    }}
+                  >
+                    🏷️ {selected.brand}
+                  </span>
+                  {selected.model && (
+                    <span
+                      className="px-3 py-1 rounded-full text-sm border font-mono"
+                      style={{
+                        background: 'var(--bg-card)',
+                        borderColor: 'var(--border-color)',
+                        color: 'var(--text-secondary)'
+                      }}
+                    >
+                      📋 {selected.model}
+                    </span>
+                  )}
+                  <span
+                    className="px-3 py-1 rounded-full text-sm border"
+                    style={{
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--border-color)',
+                      color: 'var(--accent)'
+                    }}
+                  >
+                    📂 {selected.category}
+                  </span>
+                </div>
+
+                <div
+                  className="py-4 px-5 rounded-2xl border"
+                  style={{
+                    background: 'var(--bg-card)',
+                    borderColor: 'var(--border-color)'
+                  }}
+                >
+                  <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
+                    Price
+                  </p>
+                  <p className="text-3xl font-bold" style={{ color: 'var(--accent)' }}>
+                    UGX {selected.price.toLocaleString()}
+                  </p>
+                  <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                    {selected.stockQuantity} units available
+                  </p>
+                </div>
+
+                {selected.description && (
+                  <div
+                    className="py-4 px-5 rounded-2xl border"
+                    style={{
+                      background: 'var(--bg-card)',
+                      borderColor: 'var(--border-color)'
+                    }}
+                  >
+                    <p className="text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>
+                      Description
+                    </p>
+                    <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                      {selected.description}
+                    </p>
+                  </div>
+                )}
+
+                <button
+                  onClick={() => setSelected(null)}
+                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
+                  style={{
+                    background: 'var(--accent)',
+                    color: '#000000'
+                  }}
+                >
+                  Done
+                </button>
+              </div>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   )
 }
