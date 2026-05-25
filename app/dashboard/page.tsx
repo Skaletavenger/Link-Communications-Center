@@ -2,6 +2,7 @@
 import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useInventory, Product, formatUGX } from '../../lib/useInventory'
+import ThemeToggle from '../../components/ThemeToggle'
 
 const CATEGORIES = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
 const TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
@@ -17,15 +18,15 @@ function CameraIcon() {
 
 function Skeleton() {
   return (
-    <div className="min-h-screen bg-[#0a0f1e] p-6">
+    <div className="min-h-screen bg-primary p-6">
       <div className="max-w-7xl mx-auto">
-        <div className="h-10 w-64 bg-white/10 rounded-lg animate-pulse mb-8" />
+        <div className="h-10 w-64 bg-card rounded-lg animate-pulse mb-8" />
         <div className="grid grid-cols-4 gap-4 mb-8">
-          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-white/10 rounded-xl animate-pulse" />)}
+          {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
         </div>
-        <div className="h-64 bg-white/10 rounded-xl animate-pulse mb-6" />
+        <div className="h-64 bg-card rounded-xl animate-pulse mb-6" />
         <div className="space-y-3">
-          {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-white/10 rounded-lg animate-pulse" />)}
+          {[...Array(5)].map((_, i) => <div key={i} className="h-16 bg-card rounded-lg animate-pulse" />)}
         </div>
       </div>
     </div>
@@ -196,7 +197,7 @@ export default function DashboardPage() {
   const outStock = products.filter(p => p.stockQuantity === 0).length
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white">
+    <div className="min-h-screen bg-primary text-primary">
       {/* Warning Banner */}
       {showWarning && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-center py-3 font-bold text-sm cursor-pointer" onClick={resetTimer}>
@@ -206,28 +207,29 @@ export default function DashboardPage() {
 
       {/* Toast */}
       {toast && (
-        <div className="fixed top-6 right-6 z-50 bg-[#00B4FF] text-black font-bold px-6 py-3 rounded-xl shadow-2xl animate-bounce">
+        <div className="fixed top-6 right-6 z-50 bg-accent text-black font-bold px-6 py-3 rounded-xl shadow-2xl animate-bounce">
           {toast}
         </div>
       )}
 
       {/* Header */}
-      <div className="border-b border-white/10 bg-[#0d1428]/80 backdrop-blur-md sticky top-0 z-40">
+      <div className="border-b border-theme backdrop-blur-md sticky top-0 z-40" style={{ background: 'var(--nav-bg)' }}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-white">Inventory Dashboard</h1>
-            <p className="text-sm text-white/40">Link Communications Center — Admin</p>
+            <h1 className="text-2xl font-bold text-primary">Inventory Dashboard</h1>
+            <p className="text-sm text-secondary">Link Communications Center — Admin</p>
           </div>
-          <div className="flex gap-3">
+          <div className="flex gap-3 items-center">
             <button
               onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); setImgPreview('') }}
-              className="px-4 py-2 bg-[#00B4FF] text-black font-bold rounded-lg hover:bg-[#00d4ff] transition-all"
+              className="px-4 py-2 bg-accent text-black font-bold rounded-lg hover:bg-[#00d4ff] transition-all"
             >
               {showForm ? '✕ Cancel' : '+ Add Product'}
             </button>
+            <ThemeToggle />
             <button
               onClick={handleLogout}
-              className="px-4 py-2 border border-white/20 text-white/60 rounded-lg hover:bg-white/10 transition-all"
+              className="px-4 py-2 border border-theme text-secondary rounded-lg hover:bg-card transition-all"
             >
               Logout
             </button>
@@ -245,8 +247,8 @@ export default function DashboardPage() {
             { label: 'Low Stock', value: lowStock, color: '#FFB800' },
             { label: 'Out of Stock', value: outStock, color: '#FF4444' },
           ].map(stat => (
-            <div key={stat.label} className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-              <p className="text-white/50 text-sm mb-1">{stat.label}</p>
+            <div key={stat.label} className="bg-card border border-theme rounded-xl p-4 backdrop-blur-sm">
+              <p className="text-secondary text-sm mb-1">{stat.label}</p>
               <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
             </div>
           ))}
@@ -254,43 +256,43 @@ export default function DashboardPage() {
 
         {/* Add / Edit Form */}
         {showForm && (
-          <div className="bg-white/5 border border-[#00B4FF]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
-            <h2 className="text-xl font-bold text-[#00B4FF] mb-6">
+          <div className="bg-card border border-[#00B4FF]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+            <h2 className="text-xl font-bold text-accent mb-6">
               {editId ? '✏️ Edit Product' : '➕ Add New Product'}
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* Name */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Product Name *</label>
+                <label className="text-secondary text-sm mb-1 block">Product Name *</label>
                 <input
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. HIK Vision Dome Camera"
                 />
               </div>
               {/* Brand */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Brand *</label>
+                <label className="text-secondary text-sm mb-1 block">Brand *</label>
                 <input
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
                   placeholder="e.g. HIK Vision"
                 />
               </div>
               {/* Model */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Model Number</label>
+                <label className="text-secondary text-sm mb-1 block">Model Number</label>
                 <input
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.model} onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
                   placeholder="e.g. DS-2CD2143G2-I"
                 />
               </div>
               {/* Category */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Category</label>
+                <label className="text-secondary text-sm mb-1 block">Category</label>
                 <select
-                  className="w-full bg-[#0a0f1e] border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-primary border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                 >
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -298,56 +300,56 @@ export default function DashboardPage() {
               </div>
               {/* Price */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Price (UGX) *</label>
+                <label className="text-secondary text-sm mb-1 block">Price (UGX) *</label>
                 <input
                   type="number" min="0"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.price || ''} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))}
                   placeholder="e.g. 320000"
                 />
               </div>
               {/* Stock */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Stock Quantity *</label>
+                <label className="text-secondary text-sm mb-1 block">Stock Quantity *</label>
                 <input
                   type="number" min="0"
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.stockQuantity || ''} onChange={e => setForm(f => ({ ...f, stockQuantity: Number(e.target.value) }))}
                   placeholder="0"
                 />
               </div>
               {/* Description */}
               <div className="md:col-span-2">
-                <label className="text-white/60 text-sm mb-1 block">Description</label>
+                <label className="text-secondary text-sm mb-1 block">Description</label>
                 <textarea
                   rows={3}
-                  className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all resize-none"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all resize-none"
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="Brief product description..."
                 />
               </div>
               {/* Image */}
               <div className="md:col-span-2">
-                <label className="text-white/60 text-sm mb-1 block">Product Image</label>
+                <label className="text-secondary text-sm mb-1 block">Product Image</label>
                 <div className="flex gap-4 items-start">
                   <div className="flex-1 space-y-2">
                     <input
                       type="url"
-                      className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+                      className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
                       placeholder="Paste image URL..."
                       onChange={e => handleImageUrl(e.target.value)}
                     />
-                    <div className="text-center text-white/30 text-xs">— or —</div>
+                    <div className="text-center text-muted text-xs">— or —</div>
                     <button
                       onClick={() => fileRef.current?.click()}
-                      className="w-full border border-dashed border-white/20 rounded-lg py-2 text-white/50 hover:border-[#00B4FF] hover:text-[#00B4FF] transition-all text-sm"
+                      className="w-full border border-theme border-dashed rounded-lg py-2 text-secondary hover:border-[#00B4FF] hover:text-[#00B4FF] transition-all text-sm"
                     >
                       📁 Upload image file
                     </button>
                     <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageFile} />
                   </div>
                   {/* Preview */}
-                  <div className="w-28 h-28 rounded-xl border border-white/10 bg-white/5 flex items-center justify-center overflow-hidden flex-shrink-0">
+                  <div className="w-28 h-28 rounded-xl border border-theme bg-card flex items-center justify-center overflow-hidden flex-shrink-0">
                     {imgPreview ? (
                       <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
                     ) : (
@@ -360,13 +362,13 @@ export default function DashboardPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-[#00B4FF] text-black font-bold rounded-xl hover:bg-[#00d4ff] transition-all"
+                className="px-8 py-3 bg-accent text-black font-bold rounded-xl hover:bg-[#00d4ff] transition-all"
               >
                 {editId ? 'Save Changes' : 'Add Product'}
               </button>
               <button
                 onClick={() => { setShowForm(false); setEditId(null); setForm(emptyForm); setImgPreview('') }}
-                className="px-8 py-3 border border-white/20 text-white/60 rounded-xl hover:bg-white/10 transition-all"
+                className="px-8 py-3 border border-theme text-secondary rounded-xl hover:bg-card transition-all"
               >
                 Cancel
               </button>
@@ -377,12 +379,12 @@ export default function DashboardPage() {
         {/* Search + Filter */}
         <div className="flex flex-col md:flex-row gap-3 mb-6">
           <input
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
             placeholder="Search by name, brand, or model..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
           <select
-            className="bg-[#0a0f1e] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="bg-primary border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
             value={filterCat} onChange={e => setFilterCat(e.target.value)}
           >
             <option value="All">All Categories</option>
@@ -391,19 +393,19 @@ export default function DashboardPage() {
         </div>
 
         {/* Product Count */}
-        <p className="text-white/40 text-sm mb-4">{filtered.length} product{filtered.length !== 1 ? 's' : ''} found</p>
+        <p className="text-secondary text-sm mb-4">{filtered.length} product{filtered.length !== 1 ? 's' : ''} found</p>
 
         {/* Product Table */}
         {filtered.length === 0 ? (
-          <div className="text-center py-20 text-white/30">
+          <div className="text-center py-20 text-muted">
             <div className="mb-4 flex justify-center"><CameraIcon /></div>
             <p className="text-lg">No products found.</p>
             <p className="text-sm mt-2">Click &quot;+ Add Product&quot; to add your first item.</p>
           </div>
         ) : (
-          <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
+          <div className="bg-card border border-theme rounded-2xl overflow-hidden">
             {/* Table Header */}
-            <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b border-white/10 text-white/40 text-xs font-bold uppercase tracking-wider">
+            <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b border-theme text-secondary text-xs font-bold uppercase tracking-wider">
               <span>Image</span>
               <span>Name</span>
               <span>Brand / Model</span>
@@ -417,10 +419,10 @@ export default function DashboardPage() {
             {filtered.map(p => (
               <div
                 key={p.id}
-                className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-4 border-b border-white/5 hover:bg-white/5 transition-all items-center"
+                className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-4 border-b border-theme hover:bg-card transition-all items-center"
               >
                 {/* Image */}
-                <div className="w-12 h-12 rounded-lg bg-white/10 flex items-center justify-center overflow-hidden">
+                <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center overflow-hidden">
                   {p.image ? (
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                   ) : (
@@ -432,33 +434,33 @@ export default function DashboardPage() {
                 </div>
                 {/* Name */}
                 <div>
-                  <p className="text-white font-medium text-sm">{p.name}</p>
-                  <p className="text-white/30 text-xs truncate max-w-[180px]">{p.description}</p>
+                  <p className="text-primary font-medium text-sm">{p.name}</p>
+                  <p className="text-muted text-xs truncate max-w-[180px]">{p.description}</p>
                 </div>
                 {/* Brand/Model */}
                 <div>
-                  <p className="text-white/80 text-sm">{p.brand}</p>
-                  <p className="text-white/40 text-xs font-mono">{p.model}</p>
+                  <p className="text-secondary text-sm">{p.brand}</p>
+                  <p className="text-muted text-xs font-mono">{p.model}</p>
                 </div>
                 {/* Category */}
-                <span className="text-white/60 text-xs bg-white/10 px-2 py-1 rounded-full w-fit">{p.category}</span>
+                <span className="text-secondary text-xs bg-card px-2 py-1 rounded-full w-fit">{p.category}</span>
                 {/* Price */}
-                <span className="text-[#00B4FF] font-bold text-sm">{formatUGX(p.price)}</span>
+                <span className="text-accent font-bold text-sm">{formatUGX(p.price)}</span>
                 {/* Stock */}
-                <span className="text-white/80 text-sm font-mono">{p.stockQuantity}</span>
+                <span className="text-secondary text-sm font-mono">{p.stockQuantity}</span>
                 {/* Status */}
                 <StockBadge qty={p.stockQuantity} />
                 {/* Actions */}
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(p)}
-                    className="px-3 py-1 bg-white/10 hover:bg-[#00B4FF]/20 hover:text-[#00B4FF] text-white/60 rounded-lg text-xs transition-all"
+                    className="px-3 py-1 bg-card hover:bg-[#00B4FF]/20 hover:text-[#00B4FF] text-secondary rounded-lg text-xs transition-all"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(p.id)}
-                    className="px-3 py-1 bg-white/10 hover:bg-red-500/20 hover:text-red-400 text-white/60 rounded-lg text-xs transition-all"
+                    className="px-3 py-1 bg-card hover:bg-red-500/20 hover:text-red-400 text-secondary rounded-lg text-xs transition-all"
                   >
                     Del
                   </button>

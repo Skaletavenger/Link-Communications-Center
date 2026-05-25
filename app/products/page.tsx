@@ -6,7 +6,7 @@ const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking
 
 function CameraPlaceholder() {
   return (
-    <div className="w-full h-48 bg-white/5 flex items-center justify-center rounded-xl">
+    <div className="w-full h-48 bg-card flex items-center justify-center rounded-xl">
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.2" opacity="0.5">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
@@ -17,11 +17,11 @@ function CameraPlaceholder() {
 
 function SkeletonCard() {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl p-4 animate-pulse">
-      <div className="h-48 bg-white/10 rounded-xl mb-4" />
-      <div className="h-4 bg-white/10 rounded w-3/4 mb-2" />
-      <div className="h-3 bg-white/10 rounded w-1/2 mb-4" />
-      <div className="h-6 bg-white/10 rounded w-1/3" />
+    <div className="bg-card border border-theme rounded-2xl p-4 animate-pulse">
+      <div className="h-48 bg-card rounded-xl mb-4" />
+      <div className="h-4 bg-card rounded w-3/4 mb-2" />
+      <div className="h-3 bg-card rounded w-1/2 mb-4" />
+      <div className="h-6 bg-card rounded w-1/3" />
     </div>
   )
 }
@@ -49,19 +49,19 @@ export default function ProductsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white pt-24 pb-16 px-6">
+    <div className="min-h-screen bg-primary text-primary pt-24 pb-16 px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-white mb-2">Our Products</h1>
-          <p className="text-white/50">Browse our range of surveillance and communications equipment</p>
+          <h1 className="text-4xl font-bold text-primary mb-2">Our Products</h1>
+          <p className="text-secondary">Browse our range of surveillance and communications equipment</p>
         </div>
 
         {/* Search + Filter */}
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input
-            className="flex-1 bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white placeholder-white/30 focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
             placeholder="Search products..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -73,8 +73,8 @@ export default function ProductsPage() {
                 onClick={() => setCategory(c)}
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   category === c
-                    ? 'bg-[#00B4FF] text-black'
-                    : 'bg-white/5 border border-white/10 text-white/60 hover:border-[#00B4FF]/50'
+                    ? 'bg-accent text-black'
+                    : 'bg-card border border-theme text-secondary hover:border-[#00B4FF]/50'
                 }`}
               >
                 {c}
@@ -89,7 +89,7 @@ export default function ProductsPage() {
             {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-24 text-white/30">
+          <div className="text-center py-24 text-muted">
             <div className="flex justify-center mb-4">
               <svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1">
                 <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
@@ -106,7 +106,7 @@ export default function ProductsPage() {
             {filtered.map(p => (
               <div
                 key={p.id}
-                className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden hover:border-[#00B4FF]/40 hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] group"
+                className="bg-card border border-theme rounded-2xl overflow-hidden hover:border-[#00B4FF]/40 hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] group"
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
@@ -116,7 +116,7 @@ export default function ProductsPage() {
                     <CameraPlaceholder />
                   )}
                   {/* Category tag */}
-                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-[#00B4FF] text-xs px-2 py-1 rounded-full border border-[#00B4FF]/30">
+                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-accent text-xs px-2 py-1 rounded-full border border-[#00B4FF]/30">
                     {p.category}
                   </span>
                   {/* Stock badge */}
@@ -134,13 +134,13 @@ export default function ProductsPage() {
                 {/* Info */}
                 <div className="p-5">
                   <h3 className="text-white font-bold text-lg mb-1 leading-tight">{p.name}</h3>
-                  <p className="text-white/40 text-xs font-mono mb-2">{p.brand} · {p.model}</p>
+                  <p className="text-secondary text-xs font-mono mb-2">{p.brand} · {p.model}</p>
                   {p.description && (
                     <p className="text-white/50 text-sm mb-4 line-clamp-2">{p.description}</p>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-[#00B4FF] text-2xl font-bold">{formatUGX(p.price)}</span>
-                    <span className="text-white/30 text-xs">{p.stockQuantity} units</span>
+                    <span className="text-accent text-2xl font-bold">{formatUGX(p.price)}</span>
+                    <span className="text-muted text-xs">{p.stockQuantity} units</span>
                   </div>
                 </div>
               </div>

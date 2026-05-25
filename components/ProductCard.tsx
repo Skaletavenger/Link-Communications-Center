@@ -1,6 +1,7 @@
 'use client';
 import { Product } from '../types';
 import { motion } from 'framer-motion';
+import { formatUGX } from '../lib/useInventory';
 
 const cardVariants = {
   hidden: { opacity: 0, y: 24 },
@@ -20,13 +21,13 @@ export default function ProductCard({ product }: { product: Product }) {
       exit="exit"
       whileHover={{ y: -6, scale: 1.02, boxShadow: '0 28px 60px rgba(0, 180, 255, 0.16)' }}
       transition={{ duration: 0.45, ease: 'easeOut' }}
-      className="overflow-hidden rounded-3xl border border-white/10 bg-white/5 backdrop-blur-xl"
+      className="overflow-hidden rounded-3xl border border-theme bg-card backdrop-blur-xl"
     >
-      <div className="h-64 overflow-hidden bg-white/5">
+      <div className="h-64 overflow-hidden bg-card">
         {product.image ? (
           <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-[#131c32] text-white/60">
+          <div className="flex h-full w-full items-center justify-center bg-[#131c32] text-secondary">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
               <rect x="4" y="8" width="16" height="12" rx="2" />
               <path d="M8 8V6a4 4 0 018 0v2" />
@@ -39,16 +40,16 @@ export default function ProductCard({ product }: { product: Product }) {
       <div className="space-y-3 p-5">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <h3 className="text-xl font-semibold text-white">{product.name}</h3>
-            <p className="text-sm text-white/60">{product.brand}</p>
+            <h3 className="text-xl font-semibold text-primary">{product.name}</h3>
+            <p className="text-sm text-secondary">{product.brand}</p>
           </div>
           <span className={`inline-flex rounded-full border px-3 py-1 text-xs font-semibold ${badgeClass}`}>{status}</span>
         </div>
 
-        <p className="text-sm text-white/60">{product.model}</p>
-        <div className="flex items-center justify-between gap-3 text-sm text-white/70">
-          <span className="font-semibold text-[#00B4FF]">${product.price}</span>
-          <span className="rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-[0.16em] text-white/70">{product.category}</span>
+        <p className="text-sm text-secondary">{product.model}</p>
+        <div className="flex items-center justify-between gap-3 text-sm text-secondary">
+          <span className="font-semibold text-accent">{formatUGX(product.price)}</span>
+          <span className="rounded-full bg-card px-3 py-1 text-xs uppercase tracking-[0.16em] text-secondary">{product.category}</span>
         </div>
       </div>
     </motion.article>

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { usePathname } from 'next/navigation';
+import ThemeToggle from './ThemeToggle';
 
 const navItems = [
   { href: '/products', label: 'Products' },
@@ -13,16 +14,16 @@ const navItems = [
 export default function Navbar() {
   const path = usePathname();
   return (
-    <nav className="container mx-auto px-6 py-4 flex justify-between items-center">
+    <nav className="container mx-auto px-6 py-4 flex justify-between items-center" style={{ background: 'var(--nav-bg)', borderBottom: '1px solid var(--border-color)' }}>
       <Link href="/" className="flex items-center gap-3">
-        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded-full bg-white/5 p-2">
+        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded-full bg-card p-2">
           <circle cx="50" cy="50" r="40" stroke="#00b4ff" strokeWidth="6">
             <animate attributeName="r" from="36" to="40" dur="2s" repeatCount="indefinite" />
           </circle>
         </svg>
-        <span className="font-bold">Link Communications</span>
+        <span className="font-bold text-primary">Link Communications</span>
       </Link>
-      <div className="flex gap-4">
+      <div className="flex gap-4 items-center">
         {navItems.map((item) => {
           const active = path === item.href;
           return (
@@ -36,7 +37,7 @@ export default function Navbar() {
                 initial={{ scaleX: 0 }}
                 whileHover={{ scaleX: 1 }}
                 transition={{ duration: 0.25, ease: 'easeOut' }}
-                className="absolute left-0 bottom-0 h-[2px] w-full origin-left bg-[#00B4FF]"
+                className="absolute left-0 bottom-0 h-[2px] w-full origin-left bg-accent"
               />
             </Link>
           );

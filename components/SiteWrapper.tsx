@@ -21,13 +21,14 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
       <div className="min-h-screen flex flex-col">
-        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left bg-[#00B4FF] z-50" style={{ scaleX }} />
+        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left z-50" style={{ scaleX, background: 'var(--accent)' }} />
         <Navbar />
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div
               key="loader"
-              className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/95"
+              className="fixed inset-0 z-50 flex items-center justify-center"
+              style={{ background: 'var(--overlay)' }}
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -40,7 +41,7 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
                     <LottieLoader src="/animations/loader-spinning-shield.json" className="w-24 h-24" />
                   </div>
                 </div>
-                <p className="text-white text-sm uppercase tracking-[0.25em]">Loading Link Communications</p>
+                <p className="text-primary text-sm uppercase tracking-[0.25em]">Loading Link Communications</p>
               </div>
             </motion.div>
           ) : (
