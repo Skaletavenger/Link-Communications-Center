@@ -79,10 +79,10 @@ export default function DashboardLoginPage() {
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-primary px-6 py-10 text-primary">
+    <main className="relative min-h-screen overflow-hidden bg-[#f0f4ff] dark:bg-[#0a0f1e] px-6 py-10 text-gray-900 dark:text-white">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(0,180,255,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(155,92,255,0.14),transparent_35%)]" />
       <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col items-center justify-center text-center">
-        <div className="mb-8 space-y-3 text-secondary">
+        <div className="mb-8 space-y-3 text-gray-500 dark:text-gray-300">
           <p className="text-sm uppercase tracking-[0.35em] text-[#73d5ff]">Link Communications Center</p>
           <h1 className="text-4xl font-semibold tracking-tight">Admin Access</h1>
         </div>
@@ -94,7 +94,7 @@ export default function DashboardLoginPage() {
           className="relative w-full max-w-[420px]"
         >
           <div className="absolute inset-0 rounded-[24px] bg-gradient-to-r from-[#00B4FF] via-[#9B5CFF] to-[#00B4FF] opacity-80 blur-2xl animate-spin-slow" />
-          <div className="relative overflow-hidden rounded-[24px] border border-theme bg-card px-8 py-12 backdrop-blur-xl shadow-2xl shadow-sky-500/10">
+          <div className="relative overflow-hidden rounded-[24px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-8 py-12 backdrop-blur-xl shadow-2xl shadow-sky-500/10">
             <div className="mb-8 flex items-center justify-center">
               <motion.div
                 initial={{ rotate: 0, y: 0 }}
@@ -121,7 +121,7 @@ export default function DashboardLoginPage() {
 
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="space-y-3 text-left">
-                <label htmlFor="access-code" className="block text-sm uppercase tracking-[0.24em] text-accent">
+                <label htmlFor="access-code" className="block text-sm uppercase tracking-[0.24em] text-gray-700 dark:text-white/60">
                   Access Code
                 </label>
                 <div className="relative">
@@ -130,7 +130,7 @@ export default function DashboardLoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-theme bg-card px-4 py-4 text-primary outline-none transition focus:border-[#00b4ff] focus:ring-4 focus:ring-[#00b4ff]/20"
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-gray-900 dark:text-white outline-none transition focus:border-[#00b4ff] focus:ring-4 focus:ring-[#00b4ff]/20 placeholder-gray-400 dark:placeholder-white/30"
                     placeholder="Enter access code"
                     autoComplete="current-password"
                   />

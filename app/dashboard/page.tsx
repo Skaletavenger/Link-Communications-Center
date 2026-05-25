@@ -197,7 +197,7 @@ export default function DashboardPage() {
   const outStock = products.filter(p => p.stockQuantity === 0).length
 
   return (
-    <div className="min-h-screen bg-primary text-primary">
+    <div className="min-h-screen bg-[#f0f4ff] dark:bg-[#0a0f1e] text-gray-900 dark:text-white">
       {/* Warning Banner */}
       {showWarning && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-center py-3 font-bold text-sm cursor-pointer" onClick={resetTimer}>
@@ -213,11 +213,11 @@ export default function DashboardPage() {
       )}
 
       {/* Header */}
-      <div className="border-b border-theme backdrop-blur-md sticky top-0 z-40" style={{ background: 'var(--nav-bg)' }}>
+      <div className="border-b border-gray-200 dark:border-white/10 backdrop-blur-md sticky top-0 z-40 bg-white/90 dark:bg-[#0d1428]/80">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-primary">Inventory Dashboard</h1>
-            <p className="text-sm text-secondary">Link Communications Center — Admin</p>
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Inventory Dashboard</h1>
+            <p className="text-sm text-gray-500 dark:text-white/60">Link Communications Center — Admin</p>
           </div>
           <div className="flex gap-3 items-center">
             <button
@@ -247,8 +247,8 @@ export default function DashboardPage() {
             { label: 'Low Stock', value: lowStock, color: '#FFB800' },
             { label: 'Out of Stock', value: outStock, color: '#FF4444' },
           ].map(stat => (
-            <div key={stat.label} className="bg-card border border-theme rounded-xl p-4 backdrop-blur-sm">
-              <p className="text-secondary text-sm mb-1">{stat.label}</p>
+            <div key={stat.label} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 shadow-sm dark:shadow-none">
+              <p className="text-gray-500 dark:text-white/50 text-sm mb-1">{stat.label}</p>
               <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
             </div>
           ))}

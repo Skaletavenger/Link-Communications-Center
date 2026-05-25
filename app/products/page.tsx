@@ -67,13 +67,13 @@ export default function ProductsPage() {
   })
 
   return (
-    <div className="min-h-screen bg-primary text-primary pt-24 pb-16 px-6">
+    <div className="min-h-screen bg-[#f0f4ff] dark:bg-[#0a0f1e] text-gray-900 dark:text-white pt-24 pb-16 px-6">
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}
         <div className="mb-10">
-          <h1 className="text-4xl font-bold text-primary mb-2">Our Products</h1>
-          <p className="text-secondary">Browse our range of surveillance and communications equipment</p>
+          <h1 className="text-4xl font-bold text-gray-900 dark:text-white mb-2">Our Products</h1>
+          <p className="text-gray-500 dark:text-gray-300">Browse our range of surveillance and communications equipment</p>
         </div>
 
         {/* Search + Filter */}
@@ -125,7 +125,7 @@ export default function ProductsPage() {
               <div
                 key={p.id}
                 onClick={() => setSelected(p)}
-                className="cursor-pointer bg-card border border-theme rounded-2xl overflow-hidden hover:border-[#00B4FF]/40 hover:bg-white/8 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] group"
+                className="cursor-pointer bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-[#00B4FF]/40 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] transition-all duration-300 hover:-translate-y-1 group"
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
@@ -152,10 +152,10 @@ export default function ProductsPage() {
 
                 {/* Info */}
                 <div className="p-5">
-                  <h3 className="text-white font-bold text-lg mb-1 leading-tight">{p.name}</h3>
-                  <p className="text-secondary text-xs font-mono mb-2">{p.brand} · {p.model}</p>
+                  <h3 className="text-gray-900 dark:text-white font-bold text-lg mb-1 leading-tight">{p.name}</h3>
+                  <p className="text-gray-500 dark:text-gray-400 text-xs font-mono mb-2">{p.brand} · {p.model}</p>
                   {p.description && (
-                    <p className="text-white/50 text-sm mb-4 line-clamp-2">{p.description}</p>
+                    <p className="text-gray-600 dark:text-white/50 text-sm mb-4 line-clamp-2">{p.description}</p>
                   )}
                   <div className="flex items-center justify-between">
                     <span className="text-accent text-2xl font-bold">{formatUGX(p.price)}</span>
@@ -176,8 +176,7 @@ export default function ProductsPage() {
           />
 
           <div
-            className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl animate-slide-up"
-            style={{ background: 'var(--bg-secondary)' }}
+            className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl animate-slide-up bg-white dark:bg-[#0d1428]"
           >
             <div className="flex justify-center pt-4 pb-2">
               <div className="w-12 h-1.5 rounded-full bg-white/20" />
@@ -187,17 +186,13 @@ export default function ProductsPage() {
               <div className="flex justify-end mb-4">
                 <button
                   onClick={() => setSelected(null)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:bg-white/10"
-                  style={{ color: 'var(--text-secondary)' }}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:bg-white/10 text-gray-500 dark:text-white"
                 >
                   ✕
                 </button>
               </div>
 
-              <div
-                className="w-full rounded-2xl overflow-hidden mb-6 border"
-                style={{ borderColor: 'var(--border-color)' }}
-              >
+              <div className="w-full rounded-2xl overflow-hidden mb-6 border border-gray-200 dark:border-white/10">
                 {selected.image ? (
                   <img
                     src={selected.image}
@@ -205,10 +200,7 @@ export default function ProductsPage() {
                     className="w-full max-h-80 object-cover"
                   />
                 ) : (
-                  <div
-                    className="w-full h-64 flex items-center justify-center"
-                    style={{ background: 'var(--bg-card)' }}
-                  >
+                  <div className="w-full h-64 flex items-center justify-center bg-white dark:bg-white/5">
                     <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1" opacity="0.4">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                       <circle cx="12" cy="13" r="4"/>
@@ -219,7 +211,7 @@ export default function ProductsPage() {
 
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                  <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
                     {selected.name}
                   </h2>
                   <span className={`px-3 py-1 rounded-full text-sm font-bold border ${
@@ -238,70 +230,37 @@ export default function ProductsPage() {
                 </div>
 
                 <div className="flex flex-wrap gap-3">
-                  <span
-                    className="px-3 py-1 rounded-full text-sm border"
-                    style={{
-                      background: 'var(--bg-card)',
-                      borderColor: 'var(--border-color)',
-                      color: 'var(--text-secondary)'
-                    }}
-                  >
+                  <span className="px-3 py-1 rounded-full text-sm border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-300">
                     🏷️ {selected.brand}
                   </span>
                   {selected.model && (
-                    <span
-                      className="px-3 py-1 rounded-full text-sm border font-mono"
-                      style={{
-                        background: 'var(--bg-card)',
-                        borderColor: 'var(--border-color)',
-                        color: 'var(--text-secondary)'
-                      }}
-                    >
+                    <span className="px-3 py-1 rounded-full text-sm border font-mono bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-gray-500 dark:text-gray-300">
                       📋 {selected.model}
                     </span>
                   )}
-                  <span
-                    className="px-3 py-1 rounded-full text-sm border"
-                    style={{
-                      background: 'var(--bg-card)',
-                      borderColor: 'var(--border-color)',
-                      color: 'var(--accent)'
-                    }}
-                  >
+                  <span className="px-3 py-1 rounded-full text-sm border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-[#00B4FF]">
                     📂 {selected.category}
                   </span>
                 </div>
 
-                <div
-                  className="py-4 px-5 rounded-2xl border"
-                  style={{
-                    background: 'var(--bg-card)',
-                    borderColor: 'var(--border-color)'
-                  }}
-                >
-                  <p className="text-sm mb-1" style={{ color: 'var(--text-muted)' }}>
+                <div className="py-4 px-5 rounded-2xl border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10">
+                  <p className="text-sm mb-1 text-gray-600 dark:text-white/60">
                     Price
                   </p>
-                  <p className="text-3xl font-bold" style={{ color: 'var(--accent)' }}>
+                  <p className="text-3xl font-bold text-[#00B4FF]">
                     UGX {selected.price.toLocaleString()}
                   </p>
-                  <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                  <p className="text-sm mt-1 text-gray-600 dark:text-white/60">
                     {selected.stockQuantity} units available
                   </p>
                 </div>
 
                 {selected.description && (
-                  <div
-                    className="py-4 px-5 rounded-2xl border"
-                    style={{
-                      background: 'var(--bg-card)',
-                      borderColor: 'var(--border-color)'
-                    }}
-                  >
-                    <p className="text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>
+                  <div className="py-4 px-5 rounded-2xl border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10">
+                    <p className="text-sm font-bold mb-2 text-gray-500 dark:text-gray-300">
                       Description
                     </p>
-                    <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>
+                    <p className="leading-relaxed text-gray-900 dark:text-white">
                       {selected.description}
                     </p>
                   </div>
@@ -309,11 +268,7 @@ export default function ProductsPage() {
 
                 <button
                   onClick={() => setSelected(null)}
-                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
-                  style={{
-                    background: 'var(--accent)',
-                    color: '#000000'
-                  }}
+                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4 bg-[#00B4FF] text-black"
                 >
                   Done
                 </button>

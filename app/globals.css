@@ -2,137 +2,102 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --bg-primary: #0a0f1e;
-  --bg-secondary: #0d1428;
-  --bg-card: rgba(255, 255, 255, 0.05);
-  --border-color: rgba(255, 255, 255, 0.10);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.60);
-  --text-muted: rgba(255, 255, 255, 0.30);
-  --accent: #00B4FF;
-  --accent-hover: #00d4ff;
-  --nav-bg: rgba(13, 20, 40, 0.80);
-  --overlay: rgba(10, 22, 40, 0.95);
+html {
+  color-scheme: light dark;
 }
 
-:root[data-theme="light"] {
-  --bg-primary: #f0f4ff;
-  --bg-secondary: #ffffff;
-  --bg-card: rgba(255, 255, 255, 0.90);
-  --border-color: rgba(0, 100, 200, 0.15);
-  --text-primary: #0a1628;
-  --text-secondary: rgba(10, 22, 40, 0.65);
-  --text-muted: rgba(10, 22, 40, 0.40);
-  --accent: #0077cc;
-  --accent-hover: #0066bb;
-  --nav-bg: rgba(255, 255, 255, 0.90);
-  --overlay: rgba(255, 255, 255, 0.95);
-}
-
-html,body,#root {
-  height: 100%;
+html, body, #root {
+  min-height: 100%;
 }
 
 body {
-  background-color: var(--bg-primary);
-  color: var(--text-primary);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  @apply bg-white text-gray-900 antialiased;
 }
 
-.bg-primary { background: var(--bg-primary); }
-.bg-secondary { background: var(--bg-secondary); }
-.bg-card { background: var(--bg-card); }
-.nav-bg { background: var(--nav-bg); }
-.border-theme { border-color: var(--border-color); }
-.text-primary { color: var(--text-primary); }
-.text-secondary { color: var(--text-secondary); }
-.text-muted { color: var(--text-muted); }
-.text-accent { color: var(--accent); }
-.bg-accent { background: var(--accent); }
-.overlay-bg { background: var(--overlay); }
-.input-bg { background: var(--bg-card); }
-.input-border { border-color: var(--border-color); }
-.table-row-alt { background: rgba(255, 255, 255, 0.04); }
-
-.glass {
-  background: rgba(255,255,255,0.03);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
+.dark body {
+  @apply bg-[#0a0f1e] text-white;
 }
 
-.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-electric text-navy font-semibold transition-shadow duration-300; }
-.btn:hover { box-shadow: 0 0 0 8px rgba(0,180,255,0.15); }
+.bg-primary {
+  @apply bg-white dark:bg-[#0a0f1e];
+}
+
+.bg-secondary {
+  @apply bg-white dark:bg-[#0d1428];
+}
+
+.bg-card {
+  @apply bg-white dark:bg-white/5;
+}
+
+.nav-bg {
+  @apply bg-white/90 dark:bg-[#0d1428]/80;
+}
+
+.border-theme {
+  @apply border-gray-200 dark:border-white/10;
+}
+
+.text-primary {
+  @apply text-gray-900 dark:text-white;
+}
+
+.text-secondary {
+  @apply text-gray-500 dark:text-gray-300;
+}
+
+.text-muted {
+  @apply text-gray-600 dark:text-white/60;
+}
+
+.text-accent {
+  @apply text-[#00B4FF];
+}
+
+.bg-accent {
+  @apply bg-[#00B4FF];
+}
+
+.overlay-bg {
+  @apply bg-black/70;
+}
+
+.input-bg {
+  @apply bg-white dark:bg-white/5;
+}
+
+.input-border {
+  @apply border-gray-200 dark:border-white/10;
+}
 
 input,
 textarea,
 select {
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  transition: all 0.2s ease-in-out;
+  @apply bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-white/30 transition-all;
 }
 
 input::placeholder,
 textarea::placeholder,
 select::placeholder {
-  color: var(--text-secondary);
+  @apply text-gray-400 dark:text-white/30;
 }
 
 input:focus,
 textarea:focus,
 select:focus {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: 0 0 0 4px rgba(0,180,255,0.24);
+  @apply outline-none border-[#00B4FF] ring-4 ring-[#00B4FF]/20;
 }
 
 input:focus {
   width: min(100%, 320px);
 }
 
-@keyframes spin-slow {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.btn {
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#00B4FF] text-[#0b1226] font-semibold transition-shadow duration-300;
 }
 
-.animate-spin-slow {
-  animation: spin-slow 12s linear infinite;
-}
-
-.glass {
-  background: rgba(255,255,255,0.03);
-  -webkit-backdrop-filter: blur(6px);
-  backdrop-filter: blur(6px);
-}
-
-.btn { @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-electric text-navy font-semibold transition-shadow duration-300; }
-.btn:hover { box-shadow: 0 0 0 8px rgba(0,180,255,0.15); }
-
-input,
-textarea,
-select {
-  border: 1px solid var(--border-color);
-  background: var(--bg-card);
-  color: var(--text-primary);
-  transition: all 0.2s ease-out;
-}
-
-input:focus,
-textarea:focus,
-select:focus {
-  outline: none;
-  border-color: #00b4ff;
-  box-shadow: 0 0 0 4px rgba(0,180,255,0.24);
-}
-
-input:focus {
-  width: min(100%, 320px);
+.btn:hover {
+  @apply shadow-[0_0_0_8px_rgba(0,180,255,0.15)];
 }
 
 @keyframes spin-slow {

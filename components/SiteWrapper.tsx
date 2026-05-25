@@ -21,14 +21,13 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
       <div className="min-h-screen flex flex-col">
-        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left z-50" style={{ scaleX, background: 'var(--accent)' }} />
+        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left z-50 bg-[#00B4FF]" style={{ scaleX }} />
         <Navbar />
         <AnimatePresence mode="wait">
           {loading ? (
             <motion.div
               key="loader"
-              className="fixed inset-0 z-50 flex items-center justify-center"
-              style={{ background: 'var(--overlay)' }}
+              className="fixed inset-0 z-50 flex items-center justify-center bg-black/70"
               initial={{ opacity: 1 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}

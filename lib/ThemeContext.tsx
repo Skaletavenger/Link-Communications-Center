@@ -12,17 +12,25 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [theme, setTheme] = useState<Theme>('dark')
 
   useEffect(() => {
-    const saved = localStorage.getItem('lcc_theme') as Theme
-    const initialTheme = saved === 'light' ? 'light' : 'dark'
-    setTheme(initialTheme)
-    document.documentElement.setAttribute('data-theme', initialTheme)
+    const saved = localStorage.getItem('lcc_theme')
+    if (saved === 'dark' || !saved) {
+      document.documentElement.classList.add('dark')
+      setTheme('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+      setTheme('light')
+    }
   }, [])
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
+    if (next === 'dark') {
+      document.documentElement.classList.add('dark')
+    } else {
+      document.documentElement.classList.remove('dark')
+    }
     localStorage.setItem('lcc_theme', next)
-    document.documentElement.setAttribute('data-theme', next)
+    setTheme(next)
   }
 
   return (

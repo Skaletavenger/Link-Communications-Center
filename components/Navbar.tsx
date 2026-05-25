@@ -14,14 +14,19 @@ const navItems = [
 export default function Navbar() {
   const path = usePathname();
   return (
-    <nav className="container mx-auto px-6 py-4 flex justify-between items-center" style={{ background: 'var(--nav-bg)', borderBottom: '1px solid var(--border-color)' }}>
+    <nav className="container mx-auto px-6 py-4 flex justify-between items-center bg-white/90 dark:bg-[#0d1428]/80 border-b border-gray-200 dark:border-white/10 backdrop-blur-md">
       <Link href="/" className="flex items-center gap-3">
-        <svg width="40" height="40" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" className="rounded-full bg-card p-2">
-          <circle cx="50" cy="50" r="40" stroke="#00b4ff" strokeWidth="6">
-            <animate attributeName="r" from="36" to="40" dur="2s" repeatCount="indefinite" />
-          </circle>
-        </svg>
-        <span className="font-bold text-primary">Link Communications</span>
+        <div className="flex items-center justify-center w-11 h-11 bg-[#1d70b8] dark:bg-white rounded-[12px] shadow-sm shrink-0 transition-colors duration-300">
+          <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-white dark:text-[#1d70b8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M10 5l-3 7h5l-3 7" strokeWidth="2" fill="currentColor" />
+            <path d="M7 14c2.5-1.5 5.5-1.5 8 0" />
+            <path d="M5 17c4-2.5 8-2.5 12 0" />
+          </svg>
+        </div>
+        <div className="flex flex-col justify-center leading-none">
+          <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tighter font-mono transition-colors duration-300">link</span>
+          <span className="text-[9px] font-bold text-gray-600 dark:text-gray-300 tracking-[0.12em] uppercase mt-0.5 transition-colors duration-300">Communications Center</span>
+        </div>
       </Link>
       <div className="flex gap-4 items-center">
         {navItems.map((item) => {
@@ -30,7 +35,7 @@ export default function Navbar() {
             <Link
               key={item.href}
               href={item.href}
-              className={`relative px-3 py-1 rounded-md transition-colors duration-150 ${active ? 'bg-electric text-navy' : 'text-muted hover:text-white hover:bg-white/5'}`}
+              className={`relative px-3 py-1 rounded-md transition-colors duration-150 ${active ? 'bg-electric text-navy' : 'text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white hover:bg-white/90 dark:hover:bg-white/5'}`}
             >
               {item.label}
               <motion.span
@@ -43,6 +48,7 @@ export default function Navbar() {
           );
         })}
       </div>
+      <ThemeToggle />
     </nav>
   );
 }
