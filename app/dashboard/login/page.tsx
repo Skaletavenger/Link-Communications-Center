@@ -54,6 +54,7 @@ export default function DashboardLoginPage() {
     if (password === CORRECT_PASSWORD) {
       if (typeof window !== 'undefined') {
         sessionStorage.setItem(AUTH_KEY, 'true');
+        sessionStorage.setItem('lcc_last_active', Date.now().toString());
       }
       setError('');
       setSuccess(true);

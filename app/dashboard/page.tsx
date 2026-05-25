@@ -1,9 +1,10 @@
 'use client'
-import { useState, useEffect, useRef, type ChangeEvent } from 'react'
+import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
 import { useInventory, Product } from '../../lib/useInventory'
 
 const CATEGORIES = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
+const TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
 
 function CameraIcon() {
   return (
@@ -50,25 +51,69 @@ export default function DashboardPage() {
   const [imgPreview, setImgPreview] = useState('')
   const [toast, setToast] = useState('')
   const fileRef = useRef<HTMLInputElement>(null)
+  const [authed, setAuthed] = useState(false)
+  const [showWarning, setShowWarning] = useState(false)
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const warningRef = useRef<NodeJS.Timeout | null>(null)
 
-  // Auth check
-  useEffect(() => {
+  const logout = useCallback(() => {
     if (typeof window !== 'undefined') {
-      const auth = sessionStorage.getItem('lcc_admin_auth')
-      if (auth !== 'true') {
-        router.replace('/dashboard/login')
-      }
+      sessionStorage.removeItem('lcc_admin_auth')
+      sessionStorage.removeItem('lcc_last_active')
     }
+    router.replace('/dashboard/login')
   }, [router])
 
-  // Clear session on unmount (leaving dashboard)
+  const resetTimer = useCallback(() => {
+    if (typeof window === 'undefined') return
+    // Update last active timestamp
+    sessionStorage.setItem('lcc_last_active', Date.now().toString())
+    // Clear existing timers
+    if (timerRef.current) clearTimeout(timerRef.current)
+    if (warningRef.current) clearTimeout(warningRef.current)
+    // Hide warning when user is active
+    setShowWarning(false)
+    // Set new 15 min timer
+    timerRef.current = setTimeout(() => {
+      logout()
+    }, TIMEOUT_MS)
+    // Set warning timer for 13 minutes
+    warningRef.current = setTimeout(() => {
+      setShowWarning(true)
+    }, 13 * 60 * 1000)
+  }, [logout])
+
   useEffect(() => {
-    return () => {
-      if (typeof window !== 'undefined') {
-        sessionStorage.removeItem('lcc_admin_auth')
+    if (typeof window === 'undefined') return
+    // Check auth ONCE on mount
+    const auth = sessionStorage.getItem('lcc_admin_auth')
+    if (auth !== 'true') {
+      router.replace('/dashboard/login')
+      return
+    }
+    // Check if session already expired (tab was left open)
+    const lastActive = sessionStorage.getItem('lcc_last_active')
+    if (lastActive) {
+      const elapsed = Date.now() - parseInt(lastActive)
+      if (elapsed > TIMEOUT_MS) {
+        logout()
+        return
       }
     }
-  }, [])
+    // Auth is valid - show dashboard
+    setAuthed(true)
+    // Start inactivity timer
+    resetTimer()
+    // Listen for any user activity to reset the timer
+    const events = ['mousedown', 'mousemove', 'keydown', 'scroll', 'touchstart', 'click']
+    events.forEach(e => window.addEventListener(e, resetTimer))
+    return () => {
+      // Cleanup on unmount
+      if (timerRef.current) clearTimeout(timerRef.current)
+      if (warningRef.current) clearTimeout(warningRef.current)
+      events.forEach(e => window.removeEventListener(e, resetTimer))
+    }
+  }, [router, logout, resetTimer])
 
   const showToast = (msg: string) => {
     setToast(msg)
@@ -76,8 +121,11 @@ export default function DashboardPage() {
   }
 
   const handleLogout = () => {
-    sessionStorage.removeItem('lcc_admin_auth')
-    router.push('/dashboard/login')
+    if (typeof window !== 'undefined') {
+      sessionStorage.removeItem('lcc_admin_auth')
+      sessionStorage.removeItem('lcc_last_active')
+    }
+    router.replace('/dashboard/login')
   }
 
   const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -130,6 +178,8 @@ export default function DashboardPage() {
     }
   }
 
+  if (!authed) return <Skeleton />
+
   if (!loaded) return <Skeleton />
 
   const filtered = products.filter(p => {
@@ -147,6 +197,13 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0f1e] text-white">
+      {/* Warning Banner */}
+      {showWarning && (
+        <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-center py-3 font-bold text-sm cursor-pointer" onClick={resetTimer}>
+          ⚠️ Session expiring in 2 minutes due to inactivity. Click anywhere to stay logged in.
+        </div>
+      )}
+
       {/* Toast */}
       {toast && (
         <div className="fixed top-6 right-6 z-50 bg-[#00B4FF] text-black font-bold px-6 py-3 rounded-xl shadow-2xl animate-bounce">
