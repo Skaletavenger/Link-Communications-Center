@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Product } from '../../lib/useInventory'
+import { Product, formatUGX } from '../../lib/useInventory'
 
 const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
 
@@ -139,7 +139,7 @@ export default function ProductsPage() {
                     <p className="text-white/50 text-sm mb-4 line-clamp-2">{p.description}</p>
                   )}
                   <div className="flex items-center justify-between">
-                    <span className="text-[#00B4FF] text-2xl font-bold">${p.price}</span>
+                    <span className="text-[#00B4FF] text-2xl font-bold">{formatUGX(p.price)}</span>
                     <span className="text-white/30 text-xs">{p.stockQuantity} units</span>
                   </div>
                 </div>

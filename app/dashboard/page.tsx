@@ -1,7 +1,7 @@
 'use client'
 import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useInventory, Product } from '../../lib/useInventory'
+import { useInventory, Product, formatUGX } from '../../lib/useInventory'
 
 const CATEGORIES = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
 const TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
@@ -298,12 +298,12 @@ export default function DashboardPage() {
               </div>
               {/* Price */}
               <div>
-                <label className="text-white/60 text-sm mb-1 block">Price (USD) *</label>
+                <label className="text-white/60 text-sm mb-1 block">Price (UGX) *</label>
                 <input
                   type="number" min="0"
                   className="w-full bg-white/5 border border-white/10 rounded-lg px-4 py-2 text-white focus:outline-none focus:border-[#00B4FF] transition-all"
                   value={form.price || ''} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))}
-                  placeholder="0"
+                  placeholder="e.g. 320000"
                 />
               </div>
               {/* Stock */}
@@ -443,7 +443,7 @@ export default function DashboardPage() {
                 {/* Category */}
                 <span className="text-white/60 text-xs bg-white/10 px-2 py-1 rounded-full w-fit">{p.category}</span>
                 {/* Price */}
-                <span className="text-[#00B4FF] font-bold text-sm">${p.price}</span>
+                <span className="text-[#00B4FF] font-bold text-sm">{formatUGX(p.price)}</span>
                 {/* Stock */}
                 <span className="text-white/80 text-sm font-mono">{p.stockQuantity}</span>
                 {/* Status */}
