@@ -306,53 +306,68 @@ export default function ProductsPage() {
               </div>
 
               {(() => {
-                const allImages =
-                  selected.images?.filter((i) => i) ||
-                  (selected.image ? [selected.image] : [])
+                const allImages = [
+                  ...(selected.images?.filter((i) => i && i.length > 0) || []),
+                ]
+                if (selected.image && !allImages.includes(selected.image)) {
+                  allImages.unshift(selected.image)
+                }
+
+                const safeIndex = Math.min(slideIndex, Math.max(allImages.length - 1, 0))
 
                 return allImages.length > 0 ? (
-                  <div className="relative w-full rounded-2xl overflow-hidden mb-6 border border-gray-200 dark:border-white/10">
-                    <div className="relative">
+                  <div className="relative w-full rounded-2xl overflow-hidden mb-6 border border-theme">
+                    <div className="relative w-full h-[320px]">
                       <img
-                        src={allImages[slideIndex] || allImages[0]}
-                        alt={`${selected.name} view ${slideIndex + 1}`}
-                        className="w-full max-h-80 object-cover transition-opacity duration-300"
+                        key={safeIndex}
+                        src={allImages[safeIndex]}
+                        alt={`${selected.name} view ${safeIndex + 1}`}
+                        className="w-full h-full object-contain transition-opacity duration-300 bg-card"
                       />
 
                       {allImages.length > 1 && (
-                        <>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSlideIndex((i) => (i === 0 ? allImages.length - 1 : i - 1))
-                            }
-                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm bg-black/40 text-white text-lg hover:bg-black/60 transition-all"
-                          >
-                            ‹
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              setSlideIndex((i) => (i === allImages.length - 1 ? 0 : i + 1))
-                            }
-                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm bg-black/40 text-white text-lg hover:bg-black/60 transition-all"
-                          >
-                            ›
-                          </button>
-                        </>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSlideIndex((i) => (i === 0 ? allImages.length - 1 : i - 1))
+                          }
+                          className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-black/50 text-white text-2xl hover:bg-black/70 transition-all backdrop-blur-sm z-10"
+                        >
+                          ‹
+                        </button>
+                      )}
+
+                      {allImages.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setSlideIndex((i) => (i === allImages.length - 1 ? 0 : i + 1))
+                          }
+                          className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full flex items-center justify-center bg-black/50 text-white text-2xl hover:bg-black/70 transition-all backdrop-blur-sm z-10"
+                        >
+                          ›
+                        </button>
+                      )}
+
+                      {allImages.length > 1 && (
+                        <div className="absolute top-3 right-3 bg-black/50 backdrop-blur-sm text-white text-xs px-2 py-1 rounded-full">
+                          {safeIndex + 1} / {allImages.length}
+                        </div>
                       )}
                     </div>
 
                     {allImages.length > 1 && (
-                      <div className="flex gap-2 p-3 bg-card">
+                      <div className="flex gap-2 p-3 overflow-x-auto bg-secondary">
                         {allImages.map((img, i) => (
                           <button
                             key={i}
                             type="button"
                             onClick={() => setSlideIndex(i)}
-                            className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
-                              slideIndex === i ? 'border-[#1574B5]' : 'border-transparent'
-                            }`}
+                            className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all"
+                            style={{
+                              borderColor: safeIndex === i ? '#1574B5' : 'transparent',
+                              opacity: safeIndex === i ? 1 : 0.6
+                            }}
                           >
                             <img
                               src={img}
@@ -361,21 +376,11 @@ export default function ProductsPage() {
                             />
                           </button>
                         ))}
-                        <div className="flex items-center gap-1 ml-auto">
-                          {allImages.map((_, i) => (
-                            <div
-                              key={i}
-                              className={`w-1.5 h-1.5 rounded-full transition-all ${
-                                slideIndex === i ? 'bg-[#1574B5]' : 'bg-gray-300 dark:bg-white/20'
-                              }`}
-                            />
-                          ))}
-                        </div>
                       </div>
                     )}
                   </div>
                 ) : (
-                  <div className="w-full h-64 flex items-center justify-center rounded-2xl mb-6 border border-gray-200 dark:border-white/10 bg-card">
+                  <div className="w-full h-[320px] flex items-center justify-center rounded-2xl mb-6 border border-theme bg-card">
                     <svg
                       width="80"
                       height="80"
