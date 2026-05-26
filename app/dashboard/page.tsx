@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInventory'
 import ThemeToggle from '../../components/ThemeToggle'
@@ -37,7 +37,19 @@ function StockBadge({ qty }: { qty: number }) {
   return <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30">In Stock</span>
 }
 
-const emptyForm = { name: '', brand: '', model: '', category: 'Surveillance Cameras', price: 0, stockQuantity: 0, description: '', image: '' }
+const emptyForm: Omit<Product, 'id'> = {
+  name: '',
+  brand: '',
+  model: '',
+  category: 'Surveillance Cameras',
+  price: 0,
+  stockQuantity: 0,
+  description: '',
+  image: '',
+  images: []
+}
+
+const SLOT_LABELS = ['Front', 'Side', 'Back', 'Box', 'Other']
 
 export default function DashboardPage() {
   const router = useRouter()
@@ -47,9 +59,7 @@ export default function DashboardPage() {
   const [showForm, setShowForm] = useState(false)
   const [form, setForm] = useState<Omit<Product, 'id'>>(emptyForm)
   const [editId, setEditId] = useState<string | null>(null)
-  const [imgPreview, setImgPreview] = useState('')
   const [toast, setToast] = useState('')
-  const fileRef = useRef<HTMLInputElement>(null)
   const [authed, setAuthed] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
@@ -127,44 +137,42 @@ export default function DashboardPage() {
     router.replace('/dashboard/login')
   }
 
-  const handleImageFile = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-    if (!file) return
-    const reader = new FileReader()
-    reader.onload = (ev) => {
-      const b64 = ev.target?.result as string
-      setForm(f => ({ ...f, image: b64 }))
-      setImgPreview(b64)
-    }
-    reader.readAsDataURL(file)
-  }
-
-  const handleImageUrl = (url: string) => {
-    setForm(f => ({ ...f, image: url }))
-    setImgPreview(url)
-  }
-
   const handleSubmit = () => {
     if (!form.name || !form.brand || !form.price) {
       showToast('Please fill in Name, Brand, and Price')
       return
     }
+    const images = (form.images ?? []).filter((img) => Boolean(img?.trim()))
+    const payload: Omit<Product, 'id'> = {
+      ...form,
+      images,
+      image: images[0] || form.image || ''
+    }
     if (editId) {
-      updateProduct(editId, form)
+      updateProduct(editId, payload)
       showToast('Product updated!')
     } else {
-      addProduct(form)
+      addProduct(payload)
       showToast('Product added!')
     }
     setForm(emptyForm)
-    setImgPreview('')
     setEditId(null)
     setShowForm(false)
   }
 
   const handleEdit = (p: Product) => {
-    setForm({ name: p.name, brand: p.brand, model: p.model, category: p.category, price: p.price, stockQuantity: p.stockQuantity, description: p.description, image: p.image })
-    setImgPreview(p.image)
+    const images = p.images?.length ? [...p.images] : p.image ? [p.image] : []
+    setForm({
+      name: p.name,
+      brand: p.brand,
+      model: p.model,
+      category: p.category,
+      price: p.price,
+      stockQuantity: p.stockQuantity,
+      description: p.description,
+      image: p.image,
+      images
+    })
     setEditId(p.id)
     setShowForm(true)
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -219,7 +227,7 @@ export default function DashboardPage() {
           </div>
           <div className="flex gap-3 items-center">
             <button
-              onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); setImgPreview('') }}
+              onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm) }}
               className="px-4 py-2 bg-accent text-black font-bold rounded-lg hover:bg-[#1a86cc] transition-all"
             >
               {showForm ? '✕ Cancel' : '+ Add Product'}
@@ -326,35 +334,122 @@ export default function DashboardPage() {
                   placeholder="Brief product description..."
                 />
               </div>
-              {/* Image */}
+              {/* Multi-image upload */}
               <div className="md:col-span-2">
-                <label className="text-secondary text-sm mb-1 block">Product Image</label>
-                <div className="flex gap-4 items-start">
-                  <div className="flex-1 space-y-2">
-                    <input
-                      type="url"
-                      className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
-                      placeholder="Paste image URL..."
-                      onChange={e => handleImageUrl(e.target.value)}
-                    />
-                    <div className="text-center text-muted text-xs">— or —</div>
-                    <button
-                      onClick={() => fileRef.current?.click()}
-                      className="w-full border border-theme border-dashed rounded-lg py-2 text-secondary hover:border-[#1574B5] hover:text-[#1574B5] transition-all text-sm"
-                    >
-                      📁 Upload image file
-                    </button>
-                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleImageFile} />
-                  </div>
-                  {/* Preview */}
-                  <div className="w-28 h-28 rounded-xl border border-theme bg-card flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {imgPreview ? (
-                      <img src={imgPreview} alt="preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <CameraIcon />
-                    )}
-                  </div>
+                <label className="text-secondary text-sm font-medium mb-2 block">
+                  Product Images (up to 5)
+                </label>
+                <p className="text-muted text-xs mb-3">
+                  Add front view, side view, back view, box view etc. First image is the main display image.
+                </p>
+
+                <div className="grid grid-cols-5 gap-3 mb-3">
+                  {[0, 1, 2, 3, 4].map((index) => (
+                    <div key={index} className="relative">
+                      <div
+                        className={`w-full aspect-square rounded-xl border-2 border-dashed overflow-hidden cursor-pointer flex items-center justify-center hover:border-[#1574B5] transition-all bg-card ${
+                          form.images?.[index] ? 'border-[#1574B5]' : 'border-theme'
+                        }`}
+                        onClick={() => {
+                          const input = document.getElementById(`img-slot-${index}`) as HTMLInputElement
+                          input?.click()
+                        }}
+                      >
+                        {form.images?.[index] ? (
+                          <>
+                            <img
+                              src={form.images[index]}
+                              alt={`view ${index + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation()
+                                const updated = [...(form.images || [])]
+                                updated.splice(index, 1)
+                                const trimmed = updated.filter((img) => Boolean(img?.trim()))
+                                setForm((f) => ({
+                                  ...f,
+                                  images: trimmed,
+                                  image: trimmed[0] || ''
+                                }))
+                              }}
+                              className="absolute top-1 right-1 w-5 h-5 bg-[#ED2124] text-white rounded-full text-xs flex items-center justify-center"
+                            >
+                              ×
+                            </button>
+                          </>
+                        ) : (
+                          <div className="text-center p-2">
+                            <svg
+                              width="20"
+                              height="20"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="1.5"
+                              className="mx-auto mb-1 text-muted"
+                            >
+                              <rect x="3" y="3" width="18" height="18" rx="2" />
+                              <circle cx="8.5" cy="8.5" r="1.5" />
+                              <path d="M21 15l-5-5L5 21" />
+                            </svg>
+                            <span className="text-xs text-muted">{SLOT_LABELS[index]}</span>
+                          </div>
+                        )}
+                      </div>
+
+                      <input
+                        id={`img-slot-${index}`}
+                        type="file"
+                        accept="image/*"
+                        className="hidden"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0]
+                          if (!file) return
+                          const reader = new FileReader()
+                          reader.onload = (ev) => {
+                            const b64 = ev.target?.result as string
+                            const updated = [...(form.images || [])]
+                            while (updated.length <= index) updated.push('')
+                            updated[index] = b64
+                            const lastFilled = updated.reduce(
+                              (last, img, i) => (img?.trim() ? i : last),
+                              -1
+                            )
+                            const trimmed = updated.slice(0, lastFilled + 1).filter((img) => Boolean(img?.trim()))
+                            setForm((f) => ({
+                              ...f,
+                              images: trimmed,
+                              image: index === 0 ? b64 : trimmed[0] || f.image
+                            }))
+                          }
+                          reader.readAsDataURL(file)
+                          e.target.value = ''
+                        }}
+                      />
+                    </div>
+                  ))}
                 </div>
+
+                <input
+                  type="url"
+                  className="w-full rounded-xl px-4 py-2 text-sm bg-card border border-theme text-primary focus:outline-none focus:border-[#1574B5] transition-all"
+                  placeholder="Or paste image URL for first slot..."
+                  onChange={(e) => {
+                    const url = e.target.value.trim()
+                    if (!url) return
+                    const updated = [...(form.images || [])]
+                    if (updated.length === 0) updated[0] = url
+                    else updated[0] = url
+                    setForm((f) => ({
+                      ...f,
+                      images: updated.filter((img) => Boolean(img?.trim())),
+                      image: url
+                    }))
+                  }}
+                />
               </div>
             </div>
             <div className="flex gap-3 mt-6">
@@ -365,7 +460,7 @@ export default function DashboardPage() {
                 {editId ? 'Save Changes' : 'Add Product'}
               </button>
               <button
-                onClick={() => { setShowForm(false); setEditId(null); setForm(emptyForm); setImgPreview('') }}
+                onClick={() => { setShowForm(false); setEditId(null); setForm(emptyForm) }}
                 className="px-8 py-3 border border-theme text-secondary rounded-xl hover:bg-card transition-all"
               >
                 Cancel
@@ -421,8 +516,8 @@ export default function DashboardPage() {
               >
                 {/* Image */}
                 <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center overflow-hidden">
-                  {p.image ? (
-                    <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
+                  {(p.images?.[0] || p.image) ? (
+                    <img src={p.images?.[0] || p.image} alt={p.name} className="w-full h-full object-cover" />
                   ) : (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.5">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>

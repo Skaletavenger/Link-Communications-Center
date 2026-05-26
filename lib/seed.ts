@@ -10,7 +10,8 @@ export const seedProducts: Product[] = [
     price: 249,
     stockQuantity: 12,
     description: '4MP dome camera for professional surveillance',
-    image: '/placeholder.svg'
+    image: '/placeholder.svg',
+    images: []
   },
   {
     id: 'seed-2',
@@ -21,7 +22,8 @@ export const seedProducts: Product[] = [
     price: 399,
     stockQuantity: 4,
     description: 'ColorVu bullet camera with low-light performance',
-    image: '/placeholder.svg'
+    image: '/placeholder.svg',
+    images: []
   },
   {
     id: 'seed-3',
@@ -32,6 +34,7 @@ export const seedProducts: Product[] = [
     price: 899,
     stockQuantity: 0,
     description: 'High-speed PTZ dome for long-range monitoring',
-    image: '/placeholder.svg'
+    image: '/placeholder.svg',
+    images: []
   }
 ];

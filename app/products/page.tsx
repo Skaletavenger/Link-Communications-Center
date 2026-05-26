@@ -1,8 +1,12 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Product, formatUGX } from '../../lib/useInventory'
+import { Product, formatUGX, normalizeStoredProduct } from '../../lib/useInventory'
 
 const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Phones', 'Other']
+
+function getMainImage(p: Product) {
+  return p.images?.[0] || p.image
+}
 
 function CameraPlaceholder() {
   return (
@@ -32,12 +36,16 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
+  const [slideIndex, setSlideIndex] = useState(0)
 
   useEffect(() => {
     const loadProducts = () => {
       try {
         const stored = localStorage.getItem('lcc_inventory')
-        if (stored) setProducts(JSON.parse(stored))
+        if (stored) {
+          const parsed = JSON.parse(stored) as Product[]
+          setProducts(parsed.map(normalizeStoredProduct))
+        }
       } catch {}
       setLoaded(true)
     }
@@ -67,6 +75,10 @@ export default function ProductsPage() {
     }
     return () => { document.body.style.overflow = '' }
   }, [selected])
+
+  useEffect(() => {
+    setSlideIndex(0)
+  }, [selected?.id])
 
   const phoneProducts = products.filter(p =>
     p.category === 'Phones' &&
@@ -142,7 +154,9 @@ export default function ProductsPage() {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {otherProducts.map(p => (
+              {otherProducts.map(p => {
+                const mainImage = getMainImage(p)
+                return (
                 <div
                 key={p.id}
                 onClick={() => setSelected(p)}
@@ -150,8 +164,8 @@ export default function ProductsPage() {
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
-                  {p.image ? (
-                    <img src={p.image} alt={p.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {mainImage ? (
+                    <img src={mainImage} alt={p.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <CameraPlaceholder />
                   )}
@@ -184,7 +198,7 @@ export default function ProductsPage() {
                   </div>
                 </div>
               </div>
-            ))}
+            )})}
           </div>
         ))}
 
@@ -200,16 +214,18 @@ export default function ProductsPage() {
             </div>
 
             <div className="flex gap-6 overflow-x-auto pb-6 scrollbar-hide snap-x snap-mandatory">
-              {phoneProducts.map(phone => (
+              {phoneProducts.map(phone => {
+                const mainImage = getMainImage(phone)
+                return (
                 <div
                   key={phone.id}
                   onClick={() => setSelected(phone)}
                   className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group"
                 >
                   <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 bg-gray-100 dark:bg-white/5">
-                    {phone.image ? (
+                    {mainImage ? (
                       <img
-                        src={phone.image}
+                        src={mainImage}
                         alt={phone.name}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                       />
@@ -255,7 +271,7 @@ export default function ProductsPage() {
                     </button>
                   </div>
                 </div>
-              ))}
+              )})}
             </div>
 
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-2 md:hidden text-center">
@@ -289,22 +305,92 @@ export default function ProductsPage() {
                 </button>
               </div>
 
-              <div className="w-full rounded-2xl overflow-hidden mb-6 border border-gray-200 dark:border-white/10">
-                {selected.image ? (
-                  <img
-                    src={selected.image}
-                    alt={selected.name}
-                    className="w-full max-h-80 object-cover"
-                  />
+              {(() => {
+                const allImages =
+                  selected.images?.filter((i) => i) ||
+                  (selected.image ? [selected.image] : [])
+
+                return allImages.length > 0 ? (
+                  <div className="relative w-full rounded-2xl overflow-hidden mb-6 border border-gray-200 dark:border-white/10">
+                    <div className="relative">
+                      <img
+                        src={allImages[slideIndex] || allImages[0]}
+                        alt={`${selected.name} view ${slideIndex + 1}`}
+                        className="w-full max-h-80 object-cover transition-opacity duration-300"
+                      />
+
+                      {allImages.length > 1 && (
+                        <>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSlideIndex((i) => (i === 0 ? allImages.length - 1 : i - 1))
+                            }
+                            className="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm bg-black/40 text-white text-lg hover:bg-black/60 transition-all"
+                          >
+                            ‹
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setSlideIndex((i) => (i === allImages.length - 1 ? 0 : i + 1))
+                            }
+                            className="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 rounded-full flex items-center justify-center backdrop-blur-sm bg-black/40 text-white text-lg hover:bg-black/60 transition-all"
+                          >
+                            ›
+                          </button>
+                        </>
+                      )}
+                    </div>
+
+                    {allImages.length > 1 && (
+                      <div className="flex gap-2 p-3 bg-card">
+                        {allImages.map((img, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => setSlideIndex(i)}
+                            className={`flex-shrink-0 w-14 h-14 rounded-lg overflow-hidden border-2 transition-all ${
+                              slideIndex === i ? 'border-[#1574B5]' : 'border-transparent'
+                            }`}
+                          >
+                            <img
+                              src={img}
+                              alt={`thumb ${i + 1}`}
+                              className="w-full h-full object-cover"
+                            />
+                          </button>
+                        ))}
+                        <div className="flex items-center gap-1 ml-auto">
+                          {allImages.map((_, i) => (
+                            <div
+                              key={i}
+                              className={`w-1.5 h-1.5 rounded-full transition-all ${
+                                slideIndex === i ? 'bg-[#1574B5]' : 'bg-gray-300 dark:bg-white/20'
+                              }`}
+                            />
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 ) : (
-                  <div className="w-full h-64 flex items-center justify-center bg-white dark:bg-white/5">
-                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1" opacity="0.4">
-                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
-                      <circle cx="12" cy="13" r="4"/>
+                  <div className="w-full h-64 flex items-center justify-center rounded-2xl mb-6 border border-gray-200 dark:border-white/10 bg-card">
+                    <svg
+                      width="80"
+                      height="80"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="#1574B5"
+                      strokeWidth="1"
+                      opacity="0.3"
+                    >
+                      <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+                      <circle cx="12" cy="13" r="4" />
                     </svg>
                   </div>
-                )}
-              </div>
+                )
+              })()}
 
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">

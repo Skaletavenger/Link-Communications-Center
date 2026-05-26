@@ -10,6 +10,7 @@ const cardVariants = {
 };
 
 export default function ProductCard({ product }: { product: Product }) {
+  const mainImage = product.images?.[0] || product.image;
   const status = product.stockQuantity > 5 ? 'In Stock' : product.stockQuantity > 0 ? 'Low Stock' : 'Out of Stock';
   const badgeClass = product.stockQuantity > 5 ? 'bg-emerald-500/15 text-emerald-200 border-emerald-400/20' : product.stockQuantity > 0 ? 'bg-amber-400/15 text-amber-100 border-amber-300/20' : 'bg-rose-500/15 text-rose-100 border-rose-400/20';
 
@@ -24,8 +25,8 @@ export default function ProductCard({ product }: { product: Product }) {
       className="overflow-hidden rounded-3xl border border-theme bg-card backdrop-blur-xl"
     >
       <div className="h-64 overflow-hidden bg-card">
-        {product.image ? (
-          <img src={product.image} alt={product.name} className="h-full w-full object-cover" />
+        {mainImage ? (
+          <img src={mainImage} alt={product.name} className="h-full w-full object-cover" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-[#131c32] text-secondary">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
