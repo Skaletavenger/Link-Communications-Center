@@ -100,7 +100,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             placeholder="HIK Vision Dome Camera"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
 
@@ -110,7 +110,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.brand}
             onChange={(e) => setForm({ ...form, brand: e.target.value })}
             placeholder="HIK Vision"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
       </div>
@@ -122,7 +122,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.model}
             onChange={(e) => setForm({ ...form, model: e.target.value })}
             placeholder="DS-2CD2143G2-I"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
 
@@ -134,7 +134,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             aria-label="Select product category"
             value={form.category}
             onChange={(e) => setForm({ ...form, category: e.target.value })}
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           >
             {categories.map((category) => (
               <option key={category} value={category} className="bg-primary text-primary">
@@ -152,7 +152,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.price}
             onChange={(e) => setForm({ ...form, price: Number(e.target.value) })}
             placeholder="85"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
       </div>
@@ -166,7 +166,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.stockQuantity}
             onChange={(e) => setForm({ ...form, stockQuantity: Number(e.target.value) })}
             placeholder="12"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
 
@@ -180,7 +180,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
               setPreview(e.target.value);
             }}
             placeholder="https://example.com/image.jpg"
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
       </div>
@@ -195,7 +195,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             rows={3}
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
       </div>
@@ -209,7 +209,7 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
             title="Upload product image"
             accept="image/png,image/jpeg,image/webp"
             onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#00B4FF] focus:ring-4 focus:ring-[#00B4FF]/20"
+            className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
           />
         </div>
 

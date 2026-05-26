@@ -51,11 +51,11 @@ body {
 }
 
 .text-accent {
-  @apply text-[#00B4FF];
+  @apply text-[#1574B5];
 }
 
 .bg-accent {
-  @apply bg-[#00B4FF];
+  @apply bg-[#1574B5];
 }
 
 .overlay-bg {
@@ -85,7 +85,7 @@ select::placeholder {
 input:focus,
 textarea:focus,
 select:focus {
-  @apply outline-none border-[#00B4FF] ring-4 ring-[#00B4FF]/20;
+  @apply outline-none border-[#1574B5] ring-4 ring-[#1574B5]/20;
 }
 
 input:focus {
@@ -93,11 +93,11 @@ input:focus {
 }
 
 .btn {
-  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#00B4FF] text-[#0b1226] font-semibold transition-shadow duration-300;
+  @apply inline-flex items-center gap-2 px-4 py-2 rounded-md bg-[#1574B5] text-[#0b1226] font-semibold transition-shadow duration-300;
 }
 
 .btn:hover {
-  @apply shadow-[0_0_0_8px_rgba(0,180,255,0.15)];
+  @apply shadow-[0_0_0_8px_rgba(21,116,181,0.15)];
 }
 
 @keyframes spin-slow {

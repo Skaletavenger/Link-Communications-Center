@@ -15,17 +15,30 @@ export default function Navbar() {
   const path = usePathname();
   return (
     <nav className="container mx-auto px-6 py-4 flex justify-between items-center bg-white/90 dark:bg-[#0d1428]/80 border-b border-gray-200 dark:border-white/10 backdrop-blur-md">
-      <Link href="/" className="flex items-center gap-3">
-        <div className="flex items-center justify-center w-11 h-11 bg-[#1d70b8] dark:bg-white rounded-[12px] shadow-sm shrink-0 transition-colors duration-300">
-          <svg viewBox="0 0 24 24" fill="none" className="w-7 h-7 text-white dark:text-[#1d70b8]" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <rect x="5" y="5" width="14" height="14" rx="5" fill="currentColor" />
-            <path d="M9 8h6v2h-4v6h-2V8Z" fill="white" />
-          </svg>
+      <Link href="/" className="flex flex-col items-start select-none">
+        <div className="flex items-center gap-2">
+          <div className="flex-shrink-0 rounded-xl flex items-center justify-center w-10 h-10 bg-[#1574B5]">
+            <svg viewBox="0 0 44 44" fill="none" width="30" height="30">
+              <line x1="10" y1="8" x2="18" y2="19" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+              <line x1="17" y1="8" x2="25" y2="19" stroke="white" strokeWidth="3.5" strokeLinecap="round"/>
+              <path d="M6 30 Q22 20 38 30" stroke="white" strokeWidth="3" fill="none" strokeLinecap="round"/>
+              <path d="M12 36 Q22 29 32 36" stroke="white" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
+              <circle cx="22" cy="41" r="2.8" fill="white"/>
+            </svg>
+          </div>
+          <span
+            className="font-black uppercase text-[#1574B5] dark:text-white transition-colors duration-300"
+            style={{ fontSize: '28px', lineHeight: '1', letterSpacing: '0.05em' }}
+          >
+            LINK
+          </span>
         </div>
-        <div className="flex flex-col justify-center leading-none">
-          <span className="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tighter font-mono transition-colors duration-300">link</span>
-          <span className="text-[9px] font-bold text-gray-600 dark:text-gray-300 tracking-[0.12em] uppercase mt-0.5 transition-colors duration-300">Communications Center</span>
-        </div>
+        <span
+          className="font-bold uppercase text-[#1574B5] dark:text-white/70 transition-colors duration-300"
+          style={{ fontSize: '7.5px', marginTop: '1px', paddingLeft: '2px', letterSpacing: '0.2em' }}
+        >
+          COMMUNICATIONS CENTER
+        </span>
       </Link>
       <div className="flex gap-4 items-center">
         {navItems.map((item) => {

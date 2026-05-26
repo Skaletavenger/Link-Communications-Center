@@ -80,7 +80,7 @@ export default function DashboardLoginPage() {
 
   return (
     <main className="relative min-h-screen overflow-hidden bg-[#f0f4ff] dark:bg-[#0a0f1e] px-6 py-10 text-gray-900 dark:text-white">
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(0,180,255,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(155,92,255,0.14),transparent_35%)]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(21,116,181,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(155,92,255,0.14),transparent_35%)]" />
       <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col items-center justify-center text-center">
         <div className="mb-8 space-y-3 text-gray-500 dark:text-gray-300">
           <p className="text-sm uppercase tracking-[0.35em] text-[#73d5ff]">Link Communications Center</p>
@@ -93,7 +93,7 @@ export default function DashboardLoginPage() {
           transition={{ duration: 0.55, ease: 'easeOut' }}
           className="relative w-full max-w-[420px]"
         >
-          <div className="absolute inset-0 rounded-[24px] bg-gradient-to-r from-[#00B4FF] via-[#9B5CFF] to-[#00B4FF] opacity-80 blur-2xl animate-spin-slow" />
+          <div className="absolute inset-0 rounded-[24px] bg-gradient-to-r from-[#1574B5] via-[#9B5CFF] to-[#1574B5] opacity-80 blur-2xl animate-spin-slow" />
           <div className="relative overflow-hidden rounded-[24px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-8 py-12 backdrop-blur-xl shadow-2xl shadow-sky-500/10">
             <div className="mb-8 flex items-center justify-center">
               <motion.div
@@ -130,7 +130,7 @@ export default function DashboardLoginPage() {
                     type={showPassword ? 'text' : 'password'}
                     value={password}
                     onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-gray-900 dark:text-white outline-none transition focus:border-[#00b4ff] focus:ring-4 focus:ring-[#00b4ff]/20 placeholder-gray-400 dark:placeholder-white/30"
+                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-gray-900 dark:text-white outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20 placeholder-gray-400 dark:placeholder-white/30"
                     placeholder="Enter access code"
                     autoComplete="current-password"
                   />
@@ -162,7 +162,7 @@ export default function DashboardLoginPage() {
               <button
                 type="submit"
                 disabled={disabled}
-                className="w-full rounded-2xl bg-[#00B4FF] px-4 py-4 text-navy font-semibold shadow-[0_20px_50px_-30px_rgba(0,180,255,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+                className="w-full rounded-2xl bg-[#1574B5] px-4 py-4 text-navy font-semibold shadow-[0_20px_50px_-30px_rgba(21,116,181,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {disabled ? `Try again in ${countdown}s` : 'Login'}
               </button>

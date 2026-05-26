@@ -1,15 +1,13 @@
 'use client'
 import { useState, useEffect, useRef, useCallback, type ChangeEvent } from 'react'
 import { useRouter } from 'next/navigation'
-import { useInventory, Product, formatUGX } from '../../lib/useInventory'
+import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInventory'
 import ThemeToggle from '../../components/ThemeToggle'
-
-const CATEGORIES = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Other']
 const TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
 
 function CameraIcon() {
   return (
-    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.5">
+    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.5">
       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
       <circle cx="12" cy="13" r="4"/>
     </svg>
@@ -34,8 +32,8 @@ function Skeleton() {
 }
 
 function StockBadge({ qty }: { qty: number }) {
-  if (qty === 0) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-red-500/20 text-red-400 border border-red-500/30">Out of Stock</span>
-  if (qty <= 5) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 animate-pulse">Low Stock</span>
+  if (qty === 0) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-[#ED2124]/20 text-[#ED2124] border border-[#ED2124]/30">Out of Stock</span>
+  if (qty <= 5) return <span className="px-2 py-1 rounded-full text-xs font-bold bg-[#F47821]/20 text-[#F47821] border border-[#F47821]/30 animate-pulse">Low Stock</span>
   return <span className="px-2 py-1 rounded-full text-xs font-bold bg-green-500/20 text-green-400 border border-green-500/30">In Stock</span>
 }
 
@@ -222,7 +220,7 @@ export default function DashboardPage() {
           <div className="flex gap-3 items-center">
             <button
               onClick={() => { setShowForm(!showForm); setEditId(null); setForm(emptyForm); setImgPreview('') }}
-              className="px-4 py-2 bg-accent text-black font-bold rounded-lg hover:bg-[#00d4ff] transition-all"
+              className="px-4 py-2 bg-accent text-black font-bold rounded-lg hover:bg-[#1a86cc] transition-all"
             >
               {showForm ? '✕ Cancel' : '+ Add Product'}
             </button>
@@ -242,7 +240,7 @@ export default function DashboardPage() {
         {/* Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[
-            { label: 'Total Products', value: total, color: '#00B4FF' },
+            { label: 'Total Products', value: total, color: '#1574B5' },
             { label: 'In Stock', value: inStock, color: '#00FF88' },
             { label: 'Low Stock', value: lowStock, color: '#FFB800' },
             { label: 'Out of Stock', value: outStock, color: '#FF4444' },
@@ -256,7 +254,7 @@ export default function DashboardPage() {
 
         {/* Add / Edit Form */}
         {showForm && (
-          <div className="bg-card border border-[#00B4FF]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
+          <div className="bg-card border border-[#1574B5]/30 rounded-2xl p-6 mb-8 backdrop-blur-sm">
             <h2 className="text-xl font-bold text-accent mb-6">
               {editId ? '✏️ Edit Product' : '➕ Add New Product'}
             </h2>
@@ -265,7 +263,7 @@ export default function DashboardPage() {
               <div>
                 <label className="text-secondary text-sm mb-1 block">Product Name *</label>
                 <input
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
                   placeholder="e.g. HIK Vision Dome Camera"
                 />
@@ -274,7 +272,7 @@ export default function DashboardPage() {
               <div>
                 <label className="text-secondary text-sm mb-1 block">Brand *</label>
                 <input
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.brand} onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
                   placeholder="e.g. HIK Vision"
                 />
@@ -283,7 +281,7 @@ export default function DashboardPage() {
               <div>
                 <label className="text-secondary text-sm mb-1 block">Model Number</label>
                 <input
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.model} onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
                   placeholder="e.g. DS-2CD2143G2-I"
                 />
@@ -292,7 +290,7 @@ export default function DashboardPage() {
               <div>
                 <label className="text-secondary text-sm mb-1 block">Category</label>
                 <select
-                  className="w-full bg-primary border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-primary border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.category} onChange={e => setForm(f => ({ ...f, category: e.target.value }))}
                 >
                   {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
@@ -303,7 +301,7 @@ export default function DashboardPage() {
                 <label className="text-secondary text-sm mb-1 block">Price (UGX) *</label>
                 <input
                   type="number" min="0"
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.price || ''} onChange={e => setForm(f => ({ ...f, price: Number(e.target.value) }))}
                   placeholder="e.g. 320000"
                 />
@@ -313,7 +311,7 @@ export default function DashboardPage() {
                 <label className="text-secondary text-sm mb-1 block">Stock Quantity *</label>
                 <input
                   type="number" min="0"
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                   value={form.stockQuantity || ''} onChange={e => setForm(f => ({ ...f, stockQuantity: Number(e.target.value) }))}
                   placeholder="0"
                 />
@@ -323,7 +321,7 @@ export default function DashboardPage() {
                 <label className="text-secondary text-sm mb-1 block">Description</label>
                 <textarea
                   rows={3}
-                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all resize-none"
+                  className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all resize-none"
                   value={form.description} onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
                   placeholder="Brief product description..."
                 />
@@ -335,14 +333,14 @@ export default function DashboardPage() {
                   <div className="flex-1 space-y-2">
                     <input
                       type="url"
-                      className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+                      className="w-full bg-card border border-theme rounded-lg px-4 py-2 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
                       placeholder="Paste image URL..."
                       onChange={e => handleImageUrl(e.target.value)}
                     />
                     <div className="text-center text-muted text-xs">— or —</div>
                     <button
                       onClick={() => fileRef.current?.click()}
-                      className="w-full border border-theme border-dashed rounded-lg py-2 text-secondary hover:border-[#00B4FF] hover:text-[#00B4FF] transition-all text-sm"
+                      className="w-full border border-theme border-dashed rounded-lg py-2 text-secondary hover:border-[#1574B5] hover:text-[#1574B5] transition-all text-sm"
                     >
                       📁 Upload image file
                     </button>
@@ -362,7 +360,7 @@ export default function DashboardPage() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={handleSubmit}
-                className="px-8 py-3 bg-accent text-black font-bold rounded-xl hover:bg-[#00d4ff] transition-all"
+                className="px-8 py-3 bg-accent text-black font-bold rounded-xl hover:bg-[#1a86cc] transition-all"
               >
                 {editId ? 'Save Changes' : 'Add Product'}
               </button>
@@ -379,12 +377,12 @@ export default function DashboardPage() {
         {/* Search + Filter */}
         <div className="flex flex-col md:flex-row gap-3 mb-6">
           <input
-            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
             placeholder="Search by name, brand, or model..."
             value={search} onChange={e => setSearch(e.target.value)}
           />
           <select
-            className="bg-primary border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="bg-primary border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
             value={filterCat} onChange={e => setFilterCat(e.target.value)}
           >
             <option value="All">All Categories</option>
@@ -426,7 +424,7 @@ export default function DashboardPage() {
                   {p.image ? (
                     <img src={p.image} alt={p.name} className="w-full h-full object-cover" />
                   ) : (
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.5">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.5">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                       <circle cx="12" cy="13" r="4"/>
                     </svg>
@@ -454,13 +452,13 @@ export default function DashboardPage() {
                 <div className="flex gap-2">
                   <button
                     onClick={() => handleEdit(p)}
-                    className="px-3 py-1 bg-card hover:bg-[#00B4FF]/20 hover:text-[#00B4FF] text-secondary rounded-lg text-xs transition-all"
+                    className="px-3 py-1 bg-card hover:bg-[#1574B5]/20 hover:text-[#1574B5] text-secondary rounded-lg text-xs transition-all"
                   >
                     Edit
                   </button>
                   <button
                     onClick={() => handleDelete(p.id)}
-                    className="px-3 py-1 bg-card hover:bg-red-500/20 hover:text-red-400 text-secondary rounded-lg text-xs transition-all"
+                    className="px-3 py-1 bg-card hover:bg-[#ED2124]/20 hover:text-[#ED2124] text-secondary rounded-lg text-xs transition-all"
                   >
                     Del
                   </button>

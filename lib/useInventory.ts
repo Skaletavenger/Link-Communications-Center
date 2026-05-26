@@ -17,7 +17,17 @@ export interface Product {
   image: string
 }
 
-export const categories = ['Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Phones', 'Other']
+export const CATEGORIES = [
+  'Surveillance Cameras',
+  'Access Control',
+  'Networking',
+  'Intercoms',
+  'Alarms',
+  'Phones',
+  'Other'
+]
+
+export const categories = CATEGORIES
 
 const defaultProducts: Product[] = [
   { id: '1', name: 'HIK Vision Dome Camera', brand: 'HIK Vision', model: 'DS-2CD2143G2-I', category: 'Surveillance Cameras', price: 320000, stockQuantity: 12, description: '4MP AcuSense Fixed Dome Network Camera', image: '' },
@@ -51,7 +61,10 @@ export function useInventory() {
 
   const save = (updated: Product[]) => {
     setProducts(updated)
-    try { localStorage.setItem('lcc_inventory', JSON.stringify(updated)) } catch {}
+    try {
+      localStorage.setItem('lcc_inventory', JSON.stringify(updated))
+      window.dispatchEvent(new Event('storage'))
+    } catch {}
   }
 
   const addProduct = (p: Omit<Product, 'id'>) => save([...products, { ...p, id: Date.now().toString() }])

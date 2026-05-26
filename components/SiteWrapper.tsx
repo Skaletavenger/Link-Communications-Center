@@ -21,7 +21,7 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
   return (
     <ToastProvider>
       <div className="min-h-screen flex flex-col">
-        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left z-50 bg-[#00B4FF]" style={{ scaleX }} />
+        <motion.div className="fixed left-0 top-0 h-[3px] w-full origin-left z-50 bg-[#1574B5]" style={{ scaleX }} />
         <Navbar />
         <AnimatePresence mode="wait">
           {loading ? (
@@ -35,7 +35,7 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
             >
               <div className="flex flex-col items-center gap-4">
                 <div className="relative">
-                  <div className="absolute inset-0 rounded-full border border-[#00B4FF]/30 animate-spin" />
+                  <div className="absolute inset-0 rounded-full border border-[#1574B5]/30 animate-spin" />
                   <div className="relative w-24 h-24">
                     <LottieLoader src="/animations/loader-spinning-shield.json" className="w-24 h-24" />
                   </div>

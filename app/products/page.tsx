@@ -7,7 +7,7 @@ const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking
 function CameraPlaceholder() {
   return (
     <div className="w-full h-48 bg-card flex items-center justify-center rounded-xl">
-      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1.2" opacity="0.5">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.2" opacity="0.5">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
         <circle cx="12" cy="13" r="4"/>
       </svg>
@@ -34,11 +34,21 @@ export default function ProductsPage() {
   const [selected, setSelected] = useState<Product | null>(null)
 
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem('lcc_inventory')
-      if (stored) setProducts(JSON.parse(stored))
-    } catch {}
-    setLoaded(true)
+    const loadProducts = () => {
+      try {
+        const stored = localStorage.getItem('lcc_inventory')
+        if (stored) setProducts(JSON.parse(stored))
+      } catch {}
+      setLoaded(true)
+    }
+    loadProducts()
+    window.addEventListener('storage', loadProducts)
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') loadProducts()
+    })
+    return () => {
+      window.removeEventListener('storage', loadProducts)
+    }
   }, [])
 
   useEffect(() => {
@@ -89,7 +99,7 @@ export default function ProductsPage() {
         {/* Search + Filter */}
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input
-            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#00B4FF] transition-all"
+            className="flex-1 bg-card border border-theme rounded-xl px-4 py-3 text-primary focus:outline-none focus:border-[#1574B5] transition-all"
             placeholder="Search products..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -102,7 +112,7 @@ export default function ProductsPage() {
                 className={`px-4 py-2 rounded-xl text-sm font-medium transition-all ${
                   category === c
                     ? 'bg-accent text-black'
-                    : 'bg-card border border-theme text-secondary hover:border-[#00B4FF]/50'
+                    : 'bg-card border border-theme text-secondary hover:border-[#1574B5]/50'
                 }`}
               >
                 {c}
@@ -136,7 +146,7 @@ export default function ProductsPage() {
                 <div
                 key={p.id}
                 onClick={() => setSelected(p)}
-                className="cursor-pointer bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-[#00B4FF]/40 hover:shadow-[0_20px_40px_rgba(0,180,255,0.15)] transition-all duration-300 hover:-translate-y-1 group"
+                className="cursor-pointer bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-[#1574B5]/40 hover:shadow-[0_20px_40px_rgba(21,116,181,0.15)] transition-all duration-300 hover:-translate-y-1 group"
               >
                 {/* Image */}
                 <div className="relative overflow-hidden">
@@ -146,15 +156,15 @@ export default function ProductsPage() {
                     <CameraPlaceholder />
                   )}
                   {/* Category tag */}
-                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-accent text-xs px-2 py-1 rounded-full border border-[#00B4FF]/30">
+                  <span className="absolute top-3 left-3 bg-black/60 backdrop-blur-sm text-accent text-xs px-2 py-1 rounded-full border border-[#1574B5]/30">
                     {p.category}
                   </span>
                   {/* Stock badge */}
                   <span className={`absolute top-3 right-3 text-xs px-2 py-1 rounded-full backdrop-blur-sm border font-bold ${
                     p.stockQuantity === 0
-                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                      ? 'bg-[#ED2124]/20 text-[#ED2124] border-[#ED2124]/30'
                       : p.stockQuantity <= 5
-                      ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      ? 'bg-[#F47821]/20 text-[#F47821] border-[#F47821]/30'
                       : 'bg-green-500/20 text-green-400 border-green-500/30'
                   }`}>
                     {p.stockQuantity === 0 ? 'Out of Stock' : p.stockQuantity <= 5 ? 'Low Stock' : 'In Stock'}
@@ -217,9 +227,9 @@ export default function ProductsPage() {
 
                     <span className={`absolute top-4 right-4 text-xs px-3 py-1 rounded-full font-bold backdrop-blur-sm border ${
                       phone.stockQuantity === 0
-                        ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                        ? 'bg-[#ED2124]/20 text-[#ED2124] border-[#ED2124]/30'
                         : phone.stockQuantity <= 5
-                        ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                        ? 'bg-[#F47821]/20 text-[#F47821] border-[#F47821]/30'
                         : 'bg-green-500/20 text-green-400 border-green-500/30'
                     }`}>
                       {phone.stockQuantity === 0 ? 'Out of Stock' : phone.stockQuantity <= 5 ? 'Low Stock' : 'In Stock'}
@@ -227,18 +237,18 @@ export default function ProductsPage() {
                   </div>
 
                   <div className="px-1">
-                    <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-white group-hover:text-[#0077cc] dark:group-hover:text-[#00B4FF] transition-colors duration-300">
+                    <h3 className="text-xl font-bold mb-1 text-gray-900 dark:text-white group-hover:text-[#1574B5] dark:group-hover:text-[#1574B5] transition-colors duration-300">
                       {phone.name}
                     </h3>
                     <p className="text-sm text-gray-500 dark:text-gray-400 mb-3 line-clamp-2 leading-relaxed">
                       {phone.description}
                     </p>
-                    <p className="text-xl font-bold text-[#0077cc] dark:text-[#00B4FF]">
+                    <p className="text-xl font-bold text-[#1574B5] dark:text-[#1574B5]">
                       UGX {phone.price.toLocaleString()}
                     </p>
                     <button
                       onClick={(e) => { e.stopPropagation(); setSelected(phone) }}
-                      className="mt-3 text-sm font-medium text-[#0077cc] dark:text-[#00B4FF] flex items-center gap-1 hover:gap-2 transition-all duration-200"
+                      className="mt-3 text-sm font-medium text-[#1574B5] dark:text-[#1574B5] flex items-center gap-1 hover:gap-2 transition-all duration-200"
                     >
                       Learn more
                       <span className="text-lg leading-none">›</span>
@@ -288,7 +298,7 @@ export default function ProductsPage() {
                   />
                 ) : (
                   <div className="w-full h-64 flex items-center justify-center bg-white dark:bg-white/5">
-                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#00B4FF" strokeWidth="1" opacity="0.4">
+                    <svg width="80" height="80" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1" opacity="0.4">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
                       <circle cx="12" cy="13" r="4"/>
                     </svg>
@@ -303,9 +313,9 @@ export default function ProductsPage() {
                   </h2>
                   <span className={`px-3 py-1 rounded-full text-sm font-bold border ${
                     selected.stockQuantity === 0
-                      ? 'bg-red-500/20 text-red-400 border-red-500/30'
+                      ? 'bg-[#ED2124]/20 text-[#ED2124] border-[#ED2124]/30'
                       : selected.stockQuantity <= 5
-                      ? 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30'
+                      ? 'bg-[#F47821]/20 text-[#F47821] border-[#F47821]/30'
                       : 'bg-green-500/20 text-green-400 border-green-500/30'
                   }`}>
                     {selected.stockQuantity === 0
@@ -325,7 +335,7 @@ export default function ProductsPage() {
                       📋 {selected.model}
                     </span>
                   )}
-                  <span className="px-3 py-1 rounded-full text-sm border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-[#00B4FF]">
+                  <span className="px-3 py-1 rounded-full text-sm border bg-white dark:bg-white/5 border-gray-200 dark:border-white/10 text-[#1574B5]">
                     📂 {selected.category}
                   </span>
                 </div>
@@ -334,7 +344,7 @@ export default function ProductsPage() {
                   <p className="text-sm mb-1 text-gray-600 dark:text-white/60">
                     Price
                   </p>
-                  <p className="text-3xl font-bold text-[#00B4FF]">
+                  <p className="text-3xl font-bold text-[#1574B5]">
                     UGX {selected.price.toLocaleString()}
                   </p>
                   <p className="text-sm mt-1 text-gray-600 dark:text-white/60">
@@ -355,7 +365,7 @@ export default function ProductsPage() {
 
                 <button
                   onClick={() => setSelected(null)}
-                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4 bg-[#00B4FF] text-black"
+                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4 bg-[#1574B5] text-black"
                 >
                   Done
                 </button>
