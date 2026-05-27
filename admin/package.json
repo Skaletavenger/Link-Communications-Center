@@ -12,6 +12,7 @@
   },
   "dependencies": {
     "@prisma/client": "^5.9.0",
+    "@supabase/supabase-js": "^2.106.2",
     "framer-motion": "^10.12.7",
     "lottie-react": "^2.4.0",
     "next": "14.2.30",
@@ -31,13 +32,5 @@
   },
   "prisma": {
     "seed": "node prisma/seed.js"
-  },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint",
-    "prisma:migrate": "prisma migrate dev --name init",
-    "prisma:generate": "prisma generate"
   }
 }
