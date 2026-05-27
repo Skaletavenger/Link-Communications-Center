@@ -1,6 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
-import { Product, formatUGX, normalizeStoredProduct } from '../../lib/useInventory'
+import { useInventory, Product, formatUGX } from '../../lib/useInventory'
 
 const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Phones', 'Other']
 
@@ -31,33 +31,11 @@ function SkeletonCard() {
 }
 
 export default function ProductsPage() {
-  const [products, setProducts] = useState<Product[]>([])
-  const [loaded, setLoaded] = useState(false)
+  const { products, loaded } = useInventory()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
   const [slideIndex, setSlideIndex] = useState(0)
-
-  useEffect(() => {
-    const loadProducts = () => {
-      try {
-        const stored = localStorage.getItem('lcc_inventory')
-        if (stored) {
-          const parsed = JSON.parse(stored) as Product[]
-          setProducts(parsed.map(normalizeStoredProduct))
-        }
-      } catch {}
-      setLoaded(true)
-    }
-    loadProducts()
-    window.addEventListener('storage', loadProducts)
-    document.addEventListener('visibilitychange', () => {
-      if (document.visibilityState === 'visible') loadProducts()
-    })
-    return () => {
-      window.removeEventListener('storage', loadProducts)
-    }
-  }, [])
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
