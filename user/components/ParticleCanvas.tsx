@@ -1,20 +1,22 @@
 'use client'
-import { useCallback } from 'react'
-import { loadFull } from 'tsparticles'
-import Particles from 'react-tsparticles'
+import { useEffect, useState } from 'react'
+import Particles, { initParticlesEngine } from '@tsparticles/react'
+import { loadSlim } from '@tsparticles/slim'
 
 export default function ParticleCanvas() {
-  // react-tsparticles is currently typed against tsparticles-engine
-  // while loadFull is typed against @tsparticles/engine; runtime is compatible.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const particlesInit = useCallback(async (engine: any) => {
-    await loadFull(engine)
+  const [init, setInit] = useState(false)
+
+  useEffect(() => {
+    initParticlesEngine(async (engine) => {
+      await loadSlim(engine)
+    }).then(() => setInit(true))
   }, [])
+
+  if (!init) return null
 
   return (
     <Particles
       id="tsparticles-user"
-      init={particlesInit}
       options={{
         fullScreen: { enable: false },
         particles: {
