@@ -29,6 +29,7 @@ function ImageCarousel({
   images: string[], 
   name: string 
 }) {
+  const SLIDE_MS = 1000
   const [current, setCurrent] = useState(0)
   const [paused, setPaused] = useState(false)
   const [animating, setAnimating] = useState(false)
@@ -41,7 +42,7 @@ function ImageCarousel({
     setTimeout(() => {
       setCurrent(index)
       setAnimating(false)
-    }, 400)
+    }, SLIDE_MS)
   }
 
   const next = useCallback(() => {
@@ -60,7 +61,7 @@ function ImageCarousel({
 
   useEffect(() => {
     if (paused) return
-    const timer = setInterval(next, 4000)
+    const timer = setInterval(next, 5000)
     return () => clearInterval(timer)
   }, [paused, next])
 
@@ -99,8 +100,8 @@ function ImageCarousel({
           return (
             <div key={i}
                  className="absolute inset-0 transition-transform 
-                            duration-400 ease-in-out"
-                 style={{ transform }}>
+                            duration-1000 ease-in-out"
+                 style={{ transform, transitionDuration: `${SLIDE_MS}ms` }}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={img}
                    alt={`${name} ${i + 1}`}
