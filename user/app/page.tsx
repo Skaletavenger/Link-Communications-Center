@@ -1,8 +1,12 @@
-import Link from 'next/link'
+'use client'
+
+import { useRouter } from 'next/navigation'
 import Navbar from '../components/Navbar'
 import ParticleCanvas from '../components/ParticleCanvas'
 
 export default function Home() {
+  const router = useRouter()
+
   return (
     <div className="min-h-screen">
       <Navbar />
@@ -23,26 +27,22 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link href="/products">
-                <button
-                  className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90"
-                  style={{ background: '#1574B5' }}
-                >
-                  Browse Products
-                </button>
-              </Link>
-              <Link href="/auth/login">
-                <button
-                  className="px-6 py-3 rounded-xl font-bold transition-all hover:opacity-90 border-2"
-                  style={{
-                    borderColor: '#1574B5',
-                    color: '#1574B5',
-                    background: 'transparent'
-                  }}
-                >
-                  Sign In
-                </button>
-              </Link>
+              <button
+                type="button"
+                onClick={() => router.push('/products')}
+                className="px-8 py-4 rounded-xl font-bold text-white text-lg transition-all hover:opacity-90 active:scale-95"
+                style={{ background: '#1574B5' }}
+              >
+                Browse Products
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push('/auth/login')}
+                className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 border-2"
+                style={{ borderColor: '#1574B5', color: '#1574B5' }}
+              >
+                Sign In
+              </button>
             </div>
           </div>
         </div>

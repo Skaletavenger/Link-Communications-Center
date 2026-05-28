@@ -3,6 +3,16 @@ import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInventory'
 import ThemeToggle from '../../components/ThemeToggle'
+import { supabase } from '../../lib/supabase'
+
+type ContactMessage = {
+  id: string
+  name: string
+  email: string
+  message: string
+  read: boolean
+  created_at: string
+}
 const TIMEOUT_MS = 15 * 60 * 1000 // 15 minutes
 
 function CameraIcon() {
@@ -62,6 +72,8 @@ export default function DashboardPage() {
   const [toast, setToast] = useState('')
   const [authed, setAuthed] = useState(false)
   const [showWarning, setShowWarning] = useState(false)
+  const [userCount, setUserCount] = useState(0)
+  const [messages, setMessages] = useState<ContactMessage[]>([])
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const warningRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -91,6 +103,25 @@ export default function DashboardPage() {
       setShowWarning(true)
     }, 13 * 60 * 1000)
   }, [logout])
+
+  const fetchMessages = async () => {
+    const { data } = await supabase
+      .from('contact_messages')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (data) setMessages(data as ContactMessage[])
+  }
+
+  useEffect(() => {
+    const fetchUserCount = async () => {
+      const { count } = await supabase
+        .from('user_profiles')
+        .select('*', { count: 'exact', head: true })
+      setUserCount(count || 0)
+    }
+    fetchUserCount()
+    fetchMessages()
+  }, [])
 
   useEffect(() => {
     if (typeof window === 'undefined') return
@@ -246,12 +277,13 @@ export default function DashboardPage() {
       <div className="max-w-7xl mx-auto px-6 py-8">
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
           {[
             { label: 'Total Products', value: total, color: '#1574B5' },
             { label: 'In Stock', value: inStock, color: '#00FF88' },
             { label: 'Low Stock', value: lowStock, color: '#FFB800' },
             { label: 'Out of Stock', value: outStock, color: '#FF4444' },
+            { label: 'Registered Users', value: userCount, color: '#9333ea' },
           ].map(stat => (
             <div key={stat.label} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 shadow-sm dark:shadow-none">
               <p className="text-gray-500 dark:text-white/50 text-sm mb-1">{stat.label}</p>
@@ -562,6 +594,78 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+
+        <div className="mt-8">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+              Customer Messages
+              {messages.filter(m => !m.read).length > 0 && (
+                <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
+                  {messages.filter(m => !m.read).length} new
+                </span>
+              )}
+            </h2>
+          </div>
+
+          {messages.length === 0 ? (
+            <p className="text-gray-500 dark:text-white/50">
+              No messages yet.
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {messages.map(msg => (
+                <div key={msg.id}
+                     className="p-4 rounded-xl border"
+                     style={{
+                       background: msg.read
+                         ? undefined
+                         : 'rgba(21,116,181,0.08)',
+                       borderColor: msg.read
+                         ? undefined
+                         : 'rgba(21,116,181,0.3)'
+                     }}>
+                  <div className="flex justify-between items-start mb-2 gap-4">
+                    <div>
+                      <span className="font-bold text-gray-900 dark:text-white">
+                        {msg.name}
+                      </span>
+                      <span className="text-sm ml-2 text-gray-500 dark:text-white/50">
+                        {msg.email}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2 flex-shrink-0">
+                      <span className="text-xs text-gray-500 dark:text-white/50">
+                        {new Date(msg.created_at).toLocaleDateString()}
+                      </span>
+                      {!msg.read && (
+                        <button
+                          type="button"
+                          onClick={async () => {
+                            await supabase
+                              .from('contact_messages')
+                              .update({ read: true })
+                              .eq('id', msg.id)
+                            fetchMessages()
+                          }}
+                          className="text-xs px-2 py-1 rounded-lg"
+                          style={{
+                            background: 'rgba(21,116,181,0.15)',
+                            color: '#1574B5'
+                          }}
+                        >
+                          Mark read
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <p className="text-sm text-gray-600 dark:text-white/70">
+                    {msg.message}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )
