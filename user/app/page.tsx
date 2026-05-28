@@ -1,52 +1,61 @@
 'use client'
+import Link from 'next/link'
+import Navbar from '@/components/Navbar'
 
-import { useRouter } from 'next/navigation'
-import Navbar from '../components/Navbar'
-import ParticleCanvas from '../components/ParticleCanvas'
-
-export default function Home() {
-  const router = useRouter()
-
+export default function HomePage() {
   return (
-    <div className="min-h-screen">
+    <main className="min-h-screen bg-[#0a0f1e] dark:bg-[#0a0f1e]">
       <Navbar />
-      <div className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(21,116,181,0.18),transparent_32%),radial-gradient(circle_at_bottom_right,_rgba(244,120,33,0.10),transparent_38%)]" />
-        <ParticleCanvas />
+      
+      {/* Hero Section */}
+      <section className="min-h-screen flex flex-col 
+                          items-start justify-center 
+                          px-6 md:px-16 pt-20">
+        <h1 className="text-4xl md:text-6xl font-black 
+                       text-white mb-4 leading-tight">
+          Link <span style={{ color: '#1574B5' }}>
+            Communications
+          </span> Center
+        </h1>
+        
+        <p className="text-white/60 text-lg mb-10 
+                      max-w-xl leading-relaxed">
+          Secure, monitor, and manage your environments 
+          with enterprise surveillance and communications 
+          solutions.
+        </p>
 
-        <div className="max-w-6xl mx-auto px-6 pt-24 pb-24">
-          <div className="max-w-3xl">
-            <p className="text-xs font-semibold tracking-[0.35em] uppercase mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>
-              Link Communications Center
-            </p>
-            <h1 className="text-5xl md:text-6xl font-black leading-[1.05] mb-6">
-              Security & communications solutions, built for reliability.
-            </h1>
-            <p className="text-lg md:text-xl mb-10" style={{ color: 'var(--text-secondary)' }}>
-              Explore our inventory of surveillance cameras, access control, networking, intercoms, alarms, and phones.
-            </p>
+        {/* Buttons - using Link not router */}
+        <div className="flex flex-wrap gap-4">
+          <Link href="/products">
+            <span className="inline-block px-8 py-4 
+                             rounded-xl font-bold text-white 
+                             text-lg cursor-pointer
+                             transition-all duration-200
+                             hover:opacity-90 hover:scale-105
+                             active:scale-95"
+                  style={{ background: '#1574B5' }}>
+              Browse Products
+            </span>
+          </Link>
 
-            <div className="flex flex-col sm:flex-row gap-3">
-              <button
-                type="button"
-                onClick={() => router.push('/products')}
-                className="px-8 py-4 rounded-xl font-bold text-white text-lg transition-all hover:opacity-90 active:scale-95"
-                style={{ background: '#1574B5' }}
-              >
-                Browse Products
-              </button>
-              <button
-                type="button"
-                onClick={() => router.push('/auth/login')}
-                className="px-8 py-4 rounded-xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 border-2"
-                style={{ borderColor: '#1574B5', color: '#1574B5' }}
-              >
-                Sign In
-              </button>
-            </div>
-          </div>
+          <Link href="/auth/login">
+            <span className="inline-block px-8 py-4 
+                             rounded-xl font-bold text-lg 
+                             cursor-pointer border-2
+                             transition-all duration-200
+                             hover:opacity-90 hover:scale-105
+                             active:scale-95"
+                  style={{ 
+                    borderColor: '#1574B5',
+                    color: '#1574B5',
+                    background: 'transparent'
+                  }}>
+              Sign In
+            </span>
+          </Link>
         </div>
-      </div>
-    </div>
+      </section>
+    </main>
   )
 }
