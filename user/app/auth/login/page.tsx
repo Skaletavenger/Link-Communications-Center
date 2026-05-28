@@ -8,10 +8,15 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [sent, setSent] = useState(false)
   const [error, setError] = useState('')
+  const [message, setMessage] = useState('')
 
-  const onSubmit = async (e: FormEvent) => {
-    e.preventDefault()
+  const sendMagicLink = async () => {
     setError('')
+    setMessage('')
+    if (!email.trim()) {
+      setError('Enter your email first.')
+      return false
+    }
     const origin = window.location.origin
     const { error } = await supabase.auth.signInWithOtp({
       email,
@@ -19,9 +24,16 @@ export default function LoginPage() {
     })
     if (error) {
       setError(error.message)
-      return
+      return false
     }
     setSent(true)
+    setMessage('Magic link sent! Check your inbox to continue.')
+    return true
+  }
+
+  const onSubmit = async (e: FormEvent) => {
+    e.preventDefault()
+    await sendMagicLink()
   }
 
   return (
@@ -44,6 +56,7 @@ export default function LoginPage() {
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
               Check your email for a login link!
             </p>
+            {message && <p className="text-sm mt-2" style={{ color: '#F47821' }}>{message}</p>}
           </div>
         ) : (
           <form onSubmit={onSubmit} className="space-y-4">
@@ -70,6 +83,17 @@ export default function LoginPage() {
               style={{ background: '#1574B5', color: 'white' }}
             >
               Send Magic Link
+            </button>
+
+            <button
+              type="button"
+              onClick={async () => {
+                await sendMagicLink()
+              }}
+              className="w-full rounded-2xl py-4 font-bold border"
+              style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+            >
+              Use Magic Link Instead
             </button>
           </form>
         )}

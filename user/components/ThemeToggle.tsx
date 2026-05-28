@@ -1,32 +1,35 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useTheme } from '@/lib/ThemeContext'
 
 export default function ThemeToggle() {
-  const [dark, setDark] = useState(true)
-
-  useEffect(() => {
-    const stored = localStorage.getItem('lcc_user_theme')
-    const isDark = stored ? stored === 'dark' : true
-    setDark(isDark)
-    document.documentElement.classList.toggle('dark', isDark)
-  }, [])
-
-  const toggle = () => {
-    const next = !dark
-    setDark(next)
-    document.documentElement.classList.toggle('dark', next)
-    localStorage.setItem('lcc_user_theme', next ? 'dark' : 'light')
-  }
+  const { theme, toggleTheme } = useTheme()
 
   return (
     <button
       type="button"
-      onClick={toggle}
-      className="px-3 py-2 rounded-lg border text-sm font-semibold transition-all hover:bg-white/5"
-      style={{ borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
+      onClick={toggleTheme}
+      className="relative w-14 h-7 rounded-full border transition-all duration-300 flex items-center px-1"
+      style={{
+        background: theme === 'dark'
+          ? 'rgba(21,116,181,0.2)'
+          : 'rgba(21,116,181,0.1)',
+        borderColor: theme === 'dark'
+          ? 'rgba(21,116,181,0.4)'
+          : 'rgba(21,116,181,0.3)',
+      }}
       aria-label="Toggle theme"
     >
-      {dark ? 'Dark' : 'Light'}
+      <div
+        className="w-5 h-5 rounded-full transition-all duration-300 flex items-center justify-center text-xs"
+        style={{
+          transform: theme === 'dark'
+            ? 'translateX(0)'
+            : 'translateX(28px)',
+          background: '#1574B5',
+        }}
+      >
+        {theme === 'dark' ? '🌙' : '☀️'}
+      </div>
     </button>
   )
 }

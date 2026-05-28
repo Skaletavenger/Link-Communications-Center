@@ -3,6 +3,16 @@
 @tailwind utilities;
 
 :root {
+  --bg-primary: #f3f7fb;
+  --bg-secondary: #e9f0f8;
+  --bg-card: rgba(255, 255, 255, 0.82);
+  --border-color: rgba(21, 116, 181, 0.22);
+  --text-primary: #0b1226;
+  --text-secondary: rgba(11, 18, 38, 0.72);
+  --text-muted: rgba(11, 18, 38, 0.55);
+}
+
+.dark {
   --bg-primary: #0b1226;
   --bg-secondary: #0d1428;
   --bg-card: rgba(255, 255, 255, 0.06);
@@ -13,6 +23,10 @@
 }
 
 html {
+  color-scheme: light;
+}
+
+html.dark {
   color-scheme: dark;
 }
 

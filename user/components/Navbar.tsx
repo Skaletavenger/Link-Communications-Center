@@ -63,7 +63,7 @@ export default function Navbar() {
 
   return (
     <nav className="container mx-auto px-6 py-4 flex justify-between items-center border-b backdrop-blur-md sticky top-0 z-40"
-      style={{ background: 'rgba(11, 18, 38, 0.75)', borderColor: 'rgba(255,255,255,0.08)' }}
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
     >
       <Link href="/" className="flex items-center gap-3">
         <BrandLogo />

@@ -23,19 +23,25 @@ export default function Home() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3">
-              <Link
-                href="/products"
-                className="px-6 py-4 rounded-2xl font-extrabold text-center"
-                style={{ background: '#1574B5', color: 'white' }}
-              >
-                Browse Products
+              <Link href="/products">
+                <button
+                  className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90"
+                  style={{ background: '#1574B5' }}
+                >
+                  Browse Products
+                </button>
               </Link>
-              <Link
-                href="/auth/login"
-                className="px-6 py-4 rounded-2xl font-extrabold text-center border"
-                style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-              >
-                Sign In
+              <Link href="/auth/login">
+                <button
+                  className="px-6 py-3 rounded-xl font-bold transition-all hover:opacity-90 border-2"
+                  style={{
+                    borderColor: '#1574B5',
+                    color: '#1574B5',
+                    background: 'transparent'
+                  }}
+                >
+                  Sign In
+                </button>
               </Link>
             </div>
           </div>
