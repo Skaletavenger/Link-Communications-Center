@@ -34,10 +34,10 @@ export default function ContactPage() {
   }
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 pt-24 pb-16">
-        <h1 className="text-4xl font-black mb-4">Contact</h1>
+        <h1 className="text-4xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>Contact</h1>
         <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
           Reach out for quotations, installations, and support.
         </p>

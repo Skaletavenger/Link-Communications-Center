@@ -28,10 +28,10 @@ export default function AboutPage() {
   }, [])
 
   return (
-    <div className="min-h-screen">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 pt-24 pb-16">
-        <h1 className="text-4xl font-black mb-4">About</h1>
+        <h1 className="text-4xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>About</h1>
         {loading ? (
           <p style={{ color: 'var(--text-secondary)' }}>Loading...</p>
         ) : (

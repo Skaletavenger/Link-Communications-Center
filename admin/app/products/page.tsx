@@ -77,7 +77,7 @@ export default function ProductsPage() {
   const otherProducts = filtered.filter(p => p.category !== 'Phones')
 
   return (
-    <div className="min-h-screen bg-[#f0f4ff] dark:bg-[#0a0f1e] text-gray-900 dark:text-white pt-24 pb-16 px-6">
+    <div className="min-h-screen pt-24 pb-16 px-6" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       <div className="max-w-7xl mx-auto">
 
         {/* Header */}

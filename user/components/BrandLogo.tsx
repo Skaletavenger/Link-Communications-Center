@@ -14,19 +14,18 @@ export default function BrandLogo() {
           </svg>
         </div>
         <span
-          className="font-black uppercase text-white"
-          style={{ fontSize: '28px', lineHeight: '1', letterSpacing: '0.05em' }}
+          className="font-black uppercase tracking-wide transition-colors duration-300"
+          style={{ color: 'var(--accent)', fontSize: '28px', lineHeight: '1', letterSpacing: '0.05em' }}
         >
           LINK
         </span>
       </div>
       <span
-        className="font-bold uppercase text-white/70"
-        style={{ fontSize: '7.5px', marginTop: '1px', paddingLeft: '2px', letterSpacing: '0.2em' }}
+        className="font-bold uppercase"
+        style={{ color: 'var(--text-muted)', fontSize: '8px', marginTop: '1px', paddingLeft: '2px', letterSpacing: '0.2em' }}
       >
         COMMUNICATIONS CENTER
       </span>
     </div>
   )
 }
-

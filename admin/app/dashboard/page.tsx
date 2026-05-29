@@ -234,7 +234,7 @@ export default function DashboardPage() {
   const outStock = products.filter(p => p.stockQuantity === 0).length
 
   return (
-    <div className="min-h-screen bg-[#f0f4ff] dark:bg-[#0a0f1e] text-gray-900 dark:text-white">
+    <div className="min-h-screen" style={{ background: 'var(--bg-primary)', color: 'var(--text-primary)' }}>
       {/* Warning Banner */}
       {showWarning && (
         <div className="fixed top-0 left-0 right-0 z-50 bg-yellow-500 text-black text-center py-3 font-bold text-sm cursor-pointer" onClick={resetTimer}>
@@ -250,11 +250,11 @@ export default function DashboardPage() {
       )}
 
       {/* Header */}
-      <div className="border-b border-gray-200 dark:border-white/10 backdrop-blur-md sticky top-0 z-40 bg-white/90 dark:bg-[#0d1428]/80">
+      <div className="border-b backdrop-blur-md sticky top-0 z-40" style={{ background: 'var(--nav-bg)', borderColor: 'var(--nav-border)' }}>
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Inventory Dashboard</h1>
-            <p className="text-sm text-gray-500 dark:text-white/60">Link Communications Center — Admin</p>
+            <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Inventory Dashboard</h1>
+            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Link Communications Center — Admin</p>
           </div>
           <div className="flex gap-3 items-center">
             <button
@@ -285,8 +285,8 @@ export default function DashboardPage() {
             { label: 'Out of Stock', value: outStock, color: '#FF4444' },
             { label: 'Registered Users', value: userCount, color: '#9333ea' },
           ].map(stat => (
-            <div key={stat.label} className="bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-xl p-4 shadow-sm dark:shadow-none">
-              <p className="text-gray-500 dark:text-white/50 text-sm mb-1">{stat.label}</p>
+            <div key={stat.label} className="rounded-xl p-4 border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
+              <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>{stat.label}</p>
               <p className="text-3xl font-bold" style={{ color: stat.color }}>{stat.value}</p>
             </div>
           ))}
@@ -530,7 +530,7 @@ export default function DashboardPage() {
         ) : (
           <div className="bg-card border border-theme rounded-2xl overflow-hidden">
             {/* Table Header */}
-            <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b border-theme text-secondary text-xs font-bold uppercase tracking-wider">
+            <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b text-xs font-bold uppercase tracking-wider" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
               <span>Image</span>
               <span>Name</span>
               <span>Brand / Model</span>
@@ -597,7 +597,7 @@ export default function DashboardPage() {
 
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+            <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
               Customer Messages
               {messages.filter(m => !m.read).length > 0 && (
                 <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-bold bg-red-500 text-white">
@@ -608,7 +608,7 @@ export default function DashboardPage() {
           </div>
 
           {messages.length === 0 ? (
-            <p className="text-gray-500 dark:text-white/50">
+            <p style={{ color: 'var(--text-muted)' }}>
               No messages yet.
             </p>
           ) : (
@@ -626,15 +626,15 @@ export default function DashboardPage() {
                      }}>
                   <div className="flex justify-between items-start mb-2 gap-4">
                     <div>
-                      <span className="font-bold text-gray-900 dark:text-white">
+                      <span className="font-bold" style={{ color: 'var(--text-primary)' }}>
                         {msg.name}
                       </span>
-                      <span className="text-sm ml-2 text-gray-500 dark:text-white/50">
+                      <span className="text-sm ml-2" style={{ color: 'var(--text-muted)' }}>
                         {msg.email}
                       </span>
                     </div>
                     <div className="flex items-center gap-2 flex-shrink-0">
-                      <span className="text-xs text-gray-500 dark:text-white/50">
+                      <span className="text-xs" style={{ color: 'var(--text-muted)' }}>
                         {new Date(msg.created_at).toLocaleDateString()}
                       </span>
                       {!msg.read && (
@@ -658,7 +658,7 @@ export default function DashboardPage() {
                       )}
                     </div>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-white/70">
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                     {msg.message}
                   </p>
                 </div>

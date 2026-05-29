@@ -50,7 +50,7 @@ export default function SiteWrapper({ children }: { children: ReactNode }) {
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 0.35, ease: 'easeOut' }}
-              className="flex-1"
+              className="flex-1 pt-24"
             >
               {children}
             </motion.main>
