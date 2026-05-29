@@ -41,7 +41,7 @@ export default function SignupPage() {
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(21,116,181,0.18),transparent_30%),radial-gradient(circle_at_bottom_right,_rgba(244,120,33,0.12),transparent_38%)]" />
       <div
         className="relative w-full max-w-md rounded-3xl border p-8 shadow-2xl"
-        style={{ background: 'rgba(13, 20, 40, 0.75)', borderColor: 'var(--border-color)' }}
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', boxShadow: 'var(--card-shadow)' }}
       >
         <div className="mb-6">
           <BrandLogo />
@@ -102,7 +102,7 @@ export default function SignupPage() {
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="you@example.com"
                 className="w-full rounded-2xl px-4 py-4 outline-none border"
-                style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+                style={{ background: 'var(--bg-primary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
               />
             </div>
 

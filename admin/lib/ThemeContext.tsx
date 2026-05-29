@@ -8,29 +8,47 @@ const ThemeContext = createContext<{
   toggleTheme: () => void
 }>({ theme: 'dark', toggleTheme: () => {} })
 
-export function ThemeProvider({ children }: { children: React.ReactNode }) {
+export function ThemeProvider({
+  children
+}: {
+  children: React.ReactNode
+}) {
   const [theme, setTheme] = useState<Theme>('dark')
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const saved = localStorage.getItem('lcc_theme')
-    if (saved === 'dark' || !saved) {
+    setMounted(true)
+    const saved = localStorage.getItem('lcc_theme') as Theme
+    const initial = saved || 'dark'
+    setTheme(initial)
+    if (initial === 'dark') {
       document.documentElement.classList.add('dark')
-      setTheme('dark')
+      document.documentElement.classList.remove('light')
     } else {
       document.documentElement.classList.remove('dark')
-      setTheme('light')
+      document.documentElement.classList.add('light')
     }
   }, [])
 
   const toggleTheme = () => {
     const next = theme === 'dark' ? 'light' : 'dark'
+    setTheme(next)
+    localStorage.setItem('lcc_theme', next)
     if (next === 'dark') {
       document.documentElement.classList.add('dark')
+      document.documentElement.classList.remove('light')
     } else {
       document.documentElement.classList.remove('dark')
+      document.documentElement.classList.add('light')
     }
-    localStorage.setItem('lcc_theme', next)
-    setTheme(next)
+  }
+
+  if (!mounted) {
+    return (
+      <div style={{ visibility: 'hidden' }}>
+        {children}
+      </div>
+    )
   }
 
   return (

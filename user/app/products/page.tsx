@@ -8,7 +8,7 @@ import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib
 function CameraPlaceholder() {
   return (
     <div className="w-full h-48 flex items-center justify-center rounded-xl border"
-      style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.08)' }}
+      style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }}
     >
       <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.2" opacity="0.5">
         <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
@@ -254,20 +254,20 @@ export default function ProductsPage() {
   const otherProducts = filtered.filter(p => p.category !== 'Phones')
 
   return (
-    <div className="min-h-screen pt-0">
+    <div className="min-h-screen pt-0" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <AuthGuard show={!authed} />
 
       <div className="max-w-7xl mx-auto pt-24 pb-16 px-6">
         <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-2">Our Products</h1>
+          <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Our Products</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Browse our range of surveillance and communications equipment</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input
             className="flex-1 rounded-xl px-4 py-3 outline-none border"
-            style={{ background: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.10)', color: 'var(--text-primary)' }}
+            style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
             placeholder="Search products..."
             value={search}
             onChange={e => setSearch(e.target.value)}
@@ -279,8 +279,8 @@ export default function ProductsPage() {
                 onClick={() => setCategory(c)}
                 className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
                 style={{
-                  borderColor: category === c ? 'transparent' : 'rgba(255,255,255,0.10)',
-                  background: category === c ? 'rgba(21,116,181,0.22)' : 'rgba(255,255,255,0.04)',
+                  borderColor: category === c ? 'transparent' : 'var(--border-color)',
+                  background: category === c ? 'rgba(21,116,181,0.22)' : 'var(--bg-card)',
                   color: 'var(--text-primary)'
                 }}
               >
@@ -308,7 +308,12 @@ export default function ProductsPage() {
                       key={p.id}
                       onClick={() => setSelected(p)}
                       className="cursor-pointer rounded-2xl overflow-hidden border transition-all hover:-translate-y-1"
-                      style={{ borderColor: 'rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}
+                      style={{
+                        background: 'var(--bg-card)',
+                        border: '1px solid var(--border-color)',
+                        boxShadow: 'var(--card-shadow)',
+                        color: 'var(--text-primary)'
+                      }}
                     >
                       <div className="relative overflow-hidden">
                         {mainImage ? (
@@ -317,13 +322,13 @@ export default function ProductsPage() {
                           <CameraPlaceholder />
                         )}
                         <span className="absolute top-3 left-3 text-xs px-2 py-1 rounded-full border"
-                          style={{ background: 'rgba(0,0,0,0.45)', borderColor: 'rgba(21,116,181,0.35)', color: 'white' }}
+                          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
                         >
                           {p.category}
                         </span>
                       </div>
                       <div className="p-5">
-                        <h3 className="font-bold text-lg mb-1 leading-tight">{p.name}</h3>
+                        <h3 className="font-bold text-lg mb-1 leading-tight" style={{ color: 'var(--text-primary)' }}>{p.name}</h3>
                         <p className="text-xs font-mono mb-2" style={{ color: 'var(--text-muted)' }}>{p.brand} · {p.model}</p>
                         {p.description && (
                           <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{p.description}</p>
@@ -345,7 +350,7 @@ export default function ProductsPage() {
                   <p className="text-sm font-semibold tracking-widest uppercase mb-2" style={{ color: 'var(--text-muted)' }}>
                     Phones
                   </p>
-                  <h2 className="text-4xl md:text-5xl font-bold">
+                  <h2 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     Explore the lineup.
                   </h2>
                 </div>
@@ -360,7 +365,7 @@ export default function ProductsPage() {
                         className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group"
                       >
                         <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 border"
-                          style={{ borderColor: 'rgba(255,255,255,0.10)', background: 'rgba(255,255,255,0.04)' }}
+                          style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)', boxShadow: 'var(--card-shadow)' }}
                         >
                           {mainImage ? (
                             <img src={mainImage} alt={phone.name} className="w-full h-full object-cover" />
@@ -374,7 +379,7 @@ export default function ProductsPage() {
                         </div>
 
                         <div className="px-1">
-                          <h3 className="text-xl font-bold mb-1 group-hover:text-[#1574B5] transition-colors duration-300">
+                          <h3 className="text-xl font-bold mb-1 group-hover:text-[#1574B5] transition-colors duration-300" style={{ color: 'var(--text-primary)' }}>
                             {phone.name}
                           </h3>
                           <p className="text-sm mb-3 line-clamp-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
@@ -407,7 +412,7 @@ export default function ProductsPage() {
         <>
           <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setSelected(null)} />
 
-          <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl bg-[#0d1428]">
+          <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl" style={{ background: 'var(--bg-secondary)' }}>
             <div className="flex justify-center pt-4 pb-2">
               <div className="w-12 h-1.5 rounded-full bg-white/20" />
             </div>
@@ -417,7 +422,8 @@ export default function ProductsPage() {
                 <button
                   type="button"
                   onClick={() => setSelected(null)}
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:bg-white/10 text-white"
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:opacity-70"
+                  style={{ color: 'var(--text-primary)' }}
                 >
                   ✕
                 </button>
@@ -475,31 +481,31 @@ export default function ProductsPage() {
 
               <div className="space-y-4">
                 <div className="flex flex-wrap items-start justify-between gap-3">
-                  <h2 className="text-2xl font-bold">{selected.name}</h2>
+                  <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>{selected.name}</h2>
                 </div>
 
                 <div className="flex flex-wrap gap-3">
                   <span className="px-3 py-1 rounded-full text-sm border"
-                    style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'var(--text-secondary)' }}
+                    style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
                   >
                     🏷️ {selected.brand}
                   </span>
                   {selected.model && (
                     <span className="px-3 py-1 rounded-full text-sm border font-mono"
-                      style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: 'var(--text-secondary)' }}
+                      style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}
                     >
                       📋 {selected.model}
                     </span>
                   )}
                   <span className="px-3 py-1 rounded-full text-sm border"
-                    style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)', color: '#1574B5' }}
+                    style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: '#1574B5' }}
                   >
                     📂 {selected.category}
                   </span>
                 </div>
 
                 <div className="py-4 px-5 rounded-2xl border"
-                  style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }}
+                  style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', boxShadow: 'var(--card-shadow)' }}
                 >
                   <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Price</p>
                   <p className="text-3xl font-bold" style={{ color: '#1574B5' }}>
@@ -512,10 +518,10 @@ export default function ProductsPage() {
 
                 {selected.description && (
                   <div className="py-4 px-5 rounded-2xl border"
-                    style={{ background: 'rgba(255,255,255,0.04)', borderColor: 'rgba(255,255,255,0.10)' }}
+                    style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', boxShadow: 'var(--card-shadow)' }}
                   >
                     <p className="text-sm font-bold mb-2" style={{ color: 'var(--text-secondary)' }}>Description</p>
-                    <p className="leading-relaxed">{selected.description}</p>
+                    <p className="leading-relaxed" style={{ color: 'var(--text-primary)' }}>{selected.description}</p>
                   </div>
                 )}
 

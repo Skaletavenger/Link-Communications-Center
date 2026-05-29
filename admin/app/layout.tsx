@@ -20,7 +20,7 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={openSans.variable}>
+    <html lang="en" className={`${openSans.variable} dark`}>
       <body className={`${openSans.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SiteWrapper>{children}</SiteWrapper>
