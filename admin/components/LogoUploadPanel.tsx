@@ -3,9 +3,10 @@
 import { ChangeEvent, useCallback, useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import {
-  BRAND_LOGO_BUCKET,
-  BRAND_LOGO_PATH,
-  getBrandLogoPublicUrl,
+  bumpLogoVersion,
+  checkStoredLogo,
+  deleteBrandLogo,
+  getBrandLogoDisplayUrl,
   uploadBrandLogo,
 } from '../lib/brandLogo'
 
@@ -22,20 +23,20 @@ export default function LogoUploadPanel({ onToast }: Props) {
   const [deleting, setDeleting] = useState(false)
   const [checking, setChecking] = useState(true)
 
-  const loadPreview = useCallback(() => {
-    const url = getBrandLogoPublicUrl(supabase)
-    const img = new window.Image()
-    img.onload = () => {
-      setPreviewUrl(url)
-      setHasStoredLogo(true)
-      setChecking(false)
-    }
-    img.onerror = () => {
+  const loadPreview = useCallback(async () => {
+    setChecking(true)
+    const exists = await checkStoredLogo(supabase)
+
+    if (!exists) {
       setPreviewUrl(null)
       setHasStoredLogo(false)
       setChecking(false)
+      return
     }
-    img.src = `${url}?t=${Date.now()}`
+
+    setPreviewUrl(getBrandLogoDisplayUrl(supabase))
+    setHasStoredLogo(true)
+    setChecking(false)
   }, [])
 
   useEffect(() => {
@@ -61,9 +62,10 @@ export default function LogoUploadPanel({ onToast }: Props) {
         return
       }
 
+      bumpLogoVersion()
       onToast('Logo updated successfully!')
       setFile(null)
-      loadPreview()
+      await loadPreview()
       return
     }
 
@@ -86,10 +88,11 @@ export default function LogoUploadPanel({ onToast }: Props) {
       return
     }
 
+    bumpLogoVersion()
     setFile(null)
     if (fileInputRef.current) fileInputRef.current.value = ''
     onToast('Logo uploaded successfully!')
-    loadPreview()
+    await loadPreview()
   }
 
   const handleDelete = async () => {
@@ -99,9 +102,7 @@ export default function LogoUploadPanel({ onToast }: Props) {
     if (!confirmed) return
 
     setDeleting(true)
-    const { error } = await supabase.storage
-      .from(BRAND_LOGO_BUCKET)
-      .remove([BRAND_LOGO_PATH])
+    const { error } = await deleteBrandLogo(supabase)
     setDeleting(false)
 
     if (error) {
@@ -109,6 +110,7 @@ export default function LogoUploadPanel({ onToast }: Props) {
       return
     }
 
+    bumpLogoVersion()
     setPreviewUrl(null)
     setHasStoredLogo(false)
     setFile(null)
@@ -133,8 +135,8 @@ export default function LogoUploadPanel({ onToast }: Props) {
         className="hidden"
       />
 
-      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
-        <div className="flex-1">
+      <div className="flex flex-col gap-6">
+        <div>
           <h3 className="text-lg font-bold mb-1" style={{ color: 'var(--text-primary)' }}>
             Logo
           </h3>
@@ -151,6 +153,7 @@ export default function LogoUploadPanel({ onToast }: Props) {
             ) : previewUrl ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
+                key={previewUrl}
                 src={previewUrl}
                 alt="Logo preview"
                 className="max-h-16 w-auto max-w-full object-contain"
@@ -189,36 +192,33 @@ export default function LogoUploadPanel({ onToast }: Props) {
               </p>
             </>
           )}
-        </div>
 
-        {!hasStoredLogo && !checking && (
-          <div className="flex flex-col gap-3 min-w-[240px]">
-            <label className="text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
-              Logo image
-            </label>
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="text-sm text-left px-4 py-3 rounded-xl border transition-all hover:opacity-80"
-              style={{
-                background: 'var(--bg-primary)',
-                borderColor: 'var(--border-color)',
-                color: 'var(--text-primary)',
-              }}
-            >
-              {file ? file.name : 'Choose image file...'}
-            </button>
-            <button
-              type="button"
-              onClick={handleUpload}
-              disabled={uploading || !file}
-              className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
-              style={{ background: '#1574B5' }}
-            >
-              {uploading ? 'Uploading...' : 'Upload Logo'}
-            </button>
-          </div>
-        )}
+          {!hasStoredLogo && !checking && (
+            <div className="flex flex-col sm:flex-row gap-3 max-w-md">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 text-sm text-left px-4 py-3 rounded-xl border transition-all hover:opacity-80"
+                style={{
+                  background: 'var(--bg-primary)',
+                  borderColor: 'var(--border-color)',
+                  color: 'var(--text-primary)',
+                }}
+              >
+                {file ? file.name : 'Choose image file...'}
+              </button>
+              <button
+                type="button"
+                onClick={handleUpload}
+                disabled={uploading || !file}
+                className="px-6 py-3 rounded-xl font-bold text-white transition-all hover:opacity-90 disabled:opacity-50"
+                style={{ background: '#1574B5' }}
+              >
+                {uploading ? 'Uploading...' : 'Upload Logo'}
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

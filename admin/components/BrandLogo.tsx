@@ -1,8 +1,12 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { getBrandLogoPublicUrl } from '../lib/brandLogo'
+import {
+  checkStoredLogo,
+  getBrandLogoDisplayUrl,
+  LOGO_VERSION_KEY,
+} from '../lib/brandLogo'
 
 function DefaultBrandMark() {
   return (
@@ -38,19 +42,31 @@ export default function BrandLogo() {
   const [logoUrl, setLogoUrl] = useState<string | null>(null)
   const [ready, setReady] = useState(false)
 
-  useEffect(() => {
-    const url = getBrandLogoPublicUrl(supabase)
-    const img = new window.Image()
-    img.onload = () => {
-      setLogoUrl(url)
-      setReady(true)
-    }
-    img.onerror = () => {
+  const loadLogo = useCallback(async () => {
+    setReady(false)
+    const exists = await checkStoredLogo(supabase)
+    if (!exists) {
       setLogoUrl(null)
       setReady(true)
+      return
     }
-    img.src = `${url}?t=${Date.now()}`
+    setLogoUrl(getBrandLogoDisplayUrl(supabase))
+    setReady(true)
   }, [])
+
+  useEffect(() => {
+    loadLogo()
+
+    const onLogoUpdated = () => loadLogo()
+    window.addEventListener('lcc-logo-updated', onLogoUpdated)
+    window.addEventListener('storage', (e) => {
+      if (e.key === LOGO_VERSION_KEY) loadLogo()
+    })
+
+    return () => {
+      window.removeEventListener('lcc-logo-updated', onLogoUpdated)
+    }
+  }, [loadLogo])
 
   if (!ready) {
     return <div className="h-10 w-32 rounded-lg animate-pulse" style={{ background: 'var(--bg-card)' }} />
@@ -60,6 +76,7 @@ export default function BrandLogo() {
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img
+        key={logoUrl}
         src={logoUrl}
         alt="Link Communications Center"
         className="h-10 w-auto max-w-[220px] object-contain object-left"
