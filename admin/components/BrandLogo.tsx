@@ -2,11 +2,7 @@
 
 import { useCallback, useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import {
-  checkStoredLogo,
-  getBrandLogoDisplayUrl,
-  LOGO_VERSION_KEY,
-} from '../lib/brandLogo'
+import { getLogoVersionKey, resolveBrandLogoUrl } from '../lib/brandLogo'
 
 function DefaultBrandMark() {
   return (
@@ -44,13 +40,8 @@ export default function BrandLogo() {
 
   const loadLogo = useCallback(async () => {
     setReady(false)
-    const exists = await checkStoredLogo(supabase)
-    if (!exists) {
-      setLogoUrl(null)
-      setReady(true)
-      return
-    }
-    setLogoUrl(getBrandLogoDisplayUrl(supabase))
+    const url = await resolveBrandLogoUrl(supabase)
+    setLogoUrl(url)
     setReady(true)
   }, [])
 
@@ -60,11 +51,20 @@ export default function BrandLogo() {
     const onLogoUpdated = () => loadLogo()
     window.addEventListener('lcc-logo-updated', onLogoUpdated)
     window.addEventListener('storage', (e) => {
-      if (e.key === LOGO_VERSION_KEY) loadLogo()
+      if (e.key === getLogoVersionKey('light') || e.key === getLogoVersionKey('dark')) {
+        loadLogo()
+      }
+    })
+
+    const observer = new MutationObserver(() => loadLogo())
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['class'],
     })
 
     return () => {
       window.removeEventListener('lcc-logo-updated', onLogoUpdated)
+      observer.disconnect()
     }
   }, [loadLogo])
 
