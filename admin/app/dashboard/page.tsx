@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInventory'
 import ThemeToggle from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
+import LogoUploadPanel from '../../components/LogoUploadPanel'
 
 type ContactMessage = {
   id: string
@@ -594,6 +595,13 @@ export default function DashboardPage() {
             ))}
           </div>
         )}
+
+        <div className="mt-8">
+          <h2 className="text-xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
+            Site Content
+          </h2>
+          <LogoUploadPanel onToast={showToast} />
+        </div>
 
         <div className="mt-8">
           <div className="flex items-center justify-between mb-4">

@@ -51,3 +51,28 @@ INSERT INTO site_content (id, content) VALUES (
   'Link Communications Center is Uganda''s trusted provider of surveillance cameras, communications equipment, and smart phones. We offer quality products at affordable prices with expert installation and support services.'
 )
 ON CONFLICT (id) DO NOTHING;
+
+-- Brand logo storage (public read, upload for admin dashboard)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('brand-assets', 'brand-assets', true)
+ON CONFLICT (id) DO UPDATE SET public = true;
+
+DROP POLICY IF EXISTS "Public read brand assets" ON storage.objects;
+CREATE POLICY "Public read brand assets"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'brand-assets');
+
+DROP POLICY IF EXISTS "Upload brand assets" ON storage.objects;
+CREATE POLICY "Upload brand assets"
+  ON storage.objects FOR INSERT
+  WITH CHECK (bucket_id = 'brand-assets');
+
+DROP POLICY IF EXISTS "Update brand assets" ON storage.objects;
+CREATE POLICY "Update brand assets"
+  ON storage.objects FOR UPDATE
+  USING (bucket_id = 'brand-assets');
+
+DROP POLICY IF EXISTS "Overwrite brand assets" ON storage.objects;
+CREATE POLICY "Overwrite brand assets"
+  ON storage.objects FOR DELETE
+  USING (bucket_id = 'brand-assets');
