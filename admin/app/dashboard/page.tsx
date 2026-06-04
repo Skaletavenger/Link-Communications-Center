@@ -5,6 +5,7 @@ import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInven
 import ThemeToggle from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
 import LogoUploadPanel from '../../components/LogoUploadPanel'
+import StatsPanel from '../../components/StatsPanel'
 
 type ContactMessage = {
   id: string
@@ -601,6 +602,9 @@ export default function DashboardPage() {
             Site Content
           </h2>
           <LogoUploadPanel onToast={showToast} />
+          <div className="mt-6">
+            <StatsPanel onToast={showToast} />
+          </div>
         </div>
 
         <div className="mt-8">

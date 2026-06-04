@@ -51,3 +51,45 @@ body {
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Homepage cinematic hero */
+.home-hero {
+  --hero-from: #f0f6fc;
+  --hero-to: #e4eef8;
+  --hero-grid: rgba(21, 116, 181, 0.14);
+  --hero-blob: rgba(21, 116, 181, 0.2);
+  --hero-badge-border: rgba(21, 116, 181, 0.35);
+}
+
+.dark .home-hero {
+  --hero-from: #060e1a;
+  --hero-to: #0d2244;
+  --hero-grid: rgba(21, 116, 181, 0.12);
+  --hero-blob: rgba(21, 116, 181, 0.35);
+  --hero-badge-border: rgba(21, 116, 181, 0.5);
+}
+
+.home-hero-grid {
+  background-image:
+    linear-gradient(var(--hero-grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--hero-grid) 1px, transparent 1px);
+  background-size: 48px 48px;
+  animation: homeGridDrift 24s linear infinite;
+}
+
+@keyframes homeGridDrift {
+  0% {
+    background-position: 0 0, 0 0;
+  }
+  100% {
+    background-position: 48px 48px, 48px 48px;
+  }
+}
+
+.home-stats-bar {
+  background: var(--bg-secondary);
+}
+
+.dark .home-stats-bar {
+  background: #0a1220;
+}
