@@ -253,5 +253,6 @@ export default function GlobeHero() {
     }
   }, [])
 
-  return <div ref={mountRef} style={{ width: '560px', height: '560px', right: '-30px', background: 'transparent' }} />
-}
+  return (
+    
+  )
