@@ -238,18 +238,12 @@ export default function GlobeHero() {
       camera.updateProjectionMatrix()
     }
 
-    window.addEventListener('resize', handleResize)
-    mountRef.current?.appendChild(renderer.domElement)
-
     return () => {
       cancelAnimationFrame(frameId)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', handleResize)
-      if (renderer.domElement.parentNode === mountRef.current) {
-        mountRef.current?.removeChild(renderer.domElement)
-      }
       renderer.dispose()
+      mountRef.current?.removeChild(renderer.domElement)
     }
   }, [])
 
