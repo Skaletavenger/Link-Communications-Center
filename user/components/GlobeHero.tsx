@@ -9,8 +9,8 @@ export default function GlobeHero() {
   useEffect(() => {
     if (!mountRef.current) return
 
-    const WIDTH = 600
-    const HEIGHT = 600
+    const WIDTH = 480
+    const HEIGHT = 480
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
     renderer.setSize(WIDTH, HEIGHT)
@@ -253,5 +253,5 @@ export default function GlobeHero() {
     }
   }, [])
 
-  return <div ref={mountRef} style={{ width: '600px', height: '600px', background: 'transparent' }} />
+  return <div ref={mountRef} style={{ width: '480px', height: '480px', background: 'transparent' }} />
 }
