@@ -1,0 +1,5 @@
+.DS_Store
+.vscode/
+user/node_modules copy/
+node_modules/
+node_modules copy/
