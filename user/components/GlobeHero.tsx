@@ -19,6 +19,7 @@ export default function GlobeHero(): JSX.Element {
     camera.position.set(0, 0, 4)
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.domElement.style.background = 'transparent'
     renderer.setPixelRatio(Math.min(window.devicePixelRatio ?? 1, 2))
     renderer.setSize(width, height)
     renderer.setClearColor(0x000000, 0)
@@ -302,6 +303,7 @@ export default function GlobeHero(): JSX.Element {
         height: '560px',
         pointerEvents: 'none',
         overflow: 'visible',
+        background: 'transparent',
       }}
       aria-hidden
     />
