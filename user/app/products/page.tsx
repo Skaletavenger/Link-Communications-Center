@@ -1,4 +1,5 @@
 'use client'
+/* eslint-disable @next/next/no-img-element */
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
 import AuthGuard from '../../components/AuthGuard'
@@ -35,7 +36,7 @@ function ImageCarousel({
   const [animating, setAnimating] = useState(false)
   const [direction, setDirection] = useState<'left'|'right'>('left')
 
-  const goTo = (index: number, dir: 'left'|'right') => {
+  const goTo = useCallback((index: number, dir: 'left'|'right') => {
     if (animating) return
     setDirection(dir)
     setAnimating(true)
@@ -43,14 +44,14 @@ function ImageCarousel({
       setCurrent(index)
       setAnimating(false)
     }, SLIDE_MS)
-  }
+  }, [animating])
 
   const next = useCallback(() => {
     goTo(
       current === images.length - 1 ? 0 : current + 1,
       'left'
     )
-  }, [current, images.length])
+  }, [current, images.length, goTo])
 
   const prev = () => {
     goTo(
@@ -463,7 +464,6 @@ export default function ProductsPage() {
                     <div className="w-full rounded-2xl overflow-hidden 
                                     mb-6 border"
                          style={{ borderColor: 'var(--border-color)' }}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img src={imgs[0]} alt={selected.name}
                            className="w-full h-72 object-contain"
                            style={{ background: 'var(--bg-card)' }}/>
