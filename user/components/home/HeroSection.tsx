@@ -4,6 +4,9 @@ import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useEffect, useRef } from 'react'
 import { animate } from 'animejs'
+import dynamic from 'next/dynamic'
+
+const GlobeHero = dynamic(() => import('../GlobeHero'), { ssr: false })
 
 const HEADLINE = ['Connect.', 'Secure.', 'Communicate.']
 
@@ -66,6 +69,8 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
         animate={{ scale: [1, 1.08, 1], opacity: [0.6, 0.9, 0.6] }}
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
+
+      <GlobeHero />
 
       <motion.div
         className="relative z-10 px-6 md:px-16 pt-28 pb-24 max-w-5xl"
