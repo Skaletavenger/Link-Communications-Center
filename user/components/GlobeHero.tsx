@@ -1,311 +1,327 @@
-import React, { useEffect, useRef, useState } from 'react';
-import * as THREE from 'three';
-import styles from './GlobeHero.module.css';
+"use client"
 
-type City = {
-  name: string;
-  lat: number;
-  lon: number;
-  isHub?: boolean;
-};
+import { useEffect, useRef } from 'react'
+import * as THREE from 'three'
 
-type PulsingMesh = THREE.Mesh & { userData: { pulse?: number } };
-
-const cities: City[] = [
-  { name: 'Kampala', lat: 0.3476, lon: 32.5825, isHub: true },
-  { name: 'Nairobi', lat: -1.2921, lon: 36.8219 },
-  { name: 'London', lat: 51.5074, lon: -0.1278 },
-  { name: 'Dubai', lat: 25.2048, lon: 55.2708 },
-  { name: 'Johannesburg', lat: -26.2041, lon: 28.0473 },
-  { name: 'Cairo', lat: 30.0444, lon: 31.2357 },
-];
-
-const GlobeHero: React.FC = () => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  const [hoverInfo, setHoverInfo] = useState<{ name: string; x: number; y: number } | null>(null);
+export default function GlobeHero(): JSX.Element {
+  const containerRef = useRef<HTMLDivElement | null>(null)
+  const rafRef = useRef<number | null>(null)
 
   useEffect(() => {
-    if (!containerRef.current) return;
-    const container = containerRef.current;
-    const scene = new THREE.Scene();
-    scene.background = null;
+    const container = containerRef.current
+    if (!container) return
 
-    const camera = new THREE.PerspectiveCamera(35, 1, 0.1, 100);
-    camera.position.set(0, 0, 3.4);
+    // Scene + Camera + Renderer
+    const scene = new THREE.Scene()
+    const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+    renderer.setSize(600, 600)
+    renderer.domElement.style.width = '600px'
+    renderer.domElement.style.height = '600px'
+    renderer.domElement.style.display = 'block'
+    renderer.domElement.style.pointerEvents = 'none'
+    container.appendChild(renderer.domElement)
 
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    renderer.setClearColor(0x000000, 0);
-    container.appendChild(renderer.domElement);
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000)
+    camera.position.set(0, 0, 6)
 
-    const ambientLight = new THREE.AmbientLight('#1a6cf6', 0.7);
-    scene.add(ambientLight);
-    const pointLight = new THREE.PointLight('#1a6cf6', 1.2, 12);
-    pointLight.position.set(2, 2, 3);
-    scene.add(pointLight);
+    // Resize handling (keeps fixed 600x600 but handle DPR changes)
+    const onResize = () => {
+      const dpr = Math.min(window.devicePixelRatio || 1, 2)
+      renderer.setPixelRatio(dpr)
+      renderer.setSize(600, 600)
+      camera.updateProjectionMatrix()
+    }
+    window.addEventListener('resize', onResize)
 
-    const globeGroup = new THREE.Group();
-    scene.add(globeGroup);
+    // Lights
+    const ambient = new THREE.AmbientLight(0xffffff, 0.2)
+    scene.add(ambient)
+    const pointLight = new THREE.PointLight(0x1a6cf6, 2.5, 50)
+    pointLight.position.set(4, 3, 6)
+    scene.add(pointLight)
 
-    const globeRadius = 1;
-    const globeGeometry = new THREE.SphereGeometry(globeRadius, 64, 64);
-    const globeMaterial = new THREE.MeshStandardMaterial({
-      color: '#050d1a',
-      emissive: '#050d1a',
-      roughness: 0.5,
-      metalness: 0.2,
-    });
-    const globeMesh = new THREE.Mesh(globeGeometry, globeMaterial);
-    globeGroup.add(globeMesh);
+    // Globe parameters
+    const RADIUS = 1.5
 
-    const gridMaterial = new THREE.MeshBasicMaterial({
-      color: '#0a2a6e',
-      wireframe: true,
-      transparent: true,
-      opacity: 0.65,
-    });
-    const gridMesh = new THREE.Mesh(new THREE.SphereGeometry(globeRadius + 0.001, 64, 64), gridMaterial);
-    globeGroup.add(gridMesh);
+    // Load earth texture
+    const loader = new THREE.TextureLoader()
+    const earthTextureUrl = 'https://unpkg.com/three-globe/example/img/earth-dark.jpg'
+    const earthMat = new THREE.MeshPhongMaterial({ shininess: 80 })
+    loader.load(earthTextureUrl, (tex) => {
+      tex.encoding = THREE.sRGBEncoding
+      earthMat.map = tex
+      earthMat.needsUpdate = true
+    })
 
-    const atmosphereGeometry = new THREE.SphereGeometry(globeRadius * 1.08, 64, 64);
-    const atmosphereMaterial = new THREE.MeshBasicMaterial({
-      color: '#1a6cf6',
-      transparent: true,
-      opacity: 0.12,
+    const globeGeo = new THREE.SphereGeometry(RADIUS, 64, 64)
+    const globeMesh = new THREE.Mesh(globeGeo, earthMat)
+    globeMesh.castShadow = false
+    globeMesh.receiveShadow = false
+    scene.add(globeMesh)
+
+    // Wireframe grid (lat/long) on separate LineSegments at radius + 0.01
+    const gridGeo = new THREE.EdgesGeometry(new THREE.SphereGeometry(RADIUS + 0.01, 64, 64))
+    const gridMat = new THREE.LineBasicMaterial({ color: 0x0a2a6e, transparent: true, opacity: 0.4 })
+    const gridLines = new THREE.LineSegments(gridGeo, gridMat)
+    scene.add(gridLines)
+
+    // Atmosphere: slightly larger sphere with ShaderMaterial glow
+    const atmosphereGeo = new THREE.SphereGeometry(RADIUS + 0.15, 64, 64)
+    const atmosphereMat = new THREE.ShaderMaterial({
+      uniforms: {
+        c: { value: 0.8 },
+        p: { value: 2.0 },
+        glowColor: { value: new THREE.Color(0x1a6cf6) },
+        viewVector: { value: new THREE.Vector3(0, 0, 1) },
+      },
+      vertexShader: `
+        uniform vec3 viewVector;
+        varying float intensity;
+        void main() {
+          vec3 vNormal = normalize(normalMatrix * normal);
+          vec3 vNormView = normalize(normalMatrix * viewVector - (modelViewMatrix * vec4(position, 1.0)).xyz);
+          intensity = pow(max(0.0, dot(vNormal, vNormView)), 1.5);
+          gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+        }
+      `,
+      fragmentShader: `
+        uniform vec3 glowColor;
+        varying float intensity;
+        void main() {
+          float alpha = intensity * 0.6;
+          gl_FragColor = vec4(glowColor, alpha);
+        }
+      `,
       side: THREE.BackSide,
       blending: THREE.AdditiveBlending,
-    });
-    const atmosphereMesh = new THREE.Mesh(atmosphereGeometry, atmosphereMaterial);
-    globeGroup.add(atmosphereMesh);
-
-    const nodeGroup = new THREE.Group();
-    globeGroup.add(nodeGroup);
-
-    const raycaster = new THREE.Raycaster();
-    const mouse = new THREE.Vector2();
-    const clock = new THREE.Clock();
-
-    const cityMeshes: THREE.Mesh[] = [];
-    const cityLookups: { mesh: THREE.Mesh; city: City }[] = [];
-
-    const toVector3 = (lat: number, lon: number, radius: number) => {
-      const phi = (90 - lat) * (Math.PI / 180);
-      const theta = (lon + 180) * (Math.PI / 180);
-      return new THREE.Vector3(
-        -radius * Math.sin(phi) * Math.cos(theta),
-        radius * Math.cos(phi),
-        radius * Math.sin(phi) * Math.sin(theta),
-      );
-    };
-
-    const hubCity = cities.find((city) => city.isHub) ?? cities[0];
-    const hubPosition = toVector3(hubCity.lat, hubCity.lon, globeRadius);
-
-    cities.forEach((city) => {
-      const position = toVector3(city.lat, city.lon, globeRadius);
-      const dotRadius = city.isHub ? 0.045 : 0.02;
-      const dotMaterial = new THREE.MeshStandardMaterial({
-        color: '#00d4ff',
-        emissive: '#00d4ff',
-        roughness: 0.4,
-        metalness: 0.8,
-        transparent: true,
-        opacity: 1,
-      });
-      const cityDot = new THREE.Mesh(new THREE.SphereGeometry(dotRadius, 16, 16), dotMaterial);
-      cityDot.position.copy(position);
-      nodeGroup.add(cityDot);
-      cityMeshes.push(cityDot);
-      cityLookups.push({ mesh: cityDot, city });
-
-      if (city.isHub) {
-        const ringGeometry = new THREE.RingGeometry(dotRadius * 1.5, dotRadius * 2.7, 32);
-        const ringMaterial = new THREE.MeshBasicMaterial({
-          color: '#00d4ff',
-          transparent: true,
-          opacity: 0.45,
-          side: THREE.DoubleSide,
-          blending: THREE.AdditiveBlending,
-        });
-        const ring = new THREE.Mesh(ringGeometry, ringMaterial) as PulsingMesh;
-        ring.position.copy(position);
-        const normal = position.clone().normalize();
-        const quaternion = new THREE.Quaternion().setFromUnitVectors(new THREE.Vector3(0, 0, 1), normal);
-        ring.quaternion.copy(quaternion);
-        ring.rotateX(Math.PI / 2);
-        ring.userData.pulse = 0;
-        nodeGroup.add(ring);
-      }
-    });
-
-    const arcData: {
-      curve: THREE.QuadraticBezierCurve3;
-      tracer: THREE.Mesh;
-      speed: number;
-    }[] = [];
-
-    const arcMaterial = new THREE.LineBasicMaterial({
-      color: '#00d4ff',
       transparent: true,
-      opacity: 0.35,
-    });
+      depthWrite: false,
+    })
+    const atmosphereMesh = new THREE.Mesh(atmosphereGeo, atmosphereMat)
+    atmosphereMesh.renderOrder = 1
+    scene.add(atmosphereMesh)
 
-    cities.filter((city) => !city.isHub).forEach((targetCity) => {
-      const targetPosition = toVector3(targetCity.lat, targetCity.lon, globeRadius);
-      const midPoint = hubPosition.clone().add(targetPosition).multiplyScalar(0.5);
-      const control = midPoint.clone().normalize().multiplyScalar(1.25).add(midPoint.clone().multiplyScalar(0.4));
-      const curve = new THREE.QuadraticBezierCurve3(hubPosition.clone(), control, targetPosition.clone());
-      const points = curve.getPoints(80);
-      const arcGeometry = new THREE.BufferGeometry().setFromPoints(points);
-      const arcLine = new THREE.Line(arcGeometry, arcMaterial);
-      globeGroup.add(arcLine);
+    // Stars background
+    const starCount = 2000
+    const starsGeo = new THREE.BufferGeometry()
+    const starPositions = new Float32Array(starCount * 3)
+    for (let i = 0; i < starCount; i++) {
+      const r = 10 + Math.random() * 40
+      const theta = Math.random() * Math.PI * 2
+      const phi = Math.acos(2 * Math.random() - 1)
+      starPositions[i * 3 + 0] = Math.sin(phi) * Math.cos(theta) * r
+      starPositions[i * 3 + 1] = Math.sin(phi) * Math.sin(theta) * r
+      starPositions[i * 3 + 2] = Math.cos(phi) * r
+    }
+    starsGeo.setAttribute('position', new THREE.BufferAttribute(starPositions, 3))
+    const starsMat = new THREE.PointsMaterial({ color: 0xffffff, size: 0.6, transparent: true, opacity: 0.9 })
+    const stars = new THREE.Points(starsGeo, starsMat)
+    scene.add(stars)
 
-      const tracer = new THREE.Mesh(
-        new THREE.SphereGeometry(0.01, 10, 10),
-        new THREE.MeshStandardMaterial({
-          color: '#1a6cf6',
-          emissive: '#1a6cf6',
-          roughness: 0.3,
-          metalness: 0.6,
-          transparent: true,
-          opacity: 0.9,
-        }),
-      );
-      globeGroup.add(tracer);
-      arcData.push({ curve, tracer, speed: 0.18 + Math.random() * 0.08 });
-    });
+    // Helper: lat/lon to Vector3
+    function latLonToVector3(lat: number, lon: number, radius: number) {
+      const phi = (90 - lat) * (Math.PI / 180)
+      const theta = (lon + 180) * (Math.PI / 180)
+      const x = -(radius * Math.sin(phi) * Math.cos(theta))
+      const z = radius * Math.sin(phi) * Math.sin(theta)
+      const y = radius * Math.cos(phi)
+      return new THREE.Vector3(x, y, z)
+    }
 
-    const resizeScene = () => {
-      const width = container.clientWidth;
-      const height = container.clientHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-      renderer.setSize(width, height);
-    };
+    // City list with lat/lon and sizes
+    const cities = [
+      { id: 'kampala', lat: 0.3476, lon: 32.5825, size: 12, color: 0x1a6cf6 },
+      { id: 'nairobi', lat: -1.286389, lon: 36.817223, size: 7, color: 0x00d4ff },
+      { id: 'london', lat: 51.5074, lon: -0.1278, size: 7, color: 0x00d4ff },
+      { id: 'dubai', lat: 25.2048, lon: 55.2708, size: 7, color: 0x00d4ff },
+      { id: 'joburg', lat: -26.2041, lon: 28.0473, size: 7, color: 0x00d4ff },
+      { id: 'cairo', lat: 30.0444, lon: 31.2357, size: 7, color: 0x00d4ff },
+    ]
 
-    let targetRotX = 0;
-    let targetRotY = 0;
-    let currentRotX = 0;
-    let currentRotY = 0;
-    let targetScale = 1;
-    let currentScale = 1;
-    let scrollTarget = 0;
-    let scrollCurrent = 0;
-    let totalTime = 0;
-    let frameId = 0;
+    // Create sprite texture for city glow
+    function createGlowTexture(color: string | number, size = 64) {
+      const canvas = document.createElement('canvas')
+      canvas.width = size
+      canvas.height = size
+      const ctx = canvas.getContext('2d')!
+      const grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+      grad.addColorStop(0, `#${(typeof color === 'number' ? color.toString(16) : color)}`)
+      grad.addColorStop(0.3, 'rgba(255,255,255,0.9)')
+      grad.addColorStop(1, 'rgba(255,255,255,0)')
+      ctx.fillStyle = grad
+      ctx.fillRect(0, 0, size, size)
+      const tex = new THREE.CanvasTexture(canvas)
+      tex.needsUpdate = true
+      return tex
+    }
 
-    const onMouseMove = (event: MouseEvent) => {
-      const rect = container.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
-      const y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
-      targetRotY = x * 0.15;
-      targetRotX = y * 0.08;
-      mouse.x = x;
-      mouse.y = y;
+    // Add city sprites and pulsing rings
+    const cityGroup = new THREE.Group()
+    scene.add(cityGroup)
 
-      raycaster.setFromCamera(mouse, camera);
-      const intersects = raycaster.intersectObjects(cityMeshes, false);
-      if (intersects.length > 0) {
-        const object = intersects[0].object as THREE.Mesh;
-        const found = cityLookups.find((item) => item.mesh === object);
-        if (found) {
-          const projected = found.mesh.position.clone().project(camera);
-          const xPos = (projected.x * 0.5 + 0.5) * container.clientWidth;
-          const yPos = (-projected.y * 0.5 + 0.5) * container.clientHeight;
-          setHoverInfo({ name: found.city.name, x: xPos, y: yPos });
-          return;
+    const spriteTex = createGlowTexture(0x00d4ff, 128)
+
+    const citySprites: { id: string; sprite: THREE.Sprite; pulseMeshes?: THREE.Mesh[] }[] = []
+
+    for (const c of cities) {
+      const pos = latLonToVector3(c.lat, c.lon, RADIUS + 0.01)
+      const mat = new THREE.SpriteMaterial({ map: spriteTex, color: c.color, transparent: true, opacity: 1 })
+      const sprite = new THREE.Sprite(mat)
+      sprite.scale.set((c.size / 12) * 0.25, (c.size / 12) * 0.25, 1)
+      sprite.position.copy(pos)
+      cityGroup.add(sprite)
+
+      let pulseMeshes: THREE.Mesh[] | undefined
+      if (c.id === 'kampala') {
+        pulseMeshes = []
+        for (let i = 0; i < 2; i++) {
+          const geom = new THREE.RingGeometry(0.02, 0.04, 32)
+          const mat = new THREE.MeshBasicMaterial({ color: 0x1a6cf6, transparent: true, opacity: 0.6, side: THREE.DoubleSide })
+          const mesh = new THREE.Mesh(geom, mat)
+          mesh.position.copy(pos.clone().multiplyScalar((RADIUS + 0.02) / RADIUS))
+          mesh.lookAt(camera.position)
+          cityGroup.add(mesh)
+          pulseMeshes.push(mesh)
         }
       }
-      setHoverInfo(null);
-    };
 
-    const onScroll = () => {
-      const scrollRatio = Math.min(window.scrollY / (window.innerHeight * 0.8), 1);
-      scrollTarget = scrollRatio;
-    };
+      citySprites.push({ id: c.id, sprite, pulseMeshes })
+    }
 
-    window.addEventListener('mousemove', onMouseMove);
-    window.addEventListener('scroll', onScroll);
-    window.addEventListener('resize', resizeScene);
+    // Arcs and moving dots
+    const arcsGroup = new THREE.Group()
+    scene.add(arcsGroup)
 
-    resizeScene();
+    const arcMaterial = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.6 })
 
-    const animate = () => {
-      const delta = clock.getDelta();
-      totalTime += delta;
-      currentRotX += (targetRotX - currentRotX) * 0.08;
-      currentRotY += (targetRotY - currentRotY) * 0.08;
-      scrollCurrent += (scrollTarget - scrollCurrent) * 0.06;
-      targetScale = 1 - scrollCurrent * 0.08;
-      currentScale += (targetScale - currentScale) * 0.06;
+    const movingDots: { mesh: THREE.Mesh; curve: THREE.QuadraticBezierCurve3; offset: number }[] = []
 
-      globeGroup.rotation.x = currentRotX;
-      globeGroup.rotation.y += 0.002;
-      globeGroup.rotation.y += currentRotY * 0.05;
-      globeGroup.scale.set(currentScale, currentScale, currentScale);
+    const kampala = cities.find((c) => c.id === 'kampala')!
+    const kampPos = latLonToVector3(kampala.lat, kampala.lon, RADIUS + 0.01)
 
-      nodeGroup.children.forEach((child: THREE.Object3D) => {
-        const ring = child as PulsingMesh;
-        if (ring.userData.pulse !== undefined) {
-          ring.userData.pulse += delta * 2;
-          const scale = 1 + Math.sin(ring.userData.pulse) * 0.18;
-          ring.scale.set(scale, scale, scale);
-          const material = ring.material as THREE.Material & { opacity?: number };
-          if (material.opacity !== undefined) {
-            material.opacity = 0.35 + Math.sin(ring.userData.pulse) * 0.08;
+    let arcIndex = 0
+    for (const c of cities) {
+      if (c.id === 'kampala') continue
+      const dest = latLonToVector3(c.lat, c.lon, RADIUS + 0.01)
+      const mid = new THREE.Vector3().addVectors(kampPos, dest).multiplyScalar(0.5)
+      const midDir = mid.clone().normalize().multiplyScalar(RADIUS + 0.8 + Math.random() * 0.6)
+      const control = midDir
+
+      const curve = new THREE.QuadraticBezierCurve3(kampPos.clone(), control, dest.clone())
+      const tubeGeo = new THREE.TubeGeometry(curve as any, 64, 0.01, 8, false)
+      const tube = new THREE.Mesh(tubeGeo, arcMaterial)
+      arcsGroup.add(tube)
+
+      // moving dot
+      const dotGeo = new THREE.SphereGeometry(0.03, 8, 8)
+      const dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff })
+      const dot = new THREE.Mesh(dotGeo, dotMat)
+      arcsGroup.add(dot)
+      movingDots.push({ mesh: dot, curve, offset: (arcIndex / Math.max(1, cities.length - 1)) * 0.33 })
+      arcIndex++
+    }
+
+    // Animation state
+    let targetRotX = 0
+    let targetRotY = 0
+    let currentRotX = 0
+    let currentRotY = 0
+    let scrollRot = 0
+
+    // Mouse parallax
+    function onPointerMove(e: PointerEvent) {
+      const rect = renderer.domElement.getBoundingClientRect()
+      const x = (e.clientX - (rect.left + rect.width / 2)) / (rect.width / 2)
+      const y = (e.clientY - (rect.top + rect.height / 2)) / (rect.height / 2)
+      const max = 15 * (Math.PI / 180)
+      targetRotY = x * max
+      targetRotX = y * max * -1
+    }
+    window.addEventListener('pointermove', onPointerMove)
+
+    // Scroll rotates globe
+    function onScroll() {
+      const s = window.scrollY || window.pageYOffset
+      scrollRot = s * 0.0006
+    }
+    window.addEventListener('scroll', onScroll, { passive: true })
+
+    // Animation loop
+    const clock = new THREE.Clock()
+
+    function animate() {
+      const dt = clock.getDelta()
+
+      // Auto rotate
+      globeMesh.rotation.y += 0.001
+
+      // Lerp to target rotations (mouse parallax)
+      currentRotX += (targetRotX - currentRotX) * 0.06
+      currentRotY += (targetRotY - currentRotY) * 0.06
+      globeMesh.rotation.x = currentRotX
+      globeMesh.rotation.y += (currentRotY - globeMesh.rotation.y) * 0.06
+
+      // Apply scroll rotation smoothly
+      globeMesh.rotation.y += (scrollRot - globeMesh.rotation.y) * 0.02
+
+      // Atmosphere view vector
+      atmosphereMat.uniforms.viewVector.value.copy(camera.position)
+
+      // Update pulses on Kampala
+      const t = performance.now() * 0.001
+      for (const cs of citySprites) {
+        if (cs.id === 'kampala' && cs.pulseMeshes) {
+          for (let i = 0; i < cs.pulseMeshes.length; i++) {
+            const m = cs.pulseMeshes[i]
+            const scale = 1 + ((t * 0.8 + i * 0.5) % 1) * 2.5
+            m.scale.setScalar(scale)
+            const mat = m.material as THREE.MeshBasicMaterial
+            mat.opacity = 0.6 * (1 - ((t * 0.8 + i * 0.5) % 1))
           }
         }
-      });
+      }
 
-      arcData.forEach((data) => {
-        const t = (totalTime * data.speed) % 1;
-        const point = data.curve.getPoint(t);
-        data.tracer.position.copy(point);
-      });
+      // Move dots along arcs
+      for (let i = 0; i < movingDots.length; i++) {
+        const md = movingDots[i]
+        const speed = 1 / 3 // loop every 3s
+        const phase = ((t * speed) + md.offset) % 1
+        const p = md.curve.getPoint(phase)
+        md.mesh.position.copy(p)
+      }
 
-      renderer.render(scene, camera);
-      frameId = requestAnimationFrame(animate);
-    };
+      renderer.render(scene, camera)
+      rafRef.current = requestAnimationFrame(animate)
+    }
+    rafRef.current = requestAnimationFrame(animate)
 
-    animate();
-
+    // Cleanup
     return () => {
-      window.removeEventListener('mousemove', onMouseMove);
-      window.removeEventListener('scroll', onScroll);
-      window.removeEventListener('resize', resizeScene);
-      cancelAnimationFrame(frameId);
-      globeGroup.traverse((object: THREE.Object3D) => {
-        if (object instanceof THREE.Mesh) {
-          object.geometry.dispose();
-          if (Array.isArray(object.material)) {
-            object.material.forEach((material: THREE.Material) => material.dispose());
-          } else {
-            object.material.dispose();
-          }
-        }
-      });
-      renderer.dispose();
-      if (renderer.domElement.parentElement === container) {
-        container.removeChild(renderer.domElement);
-      }
-    };
-  }, []);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current)
+      window.removeEventListener('resize', onResize)
+      window.removeEventListener('pointermove', onPointerMove)
+      window.removeEventListener('scroll', onScroll)
+      renderer.dispose()
+      scene.clear()
+      if (renderer.domElement.parentNode === container) container.removeChild(renderer.domElement)
+    }
+  }, [])
 
+  // Container styling: right side, vertically centered, fixed size 600x600, floating
   return (
-    <div ref={containerRef} className={styles.container}>
-      {hoverInfo && (
-        <div
-          className={styles.label}
-          style={{
-            '--hover-x': `${hoverInfo.x}px`,
-            '--hover-y': `${hoverInfo.y}px`,
-          } as React.CSSProperties}
-        >
-          {hoverInfo.name}
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default GlobeHero;
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        right: '6%',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '600px',
+        height: '600px',
+        pointerEvents: 'none',
+      }}
+      aria-hidden
+    />
+  )
+}
