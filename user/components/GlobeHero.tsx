@@ -209,7 +209,7 @@ export default function GlobeHero(): JSX.Element {
       const control = midDir
 
       const curve = new THREE.QuadraticBezierCurve3(kampPos.clone(), control, dest.clone())
-      const tubeGeo = new THREE.TubeGeometry(curve as any, 64, 0.01, 8, false)
+      const tubeGeo = new THREE.TubeGeometry(curve as unknown as THREE.Curve<THREE.Vector3>, 64, 0.01, 8, false)
       const tube = new THREE.Mesh(tubeGeo, arcMaterial)
       arcsGroup.add(tube)
 
@@ -251,7 +251,7 @@ export default function GlobeHero(): JSX.Element {
     const clock = new THREE.Clock()
 
     function animate() {
-      const dt = clock.getDelta()
+      clock.getDelta()
 
       // Auto rotate
       globeMesh.rotation.y += 0.001
