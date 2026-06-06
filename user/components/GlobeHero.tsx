@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import * as THREE from 'three'
-import styles from './GlobeHero.module.css'
 
 export default function GlobeHero(): JSX.Element {
   const containerRef = useRef<HTMLDivElement | null>(null)
@@ -292,6 +291,19 @@ export default function GlobeHero(): JSX.Element {
   }, [])
 
   return (
-    <div ref={containerRef} className={styles.container} aria-hidden />
+    <div
+      ref={containerRef}
+      style={{
+        position: 'absolute',
+        right: '5%',
+        top: '50%',
+        transform: 'translateY(-50%)',
+        width: '560px',
+        height: '560px',
+        pointerEvents: 'none',
+        overflow: 'visible',
+      }}
+      aria-hidden
+    />
   )
 }
