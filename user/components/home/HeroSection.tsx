@@ -50,9 +50,6 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
     <section
       ref={sectionRef}
       className="home-hero relative min-h-screen flex flex-col justify-center overflow-visible"
-      style={{
-        background: `linear-gradient(165deg, var(--hero-from) 0%, var(--hero-to) 100%)`,
-      }}
     >
       <motion.div
         ref={gridRef}
