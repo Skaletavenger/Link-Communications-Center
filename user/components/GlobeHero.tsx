@@ -249,7 +249,7 @@ export default function GlobeHero() {
   return (
     <div
       ref={mountRef}
-      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 w-[600px] h-[600px] pointer-events-none"
+      className="relative z-0 mx-auto w-[min(50vw,500px)] h-[min(50vh,500px)] pointer-events-none"
     />
   )
 }

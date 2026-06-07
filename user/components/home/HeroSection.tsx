@@ -67,77 +67,78 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      <GlobeHero />
+      <motion.div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] items-center gap-12 px-6 md:px-16 pt-28 pb-24 max-w-7xl mx-auto" style={{ y: contentY, willChange: 'transform' }}>
+        <div className="relative z-10">
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="inline-flex items-center px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold mb-8 border"
+            style={{
+              color: 'var(--text-secondary)',
+              borderColor: 'var(--hero-badge-border)',
+              boxShadow: '0 0 24px rgba(21, 116, 181, 0.25)',
+            }}
+          >
+            Uganda&apos;s Trusted Tech Partner
+          </motion.div>
 
-      <motion.div
-        className="relative z-10 px-6 md:px-16 pt-28 pb-24 max-w-5xl"
-        style={{ y: contentY, willChange: 'transform' }}
-      >
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
-          className="inline-flex items-center px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold mb-8 border"
-          style={{
-            color: 'var(--text-secondary)',
-            borderColor: 'var(--hero-badge-border)',
-            boxShadow: '0 0 24px rgba(21, 116, 181, 0.25)',
-          }}
-        >
-          Uganda&apos;s Trusted Tech Partner
+          <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+            {HEADLINE.map((word, i) => (
+              <motion.span
+                key={word}
+                className="inline-block mr-3 md:mr-4"
+                style={{ color: 'var(--text-primary)' }}
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+              >
+                {word}
+              </motion.span>
+            ))}
+          </h1>
+
+          <motion.p
+            className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed"
+            style={{ color: 'var(--text-secondary)' }}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.55 }}
+          >
+            Enterprise surveillance, access control, and communications — designed, installed, and
+            supported across Uganda.
+          </motion.p>
+
+          <motion.div
+            className="flex flex-wrap gap-4"
+            initial={{ opacity: 0, y: 24 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.55, duration: 0.5 }}
+            style={{ willChange: 'transform' }}
+          >
+            <Link href={productsHref}>
+              <span
+                className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg cursor-pointer transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
+                style={{ background: '#1574B5' }}
+              >
+                Browse Products
+              </span>
+            </Link>
+            <Link href={loggedIn ? '/products' : authHref}>
+              <span
+                className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
+                style={{ borderColor: '#1574B5', color: '#1574B5', background: 'transparent' }}
+              >
+                {loggedIn ? 'Go to Products' : 'Sign In'}
+              </span>
+            </Link>
+          </motion.div>
         </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6">
-          {HEADLINE.map((word, i) => (
-            <motion.span
-              key={word}
-              className="inline-block mr-3 md:mr-4"
-              style={{ color: 'var(--text-primary)' }}
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h1>
-
-        <motion.p
-          className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed"
-          style={{ color: 'var(--text-secondary)' }}
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.55 }}
-        >
-          Enterprise surveillance, access control, and communications — designed, installed, and
-          supported across Uganda.
-        </motion.p>
-
-        <motion.div
-          className="flex flex-wrap gap-4"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-          style={{ willChange: 'transform' }}
-        >
-          <Link href={productsHref}>
-            <span
-              className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg cursor-pointer transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
-              style={{ background: '#1574B5' }}
-            >
-              Browse Products
-            </span>
-          </Link>
-          <Link href={loggedIn ? '/products' : authHref}>
-            <span
-              className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
-              style={{ borderColor: '#1574B5', color: '#1574B5', background: 'transparent' }}
-            >
-              {loggedIn ? 'Go to Products' : 'Sign In'}
-            </span>
-          </Link>
-        </motion.div>
-      </motion.div>
+        <div className="flex justify-center items-center">
+          <GlobeHero />
+        </div>
+      </div>
 
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
