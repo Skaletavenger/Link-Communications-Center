@@ -8,19 +8,17 @@ export default function GlobeHero() {
 
   useEffect(() => {
     if (!mountRef.current) return
-
-    const WIDTH = 560
-    const HEIGHT = 560
+    const container = mountRef.current
 
     const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true })
-    renderer.setSize(WIDTH, HEIGHT)
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
     renderer.setClearColor(0x000000, 0)
     renderer.domElement.style.background = 'transparent'
     renderer.domElement.style.display = 'block'
+    container.appendChild(renderer.domElement)
 
     const scene = new THREE.Scene()
-    const camera = new THREE.PerspectiveCamera(45, WIDTH / HEIGHT, 0.1, 1000)
+    const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000)
     camera.position.z = 4
 
     const group = new THREE.Group()
@@ -186,8 +184,9 @@ export default function GlobeHero() {
     const scroll = { y: 0 }
 
     const onMouseMove = (event: MouseEvent) => {
-      mouse.x = (event.clientX / window.innerWidth - 0.5) * 2
-      mouse.y = (event.clientY / window.innerHeight - 0.5) * 2
+      const bounds = container.getBoundingClientRect()
+      mouse.x = ((event.clientX - bounds.left) / bounds.width - 0.5) * 2
+      mouse.y = ((event.clientY - bounds.top) / bounds.height - 0.5) * 2
     }
 
     const onScroll = () => {
@@ -211,16 +210,6 @@ export default function GlobeHero() {
       group.rotation.y += target.y * 0.01
       group.rotation.y += scroll.y * 0.00005
 
-      group.children.forEach((child) => {
-        if (child instanceof THREE.Mesh && child.userData && typeof child.userData.pulse === 'number') {
-          child.userData.pulse += 0.01
-          const scale = 1 + ((t + child.userData.pulse) % 1) * 2.2
-          child.scale.setScalar(scale)
-          const material = child.material as THREE.MeshBasicMaterial
-          material.opacity = Math.max(0, 0.8 - ((t + child.userData.pulse) % 1) * 0.8)
-        }
-      })
-
       arcDots.forEach(({ mesh, curve, offset }) => {
         mesh.position.copy(curve.getPoint(((t * 0.3 + offset) % 1)))
       })
@@ -228,25 +217,39 @@ export default function GlobeHero() {
       renderer.render(scene, camera)
     }
 
-    animate()
-
-    const handleResize = () => {
-      const dpr = Math.min(window.devicePixelRatio || 1, 2)
-      renderer.setPixelRatio(dpr)
-      renderer.setSize(WIDTH, HEIGHT)
-      camera.aspect = WIDTH / HEIGHT
+    const resizeRenderer = () => {
+      if (!mountRef.current) return
+      const width = mountRef.current.clientWidth
+      const height = mountRef.current.clientHeight
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2))
+      renderer.setSize(width, height, false)
+      camera.aspect = width / height
       camera.updateProjectionMatrix()
     }
+
+    resizeRenderer()
+
+    const resizeObserver = new ResizeObserver(resizeRenderer)
+    resizeObserver.observe(container)
+    window.addEventListener('resize', resizeRenderer)
+
+    animate()
 
     return () => {
       cancelAnimationFrame(frameId)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', resizeRenderer)
+      resizeObserver.disconnect()
       renderer.dispose()
-      mountRef.current?.removeChild(renderer.domElement)
+      container.removeChild(renderer.domElement)
     }
   }, [])
 
   return (
-    
+    <div
+      ref={mountRef}
+      className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-0 w-[600px] h-[600px] pointer-events-none"
+    />
   )
+}
