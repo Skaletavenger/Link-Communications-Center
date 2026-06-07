@@ -135,7 +135,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
           </motion.div>
         </motion.div>
 
-        <div className="flex justify-center items-center">
+        <div className="flex items-center justify-center lg:justify-end">
           <GlobeHero />
         </div>
       </div>
