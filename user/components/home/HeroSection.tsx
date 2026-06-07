@@ -67,7 +67,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut' }}
       />
 
-      <motion.div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1.1fr_0.9fr] items-center gap-12 px-6 md:px-16 pt-28 pb-24 max-w-7xl mx-auto" style={{ y: contentY, willChange: 'transform' }}>
+      <motion.div className="relative z-10 grid grid-cols-1 lg:grid-cols-[1fr_500px] items-center gap-12 px-6 md:px-16 pt-28 pb-24 max-w-7xl mx-auto" style={{ y: contentY, willChange: 'transform' }}>
         <div className="relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 12 }}

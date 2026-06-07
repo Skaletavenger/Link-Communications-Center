@@ -53,12 +53,15 @@ export default function GlobeHero() {
     starCanvas.height = 16
     const starContext = starCanvas.getContext('2d')
     if (starContext) {
+      starContext.clearRect(0, 0, 16, 16)
       starContext.beginPath()
       starContext.arc(8, 8, 6, 0, Math.PI * 2)
       starContext.fillStyle = 'white'
       starContext.fill()
     }
     const starTexture = new THREE.CanvasTexture(starCanvas)
+    starTexture.minFilter = THREE.LinearFilter
+    starTexture.magFilter = THREE.LinearFilter
 
     const starMaterial = new THREE.PointsMaterial({
       size: 0.08,
@@ -66,6 +69,7 @@ export default function GlobeHero() {
       color: 0xffffff,
       transparent: true,
       opacity: 0.8,
+      alphaTest: 0.5,
       map: starTexture,
     })
     const stars = new THREE.Points(starGeometry, starMaterial)
@@ -86,6 +90,12 @@ export default function GlobeHero() {
       (texture) => {
         texture.encoding = THREE.sRGBEncoding
         globeMaterial.map = texture
+        globeMaterial.needsUpdate = true
+      },
+      undefined,
+      () => {
+        globeMaterial.map = null
+        globeMaterial.color = new THREE.Color('#1a3a6b')
         globeMaterial.needsUpdate = true
       }
     )
@@ -249,7 +259,7 @@ export default function GlobeHero() {
   return (
     <div
       ref={mountRef}
-      className="relative z-0 mx-auto w-[min(50vw,500px)] h-[min(50vh,500px)] pointer-events-none"
+      className="relative z-0 mx-auto w-[500px] h-[500px] pointer-events-none"
     />
   )
 }
