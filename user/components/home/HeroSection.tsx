@@ -133,12 +133,12 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
               </span>
             </Link>
           </motion.div>
-        </motion.div>
 
         <div className="flex items-center justify-center lg:justify-end">
           <GlobeHero />
         </div>
       </div>
+      </motion.div>
 
       <motion.div
         className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2"
