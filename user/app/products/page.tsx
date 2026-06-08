@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
 import AuthGuard from '../../components/AuthGuard'
+import AirtelPayModal from '../../components/payment/AirtelPayModal'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
 
@@ -207,6 +208,7 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
+  const [showAirtel, setShowAirtel] = useState(false)
   const [authed, setAuthed] = useState(false)
 
   useEffect(() => {
@@ -525,19 +527,32 @@ export default function ProductsPage() {
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  onClick={() => setSelected(null)}
-                  className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
-                  style={{ background: '#1574B5', color: 'white' }}
-                >
-                  Done
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setShowAirtel(true)}
+                    className="flex-1 py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
+                    style={{ background: '#0ea5a0', color: 'white' }}
+                  >
+                    Pay with Airtel Money
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setSelected(null)}
+                    className="flex-1 py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
+                    style={{ background: '#1574B5', color: 'white' }}
+                  >
+                    Done
+                  </button>
+                </div>
               </div>
             </div>
           </div>
         </>
       )}
+
+      <AirtelPayModal open={showAirtel} onClose={() => setShowAirtel(false)} product={selected!} />
     </div>
   )
 }
