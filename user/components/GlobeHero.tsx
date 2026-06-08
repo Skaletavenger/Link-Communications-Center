@@ -19,7 +19,7 @@ export default function GlobeHero() {
 
     const scene = new THREE.Scene()
     const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000)
-    camera.position.z = 4
+    camera.position.z = 3.5
 
     const group = new THREE.Group()
     scene.add(group)
@@ -259,7 +259,7 @@ export default function GlobeHero() {
   return (
     <div
       ref={mountRef}
-      className="relative z-0 mx-auto w-[500px] h-[500px] pointer-events-none"
+      className="absolute inset-0 w-full h-full pointer-events-none"
     />
   )
 }
