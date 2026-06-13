@@ -43,16 +43,27 @@ export default function MTNPayModal({ open, onClose, onSuccess, product }: Props
     }
   }, [open])
 
-  const stripLeadingZero = (p: string) => p.replace(/^0+/, '')
+  const normalizeUgandaPhone = (raw: string): string => {
+    const digits = raw.replace(/\D/g, '')
+    if (digits.startsWith('256')) return digits
+    if (digits.startsWith('0')) return '256' + digits.slice(1)
+    return '256' + digits
+  }
 
   const startPayment = async () => {
     setError(null)
+    const digits = phone.replace(/\D/g, '')
+    if (digits.length < 9 || digits.length > 12) {
+      setError('Enter a valid Ugandan phone number (9–12 digits)')
+      return
+    }
+    const normalizedPhone = normalizeUgandaPhone(phone)
     setLoading(true)
     try {
       const res = await fetch('/api/mtn/pay', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ phone, amount, reference, productId: product?.id }),
+        body: JSON.stringify({ phone: normalizedPhone, amount, reference, productId: product?.id }),
       })
       const data = await res.json()
       if (!res.ok) {
@@ -137,11 +148,22 @@ export default function MTNPayModal({ open, onClose, onSuccess, product }: Props
         <div className="space-y-3">
           <div>
             <label className="text-sm text-white/80">Phone (e.g. 0752123456)</label>
-            <input className="w-full mt-2 p-3 rounded-lg bg-[#0f1a2b] text-white outline-none"
-              value={phone}
-              onChange={e => setPhone(stripLeadingZero(e.target.value))}
+            {/* Sandbox test number: 46733123450 */}
+            <input
+              type="tel"
+              inputMode="numeric"
+              title="Ugandan phone number"
               placeholder="0752123456"
+              maxLength={13}
+              autoComplete="tel"
+              className="w-full mt-2 p-3 rounded-lg bg-[#0f1a2b] text-white outline-none"
+              value={phone}
+              onChange={e => {
+                const val = e.target.value.replace(/[^0-9]/g, '')
+                setPhone(val)
+              }}
             />
+            <p className="mt-2 text-xs text-white/70">Uganda: start with 07XX or use +256 7XX XXX XXX</p>
           </div>
 
           <div>
