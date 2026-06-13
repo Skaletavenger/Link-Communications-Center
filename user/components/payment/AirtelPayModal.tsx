@@ -12,10 +12,11 @@ type Product = {
 type Props = {
   open: boolean
   onClose: () => void
+  onSuccess?: (transactionId: string) => void
   product: Product
 }
 
-export default function AirtelPayModal({ open, onClose, product }: Props) {
+export default function AirtelPayModal({ open, onClose, onSuccess, product }: Props) {
   const [phone, setPhone] = useState('')
   const [amount, setAmount] = useState(product?.price || 0)
   const [reference, setReference] = useState('')
@@ -87,6 +88,7 @@ export default function AirtelPayModal({ open, onClose, product }: Props) {
           if (okStates.includes((state || '').toString().toUpperCase())) {
             clearInterval(pollRef.current!)
             setLoading(false)
+            onSuccess?.(airtelTxId || reference)
             return
           }
           if (attemptsRef.current >= 40) {
@@ -94,14 +96,16 @@ export default function AirtelPayModal({ open, onClose, product }: Props) {
             setLoading(false)
             setError('Payment not confirmed within 2 minutes')
           }
-        } catch (e: any) {
+        } catch (e: unknown) {
           clearInterval(pollRef.current!)
           setLoading(false)
-          setError(e.message || String(e))
+          const message = e instanceof Error ? e.message : String(e)
+          setError(message)
         }
       }, 3000)
-    } catch (e: any) {
-      setError(e.message || String(e))
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e)
+      setError(message)
       setLoading(false)
     }
   }

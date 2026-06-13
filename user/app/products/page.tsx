@@ -1,5 +1,6 @@
 'use client'
 /* eslint-disable @next/next/no-img-element */
+import Link from 'next/link'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
 import AuthGuard from '../../components/AuthGuard'
@@ -340,6 +341,15 @@ export default function ProductsPage() {
                           <span className="text-2xl font-bold" style={{ color: '#1574B5' }}>{formatUGX(p.price)}</span>
                           <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{p.stockQuantity} units</span>
                         </div>
+                        <div className="mt-4 flex gap-2">
+                          <Link
+                            href={`/checkout?productId=${encodeURIComponent(p.id)}&name=${encodeURIComponent(p.name)}&price=${encodeURIComponent(String(p.price))}`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="inline-flex items-center justify-center rounded-2xl bg-[#1574B5] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
+                          >
+                            Buy now
+                          </Link>
+                        </div>
                       </div>
                     </div>
                   )
@@ -391,15 +401,23 @@ export default function ProductsPage() {
                           <p className="text-xl font-bold" style={{ color: '#1574B5' }}>
                             UGX {phone.price.toLocaleString()}
                           </p>
-                          <button
-                            type="button"
-                            onClick={(e) => { e.stopPropagation(); setSelected(phone) }}
-                            className="mt-3 text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200"
-                            style={{ color: '#1574B5' }}
-                          >
-                            Learn more
-                            <span className="text-lg leading-none">›</span>
-                          </button>
+                          <div className="mt-3 flex flex-wrap gap-2">
+                            <Link
+                              href={`/checkout?productId=${encodeURIComponent(phone.id)}&name=${encodeURIComponent(phone.name)}&price=${encodeURIComponent(String(phone.price))}`}
+                              onClick={(e) => e.stopPropagation()}
+                              className="rounded-2xl bg-[#1574B5] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90"
+                            >
+                              Buy now
+                            </Link>
+                            <button
+                              type="button"
+                              onClick={(e) => { e.stopPropagation(); setSelected(phone) }}
+                              className="rounded-2xl border border-current px-4 py-2 text-sm font-medium transition-all hover:bg-slate-100"
+                              style={{ color: 'var(--text-primary)' }}
+                            >
+                              Learn more
+                            </button>
+                          </div>
                         </div>
                       </div>
                     )

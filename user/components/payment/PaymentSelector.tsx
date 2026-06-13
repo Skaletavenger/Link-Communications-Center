@@ -8,7 +8,6 @@ type Props = {
   amount: number
   reference: string
   productName: string
-  onSuccess?: () => void
 }
 
 type Network = 'mtn' | 'airtel' | 'unknown'
@@ -20,7 +19,7 @@ function detectNetwork(phone: string): Network {
   return 'unknown'
 }
 
-export default function PaymentSelector({ amount, reference, productName, onSuccess }: Props) {
+export default function PaymentSelector({ amount, reference, productName }: Props) {
   const [phone, setPhone] = useState('')
   const [mtnModalOpen, setMtnModalOpen] = useState(false)
   const [airtelModalOpen, setAirtelModalOpen] = useState(false)

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 
-export async function POST(req: Request) {
+export async function POST() {
   try {
     const AIRTEL_BASE_URL = process.env.AIRTEL_BASE_URL
     const AIRTEL_CLIENT_ID = process.env.AIRTEL_CLIENT_ID
@@ -27,7 +27,8 @@ export async function POST(req: Request) {
     }
 
     return NextResponse.json(data)
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || String(err) }, { status: 500 })
+  } catch (err: unknown) {
+    const message = err instanceof Error ? err.message : String(err)
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }
