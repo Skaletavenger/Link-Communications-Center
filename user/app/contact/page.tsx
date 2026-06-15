@@ -1,9 +1,67 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { Facebook, MapPin, Phone } from 'lucide-react'
+import { Link, MapPin, Phone, MessageCircle } from 'lucide-react'
 import Navbar from '../../components/Navbar'
+import RadialOrbitalTimeline, {
+  type TimelineItem,
+} from '../../components/ui/radial-orbital-timeline'
 import { supabase } from '../../lib/supabase'
+
+const contactTimelineData: TimelineItem[] = [
+  {
+    id: 1,
+    title: 'WhatsApp',
+    date: '24/7',
+    content:
+      'Chat with our support team for fast quotes, installation updates, and service tracking.',
+    category: 'Messaging',
+    icon: Phone,
+    relatedIds: [2, 4],
+    status: 'completed',
+    energy: 85,
+    url: 'https://wa.me/256757837184',
+  },
+  {
+    id: 2,
+    title: 'Facebook',
+    date: 'Open Now',
+    content:
+      'Visit our Facebook page for customer reviews, announcements, and direct messages.',
+    category: 'Social',
+    icon: Link,
+    relatedIds: [1, 3],
+    status: 'in-progress',
+    energy: 75,
+    url: 'https://www.facebook.com/linkcommunicationcentre',
+  },
+  {
+    id: 3,
+    title: 'TikTok',
+    date: 'Trending',
+    content:
+      'Follow our TikTok for product demos, tech tips, and quick service highlights.',
+    category: 'Social',
+    icon: MessageCircle,
+    relatedIds: [2, 4],
+    status: 'pending',
+    energy: 65,
+    url: 'https://www.tiktok.com/@linkcommunicationscenter',
+  },
+  {
+    id: 4,
+    title: 'Location',
+    date: 'Lions Mall',
+    content:
+      'Visit us at Lions Shopping Center on Namirembe Road for in-person consultations.',
+    category: 'Visit',
+    icon: MapPin,
+    relatedIds: [1, 3],
+    status: 'completed',
+    energy: 90,
+    url: 'https://www.google.com/maps/search/Lions+Shopping+Center+Namirembe+Road+Kampala',
+  },
+]
 
 export default function ContactPage() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -43,101 +101,18 @@ export default function ContactPage() {
           Reach out for quotations, installations, and support.
         </p>
 
-        <div className="mb-10 border-b pb-8" style={{ borderColor: 'var(--border-color)' }}>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <Phone className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  WhatsApp Numbers
-                </p>
-              </div>
-              <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://wa.me/256757837184"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  +256 757 837 184
-                </a>
-                <a
-                  href="https://wa.me/256793251000"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  +256 793 251 000
-                </a>
-              </div>
-            </div>
-
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="mb-3">
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  TikTok
-                </p>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://www.tiktok.com/@linkcommunicationscenter"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  @linkcommunicationscenter
-                </a>
+        <div className="mb-10 rounded-[2rem] overflow-hidden border" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}>
+          <div className="p-4 sm:p-6">
+            <div className="mb-6">
+              <h2 className="text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                Contact Timeline
+              </h2>
+              <p className="text-sm max-w-2xl mt-2" style={{ color: 'var(--text-secondary)' }}>
+                Explore the best ways to connect with our team through an interactive timeline experience.
               </p>
             </div>
-
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="mb-3 flex items-center gap-2">
-                <Facebook className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Facebook
-                </p>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://www.facebook.com/linkcommunicationcentre"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  @linkcommunicationcentre
-                </a>
-              </p>
-            </div>
-
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Location
-                </p>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://www.google.com/maps/search/Lions+Shopping+Center+Namirembe+Road+Kampala"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Lions Shopping Center, near Namirembe Road, near Centenary Bank, Kampala
-                </a>
-              </p>
+            <div className="h-[500px] rounded-[32px] overflow-hidden">
+              <RadialOrbitalTimeline timelineData={contactTimelineData} />
             </div>
           </div>
         </div>
@@ -198,83 +173,6 @@ export default function ContactPage() {
             {loading ? 'Sending...' : 'Send Message'}
           </button>
         </form>
-
-        <div className="mt-10 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <Phone className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  WhatsApp Numbers
-                </p>
-              </div>
-              <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://wa.me/256757837184"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  +256 757 837 184
-                </a>
-                <a
-                  href="https://wa.me/256793251000"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="block text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  +256 793 251 000
-                </a>
-              </div>
-            </div>
-
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="mb-3">
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  TikTok
-                </p>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://www.tiktok.com/@linkcommunicationscenter"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  @linkcommunicationscenter
-                </a>
-              </p>
-            </div>
-
-            <div
-              className="rounded-3xl border p-6"
-              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
-            >
-              <div className="flex items-center gap-2 mb-3">
-                <MapPin className="h-5 w-5" style={{ color: 'var(--accent)' }} />
-                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Location
-                </p>
-              </div>
-              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                <a
-                  href="https://www.google.com/maps/search/Lions+Shopping+Center+Namirembe+Road+Kampala"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="text-blue-400 hover:text-blue-300 transition-colors"
-                >
-                  Lions Shopping Center, near Namirembe Road, near Centenary Bank, Kampala
-                </a>
-              </p>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
   )

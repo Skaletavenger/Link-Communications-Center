@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Open_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/ThemeContext'
+import { cn } from "@/lib/utils";
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -21,7 +22,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${openSans.variable} dark`}>
+    <html lang="en" className={cn("dark", openSans.variable, "font-sans")}>
       <body className={`${openSans.variable} font-sans antialiased`}>
         <ThemeProvider>{children}</ThemeProvider>
       </body>
