@@ -89,7 +89,7 @@ export default function LccAIAssistantSection() {
           {!isExpanded ? (
             <div className="flex flex-col justify-center gap-6 text-white">
               <div>
-                <p className="text-sm uppercase tracking-[0.3em] text-blue-300/90">LCC AI Assistant</p>
+                <p className="text-sm uppercase tracking-[0.3em] text-blue-300/90">LINK AI Assistant</p>
                 <h2 className="mt-4 text-4xl font-black leading-tight sm:text-5xl">
                   Meet Link
                 </h2>
