@@ -143,12 +143,12 @@ export default function ContactPage() {
               </div>
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
                 <a
-                  href="https://www.tiktok.com/@linkcommunicationcenter"
+                  href="https://www.tiktok.com/@linkcommunicationscenter"
                   target="_blank"
                   rel="noreferrer"
                   className="text-blue-400 hover:text-blue-300 transition-colors"
                 >
-                  @linkcommunicationcenter
+                  @linkcommunicationscenter
                 </a>
               </p>
             </div>
