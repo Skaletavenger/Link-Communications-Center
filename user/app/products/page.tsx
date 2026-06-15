@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
 import AirtelPayModal from '../../components/payment/AirtelPayModal'
+import LccAIAssistantSection from '../../components/home/LccAIAssistantSection'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
 
@@ -252,6 +253,8 @@ export default function ProductsPage() {
           <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Our Products</h1>
           <p style={{ color: 'var(--text-secondary)' }}>Browse our range of surveillance and communications equipment</p>
         </div>
+
+        <LccAIAssistantSection />
 
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input
