@@ -101,7 +101,7 @@ export default function Navbar() {
 
         <div className="flex gap-3 items-center">
           <ThemeToggle />
-          {authed ? (
+          {authed && (
             <>
               <span className="hidden sm:inline text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
                 Hi {initials || '@user'}
@@ -115,14 +115,6 @@ export default function Navbar() {
                 Logout
               </button>
             </>
-          ) : (
-            <Link
-              href="/auth/login"
-              className="px-4 py-2 rounded-xl font-bold text-sm"
-              style={{ background: '#1574B5', color: 'white' }}
-            >
-              Sign In
-            </Link>
           )}
         </div>
       </div>

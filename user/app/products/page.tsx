@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
-import AuthGuard from '../../components/AuthGuard'
 import AirtelPayModal from '../../components/payment/AirtelPayModal'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
@@ -210,19 +209,6 @@ export default function ProductsPage() {
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
   const [showAirtel, setShowAirtel] = useState(false)
-  const [authed, setAuthed] = useState(false)
-
-  useEffect(() => {
-    const loadAuth = async () => {
-      const { data } = await supabase.auth.getSession()
-      setAuthed(Boolean(data.session))
-    }
-    loadAuth()
-    const { data: sub } = supabase.auth.onAuthStateChange((_e, session) => {
-      setAuthed(Boolean(session))
-    })
-    return () => sub.subscription.unsubscribe()
-  }, [])
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
@@ -260,7 +246,6 @@ export default function ProductsPage() {
   return (
     <div className="min-h-screen pt-0" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
-      <AuthGuard show={!authed} />
 
       <div className="max-w-7xl mx-auto pt-24 pb-16 px-6">
         <div className="mb-10">
