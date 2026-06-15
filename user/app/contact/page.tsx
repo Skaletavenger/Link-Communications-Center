@@ -1,7 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
-import { MapPin, Phone } from 'lucide-react'
+import { Facebook, MapPin, Phone } from 'lucide-react'
 import Navbar from '../../components/Navbar'
 import { supabase } from '../../lib/supabase'
 
@@ -42,6 +42,105 @@ export default function ContactPage() {
         <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
           Reach out for quotations, installations, and support.
         </p>
+
+        <div className="mb-10 border-b pb-8" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Phone className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  WhatsApp Numbers
+                </p>
+              </div>
+              <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://wa.me/256757837184"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  +256 757 837 184
+                </a>
+                <a
+                  href="https://wa.me/256793251000"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  +256 793 251 000
+                </a>
+              </div>
+            </div>
+
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="mb-3">
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  TikTok
+                </p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://www.tiktok.com/@linkcommunicationscenter"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  @linkcommunicationscenter
+                </a>
+              </p>
+            </div>
+
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="mb-3 flex items-center gap-2">
+                <Facebook className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Facebook
+                </p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://www.facebook.com/linkcommunicationcentre"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  @linkcommunicationcentre
+                </a>
+              </p>
+            </div>
+
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Location
+                </p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://www.google.com/maps/search/Lions+Shopping+Center+Namirembe+Road+Kampala"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Lions Shopping Center, near Namirembe Road, near Centenary Bank, Kampala
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
 
         <form onSubmit={handleSubmit} className="max-w-lg space-y-4">
           <div>
