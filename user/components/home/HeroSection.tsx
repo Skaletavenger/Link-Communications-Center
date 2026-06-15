@@ -95,12 +95,11 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
           Uganda&apos;s Trusted Tech Partner
         </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-white">
           {HEADLINE.map((word, i) => (
             <motion.span
               key={word}
               className="inline-block mr-3 md:mr-4"
-              style={{ color: 'var(--text-primary)' }}
               initial={{ opacity: 0, y: 28 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
@@ -111,8 +110,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
         </h1>
 
         <motion.p
-          className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed"
-          style={{ color: 'var(--text-secondary)' }}
+          className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed text-white/80"
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.55 }}
