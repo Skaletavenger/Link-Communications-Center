@@ -11,7 +11,7 @@ type Profile = { username?: string | null }
 const navItems = [
   { href: '/products', label: 'Products' },
   { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact' }
+  { href: '/contact', label: 'Contact Us' }
 ]
 
 export default function Navbar() {

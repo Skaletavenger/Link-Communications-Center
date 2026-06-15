@@ -1,6 +1,7 @@
 'use client'
 
 import { FormEvent, useState } from 'react'
+import { MapPin, Phone } from 'lucide-react'
 import Navbar from '../../components/Navbar'
 import { supabase } from '../../lib/supabase'
 
@@ -37,7 +38,7 @@ export default function ContactPage() {
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <div className="max-w-5xl mx-auto px-6 pt-24 pb-16">
-        <h1 className="text-4xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>Contact</h1>
+        <h1 className="text-4xl font-black mb-4" style={{ color: 'var(--text-primary)' }}>Contact Us</h1>
         <p className="mb-8" style={{ color: 'var(--text-secondary)' }}>
           Reach out for quotations, installations, and support.
         </p>
@@ -98,6 +99,83 @@ export default function ContactPage() {
             {loading ? 'Sending...' : 'Send Message'}
           </button>
         </form>
+
+        <div className="mt-10 border-t pt-8" style={{ borderColor: 'var(--border-color)' }}>
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <Phone className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  WhatsApp Numbers
+                </p>
+              </div>
+              <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://wa.me/256757837184"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  +256 757 837 184
+                </a>
+                <a
+                  href="https://wa.me/256793251000"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="block text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  +256 793 251 000
+                </a>
+              </div>
+            </div>
+
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="mb-3">
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  TikTok
+                </p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://www.tiktok.com/@linkcommunicationcenter"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  @linkcommunicationcenter
+                </a>
+              </p>
+            </div>
+
+            <div
+              className="rounded-3xl border p-6"
+              style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)' }}
+            >
+              <div className="flex items-center gap-2 mb-3">
+                <MapPin className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+                <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  Location
+                </p>
+              </div>
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                <a
+                  href="https://www.google.com/maps/search/Lions+Shopping+Center+Namirembe+Road+Kampala"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  Lions Shopping Center, near Namirembe Road, near Centenary Bank, Kampala
+                </a>
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   )
