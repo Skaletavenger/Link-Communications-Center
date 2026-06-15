@@ -6,7 +6,14 @@ import { FormEvent, PointerEvent, useMemo, useState } from 'react'
 
 const Spline = dynamic(
   () => import('@splinetool/react-spline').then((mod) => mod.Spline),
-  { ssr: false }
+  {
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-full flex items-center justify-center">
+        <span className="text-white/50 text-sm">Loading...</span>
+      </div>
+    ),
+  }
 )
 
 const SPLINE_URL = 'https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode'
