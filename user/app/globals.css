@@ -17,6 +17,7 @@
   --nav-border: #d0e4f7;
   --nav-text: #0a1628;
   --nav-link: #2d4a6e;
+  --assistant-spotlight: rgba(21,116,181,0.22);
   --card-shadow: 0 2px 12px rgba(21,116,181,0.08);
 }
 
@@ -59,6 +60,7 @@ body {
   --hero-grid: rgba(21, 116, 181, 0.14);
   --hero-blob: rgba(21, 116, 181, 0.2);
   --hero-badge-border: rgba(21, 116, 181, 0.35);
+  --assistant-spotlight: rgba(21,116,181,0.22);
 }
 
 .dark .home-hero {
@@ -66,6 +68,7 @@ body {
   --hero-to: #0d2244;
   --hero-grid: rgba(21, 116, 181, 0.12);
   --hero-blob: rgba(21, 116, 181, 0.35);
+  --assistant-spotlight: rgba(255,255,255,0.22);
   --hero-badge-border: rgba(21, 116, 181, 0.5);
 }
 
