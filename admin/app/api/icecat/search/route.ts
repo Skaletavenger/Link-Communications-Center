@@ -8,10 +8,11 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Search query is required' }, { status: 400 })
     }
 
-    const accessKey = process.env.UNSPLASH_ACCESS_KEY
+    const accessKey = process.env.UNSPLASH_ACCESS_KEY || process.env.NEXT_PUBLIC_UNSPLASH_ACCESS_KEY
     if (!accessKey) {
-      return NextResponse.json({ error: 'Missing UNSPLASH_ACCESS_KEY' }, { status: 500 })
+      return NextResponse.json({ error: 'Missing Unsplash access key (set UNSPLASH_ACCESS_KEY or NEXT_PUBLIC_UNSPLASH_ACCESS_KEY)' }, { status: 500 })
     }
+    console.log('Using Unsplash access key from', process.env.UNSPLASH_ACCESS_KEY ? 'UNSPLASH_ACCESS_KEY' : 'NEXT_PUBLIC_UNSPLASH_ACCESS_KEY')
 
     const params = new URLSearchParams({
       query,
