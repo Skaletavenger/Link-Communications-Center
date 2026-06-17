@@ -100,10 +100,6 @@ export default function SurveillanceCamerasSection() {
     }
   }
 
-  useEffect(() => {
-    filterAndPaginateProducts()
-  }, [products, activeFilter, page, filterAndPaginateProducts])
-
   const filterAndPaginateProducts = useCallback(() => {
     let filtered = products
 
@@ -118,6 +114,10 @@ export default function SurveillanceCamerasSection() {
     setDisplayedProducts(paginated)
     setHasMore(endIndex < filtered.length)
   }, [products, activeFilter, page])
+
+  useEffect(() => {
+    filterAndPaginateProducts()
+  }, [products, activeFilter, page, filterAndPaginateProducts])
 
   const handleFilterChange = (filter: string) => {
     setActiveFilter(filter)
