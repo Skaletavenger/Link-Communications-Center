@@ -76,6 +76,12 @@ export default function DashboardPage() {
   const [showWarning, setShowWarning] = useState(false)
   const [userCount, setUserCount] = useState(0)
   const [messages, setMessages] = useState<ContactMessage[]>([])
+  const [showIcecatModal, setShowIcecatModal] = useState(false)
+  const [icecatQuery, setIcecatQuery] = useState('')
+  const [icecatResults, setIcecatResults] = useState<string[]>([])
+  const [icecatLoading, setIcecatLoading] = useState(false)
+  const [icecatError, setIcecatError] = useState('')
+  const [selectedIcecatImage, setSelectedIcecatImage] = useState('')
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const warningRef = useRef<NodeJS.Timeout | null>(null)
 
@@ -86,6 +92,66 @@ export default function DashboardPage() {
     }
     router.replace('/dashboard/login')
   }, [router])
+
+  const icecatSearch = async () => {
+    if (!icecatQuery.trim()) {
+      setIcecatError('Enter a search term')
+      return
+    }
+
+    setIcecatLoading(true)
+    setIcecatError('')
+    setIcecatResults([])
+    setSelectedIcecatImage('')
+
+    try {
+      const response = await fetch('/api/icecat/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ query: icecatQuery.trim() })
+      })
+
+      const json = await response.json()
+      if (!response.ok || !Array.isArray(json)) {
+        const errorMessage = typeof json?.error === 'string' ? json.error : 'Unable to fetch images'
+        setIcecatError(errorMessage)
+        setIcecatResults([])
+      } else {
+        setIcecatResults(json)
+        if (json.length === 0) {
+          setIcecatError('No images found')
+        }
+      }
+    } catch (error) {
+      setIcecatError('Search failed. Try again.')
+      setIcecatResults([])
+    } finally {
+      setIcecatLoading(false)
+    }
+  }
+
+  const addSelectedIcecatImage = () => {
+    if (!selectedIcecatImage) return
+
+    const updatedImages = [...(form.images ?? [])]
+    if (updatedImages.length === 0) {
+      updatedImages[0] = selectedIcecatImage
+    } else {
+      updatedImages[0] = selectedIcecatImage
+    }
+
+    setForm((f) => ({
+      ...f,
+      images: updatedImages.filter((img) => Boolean(img?.trim())),
+      image: selectedIcecatImage
+    }))
+    setShowIcecatModal(false)
+  }
+
+  const selectedImageClass = (url: string) =>
+    url === selectedIcecatImage
+      ? 'ring-2 ring-accent'
+      : 'ring-1 ring-white/10 hover:ring-[#1574B5] transition-all'
 
   const resetTimer = useCallback(() => {
     if (typeof window === 'undefined') return
@@ -377,6 +443,16 @@ export default function DashboardPage() {
                   Add front view, side view, back view, box view etc. First image is the main display image.
                 </p>
 
+                <div className="mb-4">
+                  <button
+                    type="button"
+                    onClick={() => setShowIcecatModal(true)}
+                    className="px-4 py-2 bg-accent text-black font-bold rounded-xl hover:bg-[#1a86cc] transition-all"
+                  >
+                    🔍 Search Icecat Images
+                  </button>
+                </div>
+
                 <div className="grid grid-cols-5 gap-3 mb-3">
                   {[0, 1, 2, 3, 4].map((index) => (
                     <div key={index} className="relative">
@@ -502,6 +578,86 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+
+        {showIcecatModal ? (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-white text-black dark:bg-gray-900 dark:text-white p-4">
+            <div className="w-full max-w-4xl max-h-[80vh] rounded-3xl border border-theme bg-card shadow-xl shadow-black/30 overflow-hidden flex flex-col">
+              <div className="sticky top-0 z-20 bg-card border-b border-theme p-6">
+                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                  <div>
+                    <h3 className="text-xl font-semibold text-primary">Search Images</h3>
+                    <p className="text-sm text-secondary">Search Unsplash by keyword and select an image.</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setShowIcecatModal(false)}
+                    className="rounded-2xl border border-theme bg-card px-4 py-2 text-secondary hover:bg-white/10"
+                  >
+                    Cancel
+                  </button>
+                </div>
+
+                <div className="mt-6 grid gap-4">
+                  <label className="text-secondary text-sm mb-2 block">Search</label>
+                  <div className="flex flex-col gap-3 md:flex-row md:items-end">
+                    <input
+                      value={icecatQuery}
+                      onChange={(e) => setIcecatQuery(e.target.value)}
+                      placeholder="Search Unsplash for photos"
+                      className="w-full rounded-2xl border border-theme bg-card px-4 py-3 text-primary outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20"
+                    />
+                    <button
+                      type="button"
+                      onClick={icecatSearch}
+                      className="min-w-[160px] rounded-2xl bg-accent px-5 py-3 text-black font-semibold hover:bg-[#1a86cc] transition-all disabled:opacity-60"
+                      disabled={icecatLoading}
+                    >
+                      {icecatLoading ? 'Searching...' : 'Search'}
+                    </button>
+                  </div>
+                  {icecatError ? <p className="text-sm text-rose-300">{icecatError}</p> : null}
+                </div>
+              </div>
+
+              <div className="overflow-y-auto px-6 py-6 flex-1 space-y-6">
+                <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+                  {icecatResults.map((url) => (
+                    <button
+                      key={url}
+                      type="button"
+                      onClick={() => setSelectedIcecatImage(url)}
+                      className={`group overflow-hidden rounded-3xl border bg-card p-0 transition ${selectedImageClass(url)}`}
+                    >
+                      <img
+                        src={url}
+                        alt="Search result"
+                        className="h-40 w-full object-cover transition duration-200 group-hover:scale-105"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="sticky bottom-0 z-20 bg-card border-t border-theme p-6 flex flex-wrap items-center justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={addSelectedIcecatImage}
+                  disabled={!selectedIcecatImage}
+                  className="px-4 py-3 rounded-2xl bg-accent text-black font-semibold hover:bg-[#1a86cc] transition-all disabled:opacity-60"
+                >
+                  Use Selected Image
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowIcecatModal(false)}
+                  className="px-4 py-3 rounded-2xl border border-theme bg-card text-secondary hover:bg-white/10"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        ) : null}
 
         {/* Search + Filter */}
         <div className="flex flex-col md:flex-row gap-3 mb-6">

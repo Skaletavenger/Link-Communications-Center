@@ -2,6 +2,7 @@
 
 import Navbar from '@/components/Navbar'
 import HeroSection from './HeroSection'
+import SurveillanceCamerasSection from './SurveillanceCamerasSection'
 import StatsBarSection from './StatsBarSection'
 import CategoriesSection from './CategoriesSection'
 import ParallaxFeatureSection from './ParallaxFeatureSection'
@@ -17,6 +18,7 @@ export default function HomePage() {
     <main className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <HeroSection productsHref={productsHref} authHref={authHref} loggedIn={loggedIn} />
+      <SurveillanceCamerasSection />
       <LccAIAssistantSection />
       <StatsBarSection />
       <CategoriesSection productsHref={productsHref} />
