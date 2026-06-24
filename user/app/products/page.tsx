@@ -245,7 +245,7 @@ export default function ProductsPage() {
   }, [products, search])
 
   const filtered = useMemo(() => {
-    let result = products.filter(p => {
+    const result = products.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.model.toLowerCase().includes(search.toLowerCase()) ||
         p.brand.toLowerCase().includes(search.toLowerCase())

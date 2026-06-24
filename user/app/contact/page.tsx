@@ -121,7 +121,7 @@ export default function ContactPage() {
                     Mon – Fri: 8:00 AM – 5:00 PM
                   </p>
                   <p style={{ color: 'var(--text-secondary)' }} className="text-sm">
-                    Sat: 9:00 AM – 1:00 PM
+                    Sat: 9:00 AM &ndash; 1:00 PM
                   </p>
                   <p style={{ color: 'var(--text-secondary)' }} className="text-sm">
                     Sun: Closed
