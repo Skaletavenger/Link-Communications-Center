@@ -124,10 +124,10 @@ export default function ContactPage(): JSX.Element {
                 </div>
               </div>
               <div className="flex gap-3">
-                <div className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white">f</div>
-                <div className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white">t</div>
-                <div className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center text-white">i</div>
-                <div className="w-10 h-10 rounded-full bg-[#0A66C2] flex items-center justify-center text-white">in</div>
+                <a href="https://facebook.com/linkcomms" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#1877F2] flex items-center justify-center text-white hover:opacity-80 transition-opacity">f</a>
+                <a href="https://tiktok.com/@lcc_tech" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-black flex items-center justify-center text-white hover:opacity-80 transition-opacity">t</a>
+                <a href="https://instagram.com/lcc_tech_solutions" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center text-white hover:opacity-80 transition-opacity">i</a>
+                <a href="https://linkedin.com/company/linkcc" target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-full bg-[#0A66C2] flex items-center justify-center text-white hover:opacity-80 transition-opacity">in</a>
               </div>
             </div>
 
@@ -222,21 +222,21 @@ export default function ContactPage(): JSX.Element {
             </div>
 
             <div className="flex items-center gap-6">
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white">t</div>
+              <a href="https://tiktok.com/@lcc_tech" target="_blank" rel="noopener noreferrer" className="text-center group">
+                <div className="w-12 h-12 rounded-full bg-black flex items-center justify-center text-white mx-auto group-hover:opacity-80 transition-opacity">t</div>
                 <div className="text-sm font-semibold text-[var(--color-primary)]">TikTok</div>
                 <div className="text-sm text-[var(--text-muted)]">@lcc_tech</div>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-[#1877F2] flex items-center justify-center text-white">f</div>
+              </a>
+              <a href="https://facebook.com/linkcomms" target="_blank" rel="noopener noreferrer" className="text-center group">
+                <div className="w-12 h-12 rounded-full bg-[#1877F2] flex items-center justify-center text-white mx-auto group-hover:opacity-80 transition-opacity">f</div>
                 <div className="text-sm font-semibold text-[var(--color-primary)]">Facebook</div>
                 <div className="text-sm text-[var(--text-muted)]">LCC Technology Solutions</div>
-              </div>
-              <div className="text-center">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center text-white">i</div>
+              </a>
+              <a href="https://instagram.com/lcc_tech_solutions" target="_blank" rel="noopener noreferrer" className="text-center group">
+                <div className="w-12 h-12 rounded-full bg-gradient-to-r from-pink-500 to-orange-400 flex items-center justify-center text-white mx-auto group-hover:opacity-80 transition-opacity">i</div>
                 <div className="text-sm font-semibold text-[var(--color-primary)]">Instagram</div>
                 <div className="text-sm text-[var(--text-muted)]">@lcc_tech_solutions</div>
-              </div>
+              </a>
             </div>
           </div>
         </div>

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import AirtelPayModal from '../../components/payment/AirtelPayModal'
 import LccAIAssistantSection from '../../components/home/LccAIAssistantSection'
+import SocialCards from '@/components/ui/card-fan-carousel'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
 
@@ -219,14 +220,103 @@ export default function ProductsPage() {
         <>
           <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setSelected(null)} />
 
-          <div className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl" style={{ background: 'var(--bg-secondary)' }}>
-            <div className="flex justify-center pt-4 pb-2"><div className="w-12 h-1.5 rounded-full bg-white/20" /></div>
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 max-h-[90vh] overflow-y-auto rounded-t-3xl shadow-2xl"
+            style={{ background: 'var(--bg-card)' }}
+          >
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1.5 rounded-full" style={{ background: 'var(--border)' }} />
+            </div>
+
             <div className="max-w-3xl mx-auto px-6 pb-10">
+              {/* Close button */}
               <div className="flex justify-end mb-4">
-                <button type="button" onClick={() => setSelected(null)} className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:opacity-70" style={{ color: 'var(--text-primary)' }}>✕</button>
+                <button
+                  type="button"
+                  onClick={() => setSelected(null)}
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-xl transition-all hover:opacity-70"
+                  style={{ color: 'var(--text-primary)', background: 'var(--bg-primary)' }}
+                >
+                  ✕
+                </button>
               </div>
 
-              {/* Image / details omitted for brevity; keep original modal content if needed */}
+              <div className="flex flex-col md:flex-row gap-8">
+                {/* Images — card-fan-carousel */}
+                <div className="w-full md:w-1/2">
+                  {selected.images && selected.images.length > 1 ? (
+                    <SocialCards
+                      cards={selected.images.map((url: string, i: number) => ({
+                        imgUrl: url,
+                        alt: `${selected.name} image ${i + 1}`
+                      }))}
+                    />
+                  ) : selected.images?.[0] || selected.image ? (
+                    <img
+                      src={selected.images?.[0] || selected.image}
+                      alt={selected.name}
+                      className="w-full rounded-2xl object-cover"
+                      style={{ maxHeight: 360 }}
+                    />
+                  ) : (
+                    <CameraPlaceholder />
+                  )}
+                </div>
+
+                {/* Details */}
+                <div className="w-full md:w-1/2 flex flex-col gap-4">
+                  <div>
+                    <span
+                      className="text-xs px-3 py-1 rounded-full border"
+                      style={{ borderColor: 'var(--border)', color: 'var(--text-muted)' }}
+                    >
+                      {selected.category}
+                    </span>
+                  </div>
+
+                  <h2 className="text-3xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                    {selected.name}
+                  </h2>
+
+                  <p className="text-sm font-mono" style={{ color: 'var(--text-muted)' }}>
+                    {selected.brand} · {selected.model}
+                  </p>
+
+                  {selected.description && (
+                    <p className="text-sm leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                      {selected.description}
+                    </p>
+                  )}
+
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-3xl font-bold" style={{ color: 'var(--color-primary)' }}>
+                      {formatUGX(selected.price)}
+                    </span>
+                    <span className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                      {selected.stockQuantity} in stock
+                    </span>
+                  </div>
+
+                  <div className="flex gap-3 mt-4">
+                    <Link
+                      href={`/checkout?productId=${encodeURIComponent(selected.id)}&name=${encodeURIComponent(selected.name)}&price=${encodeURIComponent(String(selected.price))}`}
+                      onClick={() => setSelected(null)}
+                      className="flex-1 inline-flex items-center justify-center rounded-2xl px-4 py-3 font-bold text-white"
+                      style={{ background: 'var(--color-primary)' }}
+                    >
+                      Buy Now
+                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setSelected(null)}
+                      className="px-4 py-3 rounded-2xl border font-medium"
+                      style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </>

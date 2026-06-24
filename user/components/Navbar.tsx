@@ -9,7 +9,6 @@ import {
   Menu,
   X,
   ChevronDown,
-  UserCircle,
   House,
   Box,
   Building2,
@@ -62,9 +61,6 @@ export default function Navbar() {
             <div className="hidden sm:flex items-center">
               <ThemeToggle />
             </div>
-            <Link href="/auth" className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-semibold" style={{ background: 'var(--color-primary)' }}>
-              <UserCircle size={18} /> Sign In
-            </Link>
 
             {/* mobile toggles */}
             <div className="flex items-center gap-2 md:hidden">
@@ -101,12 +97,6 @@ export default function Navbar() {
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
             <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />
             <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
-
-            <div className="mt-4">
-              <Link href="/auth" onClick={() => setOpen(false)} className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-semibold" style={{ background: 'var(--color-primary)' }}>
-                <UserCircle /> Sign In
-              </Link>
-            </div>
 
             <div className="mt-6 text-center text-sm text-muted" style={{ color: 'var(--text-muted)' }}>
               <div className="border-t" style={{ borderColor: 'var(--border)' }} />
