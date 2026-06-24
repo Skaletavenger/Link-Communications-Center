@@ -87,26 +87,32 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
           transition={{ duration: 0.5 }}
           className="inline-flex items-center px-4 py-1.5 rounded-full text-xs md:text-sm font-semibold mb-8 border"
           style={{
-            color: 'var(--text-secondary)',
+            color: 'var(--text-muted)',
             borderColor: 'var(--hero-badge-border)',
-            boxShadow: '0 0 24px rgba(21, 116, 181, 0.25)',
+            boxShadow: '0 0 24px rgba(21, 116, 181, 0.12)',
+            textTransform: 'uppercase',
+            letterSpacing: '0.08em'
           }}
         >
-          Uganda&apos;s Trusted Tech Partner
+          SECURE. CONNECT. SUCCEED.
         </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-white">
-          {HEADLINE.map((word, i) => (
-            <motion.span
-              key={word}
-              className="inline-block mr-3 md:mr-4"
-              initial={{ opacity: 0, y: 28 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-            >
-              {word}
-            </motion.span>
-          ))}
+        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6">
+          {HEADLINE.map((word, i) => {
+            const isAccent = i === 2
+            return (
+              <motion.span
+                key={word}
+                className={`inline-block mr-3 md:mr-4 ${isAccent ? '' : ''}`}
+                initial={{ opacity: 0, y: 28 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                style={{ color: isAccent ? 'var(--color-accent)' : 'var(--text-primary)' }}
+              >
+                {word}
+              </motion.span>
+            )
+          })}
         </h1>
 
         <motion.p
@@ -119,27 +125,15 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
           supported across Uganda.
         </motion.p>
 
-        <motion.div
-          className="flex flex-wrap gap-4"
-          initial={{ opacity: 0, y: 24 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-          style={{ willChange: 'transform' }}
-        >
+        <motion.div className="flex flex-wrap gap-4" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }} style={{ willChange: 'transform' }}>
           <Link href={productsHref}>
-            <span
-              className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg cursor-pointer transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
-              style={{ background: '#1574B5' }}
-            >
-              Browse Products
+            <span className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg cursor-pointer transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95" style={{ background: 'var(--color-primary)' }}>
+              🛒 Shop Now
             </span>
           </Link>
           <Link href={loggedIn ? '/products' : authHref}>
-            <span
-              className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95"
-              style={{ borderColor: '#1574B5', color: '#1574B5', background: 'transparent' }}
-            >
-              {loggedIn ? 'Go to Products' : 'Sign In'}
+            <span className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95" style={{ borderColor: 'var(--color-primary)', color: 'var(--text-primary)', background: 'transparent' }}>
+              Learn More →
             </span>
           </Link>
         </motion.div>

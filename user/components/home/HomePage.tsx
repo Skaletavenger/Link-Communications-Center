@@ -1,6 +1,4 @@
-'use client'
-
-import Navbar from '@/components/Navbar'
+"use client"
 import HeroSection from './HeroSection'
 import SurveillanceCamerasSection from './SurveillanceCamerasSection'
 import StatsBarSection from './StatsBarSection'
@@ -16,7 +14,6 @@ export default function HomePage() {
 
   return (
     <main className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      <Navbar />
       <HeroSection productsHref={productsHref} authHref={authHref} loggedIn={loggedIn} />
       <SurveillanceCamerasSection />
       <LccAIAssistantSection />

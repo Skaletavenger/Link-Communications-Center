@@ -3,6 +3,9 @@ import { Open_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/ThemeContext'
 import { cn } from "@/lib/utils";
+import Navbar from '@/components/Navbar'
+import Breadcrumb from '@/components/Breadcrumb'
+import Footer from '@/components/Footer'
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -24,7 +27,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={cn("dark", openSans.variable, "font-sans")}>
       <body className={`${openSans.variable} font-sans antialiased`}>
-        <ThemeProvider>{children}</ThemeProvider>
+        <ThemeProvider>
+          <Navbar />
+          <Breadcrumb />
+          <main>{children}</main>
+          <Footer />
+        </ThemeProvider>
       </body>
     </html>
   );

@@ -3,47 +3,44 @@
 @tailwind components;
 @tailwind utilities;
 
-/* LIGHT MODE - default */
+/* Brand tokens and light/dark design tokens requested by the project */
 :root {
-  --bg-primary: #f0f6ff;
-  --bg-secondary: #ffffff;
-  --bg-card: #ffffff;
-  --border-color: #d0e4f7;
-  --text-primary: #0a1628;
-  --text-secondary: #2d4a6e;
-  --text-muted: #6b8aaa;
-  --accent: #1574B5;
-  --accent-hover: #1264a3;
-  --nav-bg: rgba(255, 255, 255, 0.95);
-  --nav-border: #d0e4f7;
-  --nav-text: #0a1628;
-  --nav-link: #2d4a6e;
-  --assistant-spotlight: rgba(21,116,181,0.22);
-  --card-shadow: 0 2px 12px rgba(21,116,181,0.08);
+  /* Brand colors */
+  --color-primary: #1574B5; /* Blue */
+  --color-secondary: #ED2124; /* Red */
+  --color-accent: #F47821; /* Orange */
+  --color-success: #25D366; /* WhatsApp Green */
+
+  /* Light mode tokens */
+  --bg-primary: #FFFFFF;
+  --bg-card: #F8FAFC;
+  --bg-card-hover: #F1F5F9;
+  --border: #E2E8F0;
+  --text-primary: #0F172A;
+  --text-muted: #64748B;
+
+  /* nav */
+  --nav-bg: var(--bg-primary);
+  --nav-border: var(--border);
 }
 
-/* DARK MODE */
 .dark {
-  --bg-primary: #0a0f1e;
-  --bg-secondary: #0d1428;
-  --bg-card: rgba(255,255,255,0.05);
-  --border-color: rgba(255,255,255,0.10);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255,255,255,0.70);
-  --text-muted: rgba(255,255,255,0.40);
-  --accent: #1574B5;
-  --accent-hover: #1264a3;
-  --nav-bg: rgba(13,20,40,0.90);
-  --nav-border: rgba(255,255,255,0.08);
-  --nav-text: #ffffff;
-  --nav-link: rgba(255,255,255,0.75);
-  --card-shadow: none;
+  /* Dark mode tokens */
+  --bg-primary: #0A0F1E;
+  --bg-card: #0F172A;
+  --bg-card-hover: #1E293B;
+  --border: #1E293B;
+  --text-primary: #FFFFFF;
+  --text-muted: #94A3B8;
+
+  --nav-bg: var(--bg-card);
+  --nav-border: var(--border);
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
-  transition: background 0.3s, color 0.3s;
+  transition: background-color 300ms ease, color 300ms ease;
 }
 
 .scrollbar-hide {

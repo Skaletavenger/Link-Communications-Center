@@ -1,123 +1,134 @@
 'use client'
 import Link from 'next/link'
-import { useEffect, useMemo, useState } from 'react'
-import { usePathname, useRouter } from 'next/navigation'
-import { supabase } from '../lib/supabase'
-import ThemeToggle from './ThemeToggle'
+import { useState } from 'react'
+import { usePathname } from 'next/navigation'
+import { useTheme } from '@/lib/ThemeContext'
 import BrandLogo from './BrandLogo'
-
-type Profile = { username?: string | null }
-
-const navItems = [
-  { href: '/products', label: 'Products' },
-  { href: '/about', label: 'About' },
-  { href: '/contact', label: 'Contact Us' }
-]
+import ThemeToggle from './ThemeToggle'
+import {
+  Menu,
+  X,
+  ChevronDown,
+  UserCircle,
+  House,
+  Box,
+  Building2,
+  Phone,
+  Smartphone,
+  ChevronRight
+} from 'lucide-react'
 
 export default function Navbar() {
-  const path = usePathname()
-  const router = useRouter()
-  const [authed, setAuthed] = useState(false)
-  const [username, setUsername] = useState<string>('')
+  const path = usePathname() || '/'
+  useTheme()
+  const [open, setOpen] = useState(false)
 
-  const initials = useMemo(() => (username ? `@${username}` : ''), [username])
-
-  useEffect(() => {
-    let mounted = true
-
-    const load = async () => {
-      const { data } = await supabase.auth.getSession()
-      const session = data.session
-      if (!mounted) return
-      setAuthed(Boolean(session))
-
-      if (session?.user?.id) {
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('username')
-          .eq('id', session.user.id)
-          .maybeSingle()
-        if (!mounted) return
-        setUsername((profile as Profile | null)?.username || '')
-      } else {
-        setUsername('')
-      }
-    }
-
-    load()
-
-    const { data: sub } = supabase.auth.onAuthStateChange(() => {
-      load()
-    })
-
-    return () => {
-      mounted = false
-      sub.subscription.unsubscribe()
-    }
-  }, [])
-
-  const logout = async () => {
-    await supabase.auth.signOut()
-    router.push('/')
-  }
+  const isActive = (p: string) => path === p
 
   return (
-    <nav
-      className="fixed top-0 left-0 right-0 z-50 border-b backdrop-blur-md transition-all"
-      style={{
-        background: 'var(--nav-bg)',
-        borderColor: 'var(--nav-border)'
-      }}
-    >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-        <Link href="/" className="flex items-center gap-3">
-          <BrandLogo />
-        </Link>
+    <>
+      <nav
+        className="fixed top-0 left-0 right-0 z-50 border-b"
+        style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <Link href="/" className="flex items-center">
+              <BrandLogo />
+            </Link>
+          </div>
 
-        <div className="hidden md:flex gap-2 items-center">
-          {navItems.map((item) => {
-            const active = path === item.href
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-medium transition-colors duration-200 hover:opacity-80"
-                style={
-                  active
-                    ? {
-                        background: '#1574B5',
-                        color: '#ffffff',
-                        padding: '6px 14px',
-                        borderRadius: '8px'
-                      }
-                    : { color: 'var(--nav-link)' }
-                }
-              >
-                {item.label}
-              </Link>
-            )
-          })}
-        </div>
+          {/* center - desktop links */}
+          <div className="hidden md:flex items-center gap-6">
+            <Link
+              href="/products"
+              className="flex items-center gap-1 font-medium text-sm transition-colors duration-200"
+              style={isActive('/products') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}
+            >
+              Products <ChevronDown size={16} />
+            </Link>
+            <Link href="/about" className="font-medium text-sm transition-colors duration-200" style={isActive('/about') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              About
+            </Link>
+            <Link href="/contact" className="font-medium text-sm transition-colors duration-200" style={isActive('/contact') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              Contact
+            </Link>
+            <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              Smartphone Loans
+            </Link>
+          </div>
 
-        <div className="flex gap-3 items-center">
-          <ThemeToggle />
-          {authed && (
-            <>
-              <span className="hidden sm:inline text-sm font-semibold" style={{ color: 'var(--text-secondary)' }}>
-                Hi {initials || '@user'}
-              </span>
-              <button
-                type="button"
-                onClick={logout}
-                className="px-4 py-2 rounded-xl font-bold text-sm border transition-all hover:opacity-80"
-                style={{ borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-              >
-                Logout
+          <div className="flex items-center gap-3">
+            <div className="hidden sm:flex items-center">
+              <ThemeToggle />
+            </div>
+            <Link href="/auth" className="hidden md:inline-flex items-center gap-2 px-4 py-2 rounded-xl text-white font-semibold" style={{ background: 'var(--color-primary)' }}>
+              <UserCircle size={18} /> Sign In
+            </Link>
+
+            {/* mobile toggles */}
+            <div className="flex items-center gap-2 md:hidden">
+              <ThemeToggle />
+              <button aria-label="open menu" onClick={() => setOpen(true)} className="p-2 rounded-md">
+                <Menu />
               </button>
-            </>
-          )}
+            </div>
+          </div>
         </div>
+      </nav>
+
+      {/* mobile drawer */}
+      <div className={`fixed inset-0 z-40 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+        {/* backdrop */}
+        <div className={`absolute inset-0 bg-black/50 transition-opacity ${open ? 'opacity-60' : 'opacity-0'}`} onClick={() => setOpen(false)} />
+
+        <aside className={`absolute top-0 right-0 h-full bg-[var(--bg-card)] shadow-xl transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '85%', borderLeft: '1px solid var(--border)' }}>
+          <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
+            <Link href="/" className="flex items-center gap-3">
+              <BrandLogo />
+            </Link>
+            <div className="flex items-center gap-2">
+              <ThemeToggle />
+              <button aria-label="close" onClick={() => setOpen(false)} className="p-2 rounded-md">
+                <X />
+              </button>
+            </div>
+          </div>
+
+          <nav className="p-4 space-y-2">
+            <MobileItem href="/" icon={<House />} label="Home" active={isActive('/')} onClick={() => setOpen(false)} />
+            <MobileItem href="/products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
+            <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
+            <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />
+            <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
+
+            <div className="mt-4">
+              <Link href="/auth" onClick={() => setOpen(false)} className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl text-white font-semibold" style={{ background: 'var(--color-primary)' }}>
+                <UserCircle /> Sign In
+              </Link>
+            </div>
+
+            <div className="mt-6 text-center text-sm text-muted" style={{ color: 'var(--text-muted)' }}>
+              <div className="border-t" style={{ borderColor: 'var(--border)' }} />
+              <div className="py-3">v 1.0.0</div>
+            </div>
+          </nav>
+        </aside>
       </div>
-    </nav>
+    </>
+  )
+}
+
+function MobileItem({ href, icon, label, active, onClick }: { href: string; icon: JSX.Element; label: string; active: boolean; onClick?: () => void }) {
+  return (
+    <Link href={href} onClick={onClick} className={`flex items-center justify-between w-full px-3 py-3 rounded-xl transition-all ${active ? 'bg-[var(--color-primary)] text-white' : 'text-[var(--text-primary)]'}`}>
+      <div className="flex items-center gap-3">
+        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${active ? 'bg-white/10' : 'bg-transparent'}`}>
+          {icon}
+        </div>
+        <span className="font-medium">{label}</span>
+      </div>
+      <ChevronRight />
+    </Link>
   )
 }
