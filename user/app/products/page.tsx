@@ -1,9 +1,11 @@
 'use client'
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import Navbar from '../../components/Navbar'
+import Breadcrumb from '../../components/Breadcrumb'
 import AuthGuard from '../../components/AuthGuard'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
+import Footer from '../../components/Footer'
 
 function CameraPlaceholder() {
   return (
@@ -207,6 +209,7 @@ export default function ProductsPage() {
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
   const [authed, setAuthed] = useState(false)
+  const [sortBy, setSortBy] = useState('newest')
 
   useEffect(() => {
     const loadAuth = async () => {
@@ -242,14 +245,25 @@ export default function ProductsPage() {
   }, [products, search])
 
   const filtered = useMemo(() => {
-    return products.filter(p => {
+    let result = products.filter(p => {
       const matchSearch = p.name.toLowerCase().includes(search.toLowerCase()) ||
         p.model.toLowerCase().includes(search.toLowerCase()) ||
         p.brand.toLowerCase().includes(search.toLowerCase())
       const matchCat = category === 'All' || p.category === category
       return matchSearch && matchCat
     })
-  }, [products, search, category])
+
+    // Apply sorting
+    if (sortBy === 'price-low') {
+      result.sort((a, b) => a.price - b.price)
+    } else if (sortBy === 'price-high') {
+      result.sort((a, b) => b.price - a.price)
+    } else if (sortBy === 'name') {
+      result.sort((a, b) => a.name.localeCompare(b.name))
+    }
+
+    return result
+  }, [products, search, category, sortBy])
 
   const otherProducts = filtered.filter(p => p.category !== 'Phones')
 
@@ -257,102 +271,159 @@ export default function ProductsPage() {
     <div className="min-h-screen pt-0" style={{ background: 'var(--bg-primary)' }}>
       <Navbar />
       <AuthGuard show={!authed} />
+      <Breadcrumb items={[
+        { label: 'Home', href: '/' },
+        { label: 'Products' }
+      ]} />
 
-      <div className="max-w-7xl mx-auto pt-24 pb-16 px-6">
-        <div className="mb-10">
-          <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Our Products</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Browse our range of surveillance and communications equipment</p>
+      <div className="max-w-7xl mx-auto pb-16 px-4 md:px-6">
+        {/* Page Header */}
+        <div className="mb-8">
+          <h1 className="text-4xl md:text-5xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>
+            Our Products
+          </h1>
+          <p style={{ color: 'var(--text-secondary)' }}>
+            Browse our range of surveillance, access control, and communications equipment
+          </p>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-3 mb-8">
-          <input
-            className="flex-1 rounded-xl px-4 py-3 outline-none border"
-            style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-            placeholder="Search products..."
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-          />
-          <div className="flex gap-2 flex-wrap">
-            {CATEGORIES.map(c => (
-              <button
-                key={c}
-                onClick={() => setCategory(c)}
-                className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all"
-                style={{
-                  borderColor: category === c ? 'transparent' : 'var(--border-color)',
-                  background: category === c ? 'rgba(21,116,181,0.22)' : 'var(--bg-card)',
-                  color: 'var(--text-primary)'
-                }}
-              >
-                {c}
-              </button>
-            ))}
+        {/* Search and Filters */}
+        <div className="mb-8 space-y-4">
+          {/* Search Bar */}
+          <div className="relative">
+            <input
+              className="w-full rounded-xl px-4 py-3 outline-none border"
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+              placeholder="🔍 Search products by name, brand, or model..."
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+          </div>
+
+          {/* Category Filters and Sort */}
+          <div className="flex flex-col md:flex-row gap-4 md:items-center md:justify-between">
+            <div className="flex gap-2 flex-wrap">
+              {CATEGORIES.map(c => (
+                <button
+                  key={c}
+                  onClick={() => setCategory(c)}
+                  className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all hover:scale-105"
+                  style={{
+                    borderColor: category === c ? '#1574B5' : 'var(--border-color)',
+                    background: category === c ? '#1574B5' : 'var(--bg-card)',
+                    color: category === c ? 'white' : 'var(--text-primary)'
+                  }}
+                >
+                  {c}
+                </button>
+              ))}
+            </div>
+
+            {/* Sort Dropdown */}
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="px-4 py-2 rounded-xl border outline-none"
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+            >
+              <option value="newest">Newest</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="name">Name: A to Z</option>
+            </select>
           </div>
         </div>
 
+        {/* Products Display */}
         {!loaded ? (
-          <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading...</div>
+          <div className="text-center py-24">
+            <div className="inline-block">
+              <div className="w-12 h-12 rounded-full border-4 border-transparent border-t-blue-500 animate-spin" />
+            </div>
+            <p className="mt-4" style={{ color: 'var(--text-secondary)' }}>Loading products...</p>
+          </div>
         ) : otherProducts.length === 0 && phoneProducts.length === 0 ? (
-          <div className="text-center py-24" style={{ color: 'var(--text-muted)' }}>
-            <p className="text-xl font-medium">No products found</p>
-            <p className="text-sm mt-2">Try a different search or category.</p>
+          <div className="text-center py-24 rounded-2xl border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+            <p className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>No products found</p>
+            <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
+              Try adjusting your search or category filters.
+            </p>
           </div>
         ) : (
           <>
-            {category !== 'Phones' && (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {otherProducts.map(p => {
-                  const mainImage = getMainImage(p)
-                  return (
-                    <div
-                      key={p.id}
-                      onClick={() => setSelected(p)}
-                      className="cursor-pointer rounded-2xl overflow-hidden border transition-all hover:-translate-y-1"
-                      style={{
-                        background: 'var(--bg-card)',
-                        border: '1px solid var(--border-color)',
-                        boxShadow: 'var(--card-shadow)',
-                        color: 'var(--text-primary)'
-                      }}
-                    >
-                      <div className="relative overflow-hidden">
-                        {mainImage ? (
-                          <img src={mainImage} alt={p.name} className="w-full h-48 object-cover" />
-                        ) : (
-                          <CameraPlaceholder />
-                        )}
-                        <span className="absolute top-3 left-3 text-xs px-2 py-1 rounded-full border"
-                          style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
-                        >
-                          {p.category}
-                        </span>
-                      </div>
-                      <div className="p-5">
-                        <h3 className="font-bold text-lg mb-1 leading-tight" style={{ color: 'var(--text-primary)' }}>{p.name}</h3>
-                        <p className="text-xs font-mono mb-2" style={{ color: 'var(--text-muted)' }}>{p.brand} · {p.model}</p>
-                        {p.description && (
-                          <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>{p.description}</p>
-                        )}
-                        <div className="flex items-center justify-between">
-                          <span className="text-2xl font-bold" style={{ color: '#1574B5' }}>{formatUGX(p.price)}</span>
-                          <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{p.stockQuantity} units</span>
+            {/* Other Products Grid */}
+            {category !== 'Phones' && otherProducts.length > 0 && (
+              <div className="mb-16">
+                <h2 className="text-2xl font-bold mb-6" style={{ color: 'var(--text-primary)' }}>
+                  {category === 'All' ? 'Equipment & Devices' : category}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {otherProducts.map(p => {
+                    const mainImage = getMainImage(p)
+                    return (
+                      <div
+                        key={p.id}
+                        onClick={() => setSelected(p)}
+                        className="cursor-pointer rounded-2xl overflow-hidden border transition-all hover:-translate-y-2 hover:shadow-lg"
+                        style={{
+                          background: 'var(--bg-card)',
+                          borderColor: 'var(--border-color)',
+                          boxShadow: 'var(--card-shadow)'
+                        }}
+                      >
+                        <div className="relative overflow-hidden bg-gradient-to-br from-blue-500/10 to-purple-500/10">
+                          {mainImage ? (
+                            <img src={mainImage} alt={p.name} className="w-full h-48 object-cover hover:scale-110 transition-transform duration-300" />
+                          ) : (
+                            <CameraPlaceholder />
+                          )}
+                          <span className="absolute top-3 left-3 text-xs px-3 py-1 rounded-full font-semibold border"
+                            style={{ background: '#1574B5', borderColor: '#1574B5', color: 'white' }}
+                          >
+                            {p.category}
+                          </span>
+                        </div>
+                        <div className="p-5">
+                          <h3 className="font-bold text-lg mb-1 leading-tight line-clamp-2" style={{ color: 'var(--text-primary)' }}>
+                            {p.name}
+                          </h3>
+                          <p className="text-xs font-mono mb-3" style={{ color: 'var(--text-muted)' }}>
+                            {p.brand} · {p.model}
+                          </p>
+                          {p.description && (
+                            <p className="text-sm mb-4 line-clamp-2" style={{ color: 'var(--text-secondary)' }}>
+                              {p.description}
+                            </p>
+                          )}
+                          <div className="flex items-center justify-between pt-3 border-t" style={{ borderColor: 'var(--border-color)' }}>
+                            <span className="text-2xl font-bold" style={{ color: '#1574B5' }}>
+                              {formatUGX(p.price)}
+                            </span>
+                            <span className="text-xs px-2 py-1 rounded-lg" style={{ background: 'var(--bg-primary)', color: 'var(--text-secondary)' }}>
+                              {p.stockQuantity} in stock
+                            </span>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  )
-                })}
+                    )
+                  })}
+                </div>
               </div>
             )}
 
+            {/* Phones Section */}
             {phoneProducts.length > 0 && (category === 'All' || category === 'Phones') && (
               <div className="mt-16 mb-8">
                 <div className="mb-10">
                   <p className="text-sm font-semibold tracking-widest uppercase mb-2" style={{ color: 'var(--text-muted)' }}>
-                    Phones
+                    📱 Smartphone Loans
                   </p>
                   <h2 className="text-4xl md:text-5xl font-bold" style={{ color: 'var(--text-primary)' }}>
                     Explore the lineup.
                   </h2>
+                  <p style={{ color: 'var(--text-secondary)' }} className="mt-2">
+                    Flexible payment plans available for all devices
+                  </p>
                 </div>
 
                 <div className="flex gap-6 overflow-x-auto pb-6 snap-x snap-mandatory">
@@ -364,11 +435,11 @@ export default function ProductsPage() {
                         onClick={() => setSelected(phone)}
                         className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group"
                       >
-                        <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 border"
+                        <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 border transition-all hover:shadow-lg"
                           style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)', boxShadow: 'var(--card-shadow)' }}
                         >
                           {mainImage ? (
-                            <img src={mainImage} alt={phone.name} className="w-full h-full object-cover" />
+                            <img src={mainImage} alt={phone.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300" />
                           ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-3">
                               <span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>
@@ -386,16 +457,16 @@ export default function ProductsPage() {
                             {phone.description}
                           </p>
                           <p className="text-xl font-bold" style={{ color: '#1574B5' }}>
-                            UGX {phone.price.toLocaleString()}
+                            {formatUGX(phone.price)}
                           </p>
                           <button
                             type="button"
                             onClick={(e) => { e.stopPropagation(); setSelected(phone) }}
-                            className="mt-3 text-sm font-medium flex items-center gap-1 hover:gap-2 transition-all duration-200"
+                            className="mt-3 text-sm font-bold flex items-center gap-1 hover:gap-2 transition-all duration-200 px-3 py-2 rounded-lg hover:bg-blue-500/10"
                             style={{ color: '#1574B5' }}
                           >
-                            Learn more
-                            <span className="text-lg leading-none">›</span>
+                            View Details
+                            <span className="text-lg leading-none">→</span>
                           </button>
                         </div>
                       </div>
@@ -408,6 +479,7 @@ export default function ProductsPage() {
         )}
       </div>
 
+      {/* Product Detail Modal */}
       {selected && (
         <>
           <div className="fixed inset-0 z-40 bg-black/70 backdrop-blur-sm" onClick={() => setSelected(null)} />
@@ -509,7 +581,7 @@ export default function ProductsPage() {
                 >
                   <p className="text-sm mb-1" style={{ color: 'var(--text-secondary)' }}>Price</p>
                   <p className="text-3xl font-bold" style={{ color: '#1574B5' }}>
-                    UGX {selected.price.toLocaleString()}
+                    {formatUGX(selected.price)}
                   </p>
                   <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
                     {selected.stockQuantity} units available
@@ -531,14 +603,16 @@ export default function ProductsPage() {
                   className="w-full py-4 rounded-2xl font-bold text-lg transition-all hover:opacity-90 active:scale-95 mt-4"
                   style={{ background: '#1574B5', color: 'white' }}
                 >
-                  Done
+                  Close
                 </button>
               </div>
             </div>
           </div>
         </>
       )}
+
+      {/* Footer */}
+      <Footer />
     </div>
   )
 }
-
