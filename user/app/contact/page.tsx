@@ -81,7 +81,7 @@ export default function ContactPage() {
             Get in Touch
           </h1>
           <p className="text-lg" style={{ color: 'var(--text-secondary)' }}>
-            We'd love to hear from you. Reach out to us for quotations, installations, support, or any inquiries.
+            We&apos;d love to hear from you. Reach out to us for quotations, installations, support, or any inquiries.
           </p>
         </div>
 
@@ -98,7 +98,7 @@ export default function ContactPage() {
                     Our Office
                   </h3>
                   <p style={{ color: 'var(--text-secondary)' }} className="text-sm">
-                    We're here to help
+                    We&apos;re here to help
                   </p>
                 </div>
               </div>
