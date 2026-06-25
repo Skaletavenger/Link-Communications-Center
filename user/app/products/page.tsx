@@ -7,6 +7,7 @@ import LccAIAssistantSection from '../../components/home/LccAIAssistantSection'
 import SocialCards from '@/components/ui/card-fan-carousel'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
+import { useCart } from '@/lib/CartContext'
 
 function CameraPlaceholder() {
   return (
@@ -28,6 +29,7 @@ function getMainImage(p: Product) {
 // ImageCarousel removed (not used)
 
 export default function ProductsPage() {
+  const { addToCart } = useCart()
   const [products, setProducts] = useState<Product[]>([])
   const [loaded, setLoaded] = useState(false)
   const [search, setSearch] = useState('')
@@ -169,7 +171,18 @@ export default function ProductsPage() {
                               <span className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>{formatUGX(p.price)}</span>
                               <span className="text-xs" style={{ color: 'var(--text-muted)' }}>{p.stockQuantity} units</span>
                             </div>
-                            <div className="mt-4 flex gap-2">
+                            <div className="mt-4 flex flex-wrap gap-2">
+                              <button
+                                type="button"
+                                onClick={e => {
+                                  e.stopPropagation()
+                                  addToCart({ id: p.id, name: p.name, price: p.price, image: getMainImage(p) })
+                                }}
+                                className="inline-flex items-center justify-center rounded-2xl border border-[var(--border)] px-4 py-2 text-sm font-semibold transition-all hover:bg-[var(--bg-primary)]"
+                                style={{ color: 'var(--text-primary)' }}
+                              >
+                                Add to cart
+                              </button>
                               <Link href={`/checkout?productId=${encodeURIComponent(p.id)}&name=${encodeURIComponent(p.name)}&price=${encodeURIComponent(String(p.price))}`} onClick={(e) => e.stopPropagation()} className="inline-flex items-center justify-center rounded-2xl bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90">Buy now</Link>
                             </div>
                           </div>
@@ -200,6 +213,17 @@ export default function ProductsPage() {
                               <p className="text-sm mb-3 line-clamp-2 leading-relaxed" style={{ color: 'var(--text-secondary)' }}>{phone.description}</p>
                               <p className="text-xl font-bold" style={{ color: 'var(--color-primary)' }}>UGX {phone.price.toLocaleString()}</p>
                               <div className="mt-3 flex flex-wrap gap-2">
+                                <button
+                                  type="button"
+                                  onClick={e => {
+                                    e.stopPropagation()
+                                    addToCart({ id: phone.id, name: phone.name, price: phone.price, image: getMainImage(phone) })
+                                  }}
+                                  className="rounded-2xl border border-[var(--border)] px-4 py-2 text-sm font-semibold transition-all hover:bg-[var(--bg-primary)]"
+                                  style={{ color: 'var(--text-primary)' }}
+                                >
+                                  Add to cart
+                                </button>
                                 <Link href={`/checkout?productId=${encodeURIComponent(phone.id)}&name=${encodeURIComponent(phone.name)}&price=${encodeURIComponent(String(phone.price))}`} onClick={(e) => e.stopPropagation()} className="rounded-2xl bg-[var(--color-primary)] px-4 py-2 text-sm font-semibold text-white transition-all hover:opacity-90">Buy now</Link>
                                 <button type="button" onClick={(e) => { e.stopPropagation(); setSelected(phone) }} className="rounded-2xl border border-current px-4 py-2 text-sm font-medium transition-all hover:bg-slate-100" style={{ color: 'var(--text-primary)' }}>Learn more</button>
                               </div>

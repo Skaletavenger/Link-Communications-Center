@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { Open_Sans } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/lib/ThemeContext'
+import { CartProvider } from '@/lib/CartContext'
 import { cn } from "@/lib/utils";
 import Navbar from '@/components/Navbar'
 import Breadcrumb from '@/components/Breadcrumb'
@@ -28,10 +29,12 @@ export default function RootLayout({
     <html lang="en" className={cn("dark", openSans.variable, "font-sans")}>
       <body className={`${openSans.variable} font-sans antialiased`}>
         <ThemeProvider>
-          <Navbar />
-          <Breadcrumb />
-          <main>{children}</main>
-          <Footer />
+          <CartProvider>
+            <Navbar />
+            <Breadcrumb />
+            <main>{children}</main>
+            <Footer />
+          </CartProvider>
         </ThemeProvider>
       </body>
     </html>
