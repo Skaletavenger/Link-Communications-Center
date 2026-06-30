@@ -167,7 +167,7 @@ Both apps deploy automatically to Vercel on push to `main`.
 
 ## 👨‍💻 Developer
 
-**Maurice Gabriel** — IT Student @ Uganda Christian University & Founder of Link Communications Center.
+**Maurice Gabriel** — IT Student @ Uganda Christian University & Technician of Link Communications Center.
 
 - 🌐 [linkcommunicationcentre.com](https://linkcommunicationcentre.com)
 - 💼 [LinkedIn](https://linkedin.com/in/mauricegabrile)
