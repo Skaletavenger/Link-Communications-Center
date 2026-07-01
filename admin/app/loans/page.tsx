@@ -165,8 +165,19 @@ export default function LoansPage() {
   }
 
   function openEdit(loan: Loan) {
-    setForm({ ...loan })
     setEditingLoan(loan)
+    setForm({
+      brand: loan.brand,
+      model: loan.model,
+      storage_variant: loan.storage_variant || '',
+      device_price: loan.device_price,
+      daily_deposit: loan.daily_deposit ?? 0,
+      daily_amount: loan.daily_amount ?? 0,
+      monthly_deposit: loan.monthly_deposit ?? 0,
+      monthly_amount: loan.monthly_amount ?? 0,
+      image_url: loan.image_url || '',
+      is_available: loan.is_available ?? true,
+    })
     setShowForm(true)
   }
 
@@ -556,10 +567,14 @@ export default function LoansPage() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold mb-2">Upload new image (replaces current)</label>
-                {form.image_url && (
-                  <div className="mb-4">
-                    <img src={form.image_url} alt="Current image" className="w-32 h-32 object-cover rounded-lg mb-2 border" />
+                {form.image_url ? (
+                  <div className="mb-3">
+                    <p className="text-sm font-medium mb-1 text-gray-600">Current image</p>
+                    <img
+                      src={form.image_url}
+                      alt="Current"
+                      className="w-36 h-36 object-cover rounded-xl border border-gray-200 mb-2"
+                    />
                     <button
                       type="button"
                       onClick={() => setForm(f => ({ ...f, image_url: '' }))}
@@ -568,14 +583,11 @@ export default function LoansPage() {
                       Remove image
                     </button>
                   </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageUpload}
-                  className="w-full rounded-xl px-4 py-3 border cursor-pointer"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
+                ) : null}
+                <label className="block text-sm font-medium mb-1">
+                  {form.image_url ? 'Replace image' : 'Upload image'}
+                </label>
+                <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full" />
                 {uploadingImage && <p className="text-sm mt-1" style={{ color: '#1574B5' }}>Uploading...</p>}
               </div>
 
