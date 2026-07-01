@@ -249,7 +249,7 @@ export default function LoansPage() {
 
               <div className="rounded-3xl bg-slate-50 p-4 border border-slate-200">
                 <p className="text-sm text-slate-500">Total repayment</p>
-                <p className="text-xl font-semibold mt-2">{formatUGX((applicationPlan === 'daily' ? selectedLoan.daily_amount : selectedLoan.monthly_amount) * applicationDuration)}</p>
+                <p className="text-xl font-semibold mt-2">{formatUGX(((applicationPlan === 'daily' ? selectedLoan.daily_amount : selectedLoan.monthly_amount) ?? 0) * applicationDuration)}</p>
               </div>
 
               <button
