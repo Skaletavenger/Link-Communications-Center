@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Plus, Pencil, Trash2, Phone } from 'lucide-react'
+import { Plus, Pencil, Trash2, Phone, ChevronDown } from 'lucide-react'
 
 type Loan = {
   id: number
@@ -16,6 +16,14 @@ type Loan = {
   monthly_amount?: number
   image_url?: string
   is_available?: boolean
+}
+
+type LoanSettings = {
+  daily_deposit_percent: number
+  monthly_deposit_percent: number
+  min_loan_duration_days: number
+  max_loan_duration_days: number
+  contact_phone: string
 }
 
 const INITIAL_FORM: Partial<Loan> = {
@@ -43,9 +51,19 @@ export default function LoansPage() {
   const [showForm, setShowForm] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
   const [form, setForm] = useState<Partial<Loan>>(INITIAL_FORM)
+  const [settings, setSettings] = useState<LoanSettings>({
+    daily_deposit_percent: 10,
+    monthly_deposit_percent: 20,
+    min_loan_duration_days: 30,
+    max_loan_duration_days: 365,
+    contact_phone: '+256700000000',
+  })
+  const [settingsExpanded, setSettingsExpanded] = useState(false)
+  const [settingsSaved, setSettingsSaved] = useState(false)
 
   useEffect(() => {
     fetchLoans()
+    fetchSettings()
   }, [])
 
   async function fetchLoans() {
@@ -56,6 +74,40 @@ export default function LoansPage() {
     setLoading(false)
   }
 
+  async function fetchSettings() {
+    const { data, error } = await supabase.from('loan_settings').select('*').eq('id', 1).single()
+    if (error) {
+      console.error('fetch settings error', error)
+      return
+    }
+    if (data) {
+      setSettings({
+        daily_deposit_percent: Number(data.daily_deposit_percent) || 10,
+        monthly_deposit_percent: Number(data.monthly_deposit_percent) || 20,
+        min_loan_duration_days: Number(data.min_loan_duration_days) || 30,
+        max_loan_duration_days: Number(data.max_loan_duration_days) || 365,
+        contact_phone: data.contact_phone || '+256700000000',
+      })
+    }
+  }
+
+  async function saveSettings() {
+    const payload = {
+      daily_deposit_percent: Number(settings.daily_deposit_percent) || 0,
+      monthly_deposit_percent: Number(settings.monthly_deposit_percent) || 0,
+      min_loan_duration_days: Number(settings.min_loan_duration_days) || 0,
+      max_loan_duration_days: Number(settings.max_loan_duration_days) || 0,
+      contact_phone: settings.contact_phone,
+    }
+    const { error } = await supabase.from('loan_settings').update(payload).eq('id', 1)
+    if (error) {
+      console.error('save settings error', error)
+      return
+    }
+    setSettingsSaved(true)
+    window.setTimeout(() => setSettingsSaved(false), 2000)
+  }
+
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
@@ -63,11 +115,11 @@ export default function LoansPage() {
     const ext = file.name.split('.').pop()
     const fileName = `loan-${Date.now()}.${ext}`
     const { data, error } = await supabase.storage
-      .from('product-images')
+      .from('brand-assets')
       .upload(fileName, file, { upsert: true })
     if (!error && data) {
       const { data: urlData } = supabase.storage
-        .from('product-images')
+        .from('brand-assets')
         .getPublicUrl(data.path)
       setForm(f => ({ ...f, image_url: urlData.publicUrl }))
     }
@@ -107,6 +159,11 @@ export default function LoansPage() {
     fetchLoans()
   }
 
+  async function toggleAvailability(loan: Loan) {
+    await supabase.from('loans').update({ is_available: !loan.is_available }).eq('id', loan.id)
+    fetchLoans()
+  }
+
   function openEdit(loan: Loan) {
     setForm({ ...loan })
     setEditingLoan(loan)
@@ -135,10 +192,119 @@ export default function LoansPage() {
             type="button"
             onClick={openNewLoan}
             className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-white font-semibold transition-all"
-            style={{ background: 'var(--color-primary)' }}
+            style={{ background: '#1574B5' }}
           >
-            <Plus size={16} /> Add New Phone
+            <Plus size={16} /> Add Product
           </button>
+        </div>
+
+        <div className="mb-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setSettingsExpanded(prev => !prev)}
+            className="w-full flex items-center justify-between px-6 py-5 text-left"
+            style={{ borderBottom: settingsExpanded ? '1px solid var(--border)' : 'none' }}
+          >
+            <div>
+              <p className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: '#1574B5' }}>
+                Loan Settings
+              </p>
+              <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                Configure global loan defaults and contact details.
+              </p>
+            </div>
+            <ChevronDown className={`transition-transform ${settingsExpanded ? 'rotate-180' : ''}`} stroke="#1574B5" />
+          </button>
+          {settingsExpanded && (
+            <div className="px-6 py-6 grid gap-6 md:grid-cols-2">
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Daily deposit %
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={settings.daily_deposit_percent}
+                  onChange={e => setSettings(s => ({ ...s, daily_deposit_percent: Number(e.target.value) }))}
+                  className="w-full rounded-xl px-4 py-3 border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Monthly deposit %
+                </label>
+                <input
+                  type="number"
+                  min={0}
+                  step={0.1}
+                  value={settings.monthly_deposit_percent}
+                  onChange={e => setSettings(s => ({ ...s, monthly_deposit_percent: Number(e.target.value) }))}
+                  className="w-full rounded-xl px-4 py-3 border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Min duration (days)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={settings.min_loan_duration_days}
+                  onChange={e => setSettings(s => ({ ...s, min_loan_duration_days: Number(e.target.value) }))}
+                  className="w-full rounded-xl px-4 py-3 border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Max duration (days)
+                </label>
+                <input
+                  type="number"
+                  min={1}
+                  value={settings.max_loan_duration_days}
+                  onChange={e => setSettings(s => ({ ...s, max_loan_duration_days: Number(e.target.value) }))}
+                  className="w-full rounded-xl px-4 py-3 border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
+                  Contact phone
+                </label>
+                <input
+                  type="text"
+                  value={settings.contact_phone}
+                  onChange={e => setSettings(s => ({ ...s, contact_phone: e.target.value }))}
+                  className="w-full rounded-xl px-4 py-3 border"
+                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
+                />
+              </div>
+
+              <div className="md:col-span-2 flex items-center gap-4">
+                <button
+                  type="button"
+                  onClick={saveSettings}
+                  className="rounded-2xl px-6 py-3 text-white font-semibold"
+                  style={{ background: '#1574B5' }}
+                >
+                  Save Settings
+                </button>
+                {settingsSaved && (
+                  <span className="text-sm font-semibold" style={{ color: '#16a34a' }}>
+                    Saved!
+                  </span>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
         {loading ? (
@@ -160,40 +326,47 @@ export default function LoansPage() {
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {loans.map(loan => (
               <div key={loan.id} className="rounded-3xl overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
-                <div className="relative h-48 bg-slate-100">
-                  {loan.image_url ? (
-                    <img
-                      src={loan.image_url}
-                      alt={`${loan.brand} ${loan.model}`}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-slate-400">
-                      <Phone size={48} />
-                    </div>
-                  )}
+                <div className="relative h-[140px] bg-slate-100">
+                  <img
+                    src={loan.image_url || '/favicon.ico'}
+                    alt={`${loan.brand} ${loan.model}`}
+                    className="w-full h-full object-cover rounded-t-3xl"
+                    style={{ objectPosition: 'center' }}
+                  />
                 </div>
                 <div className="p-6">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                        {loan.brand} {loan.model}
-                      </h2>
-                      {loan.storage_variant && (
-                        <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                          {loan.storage_variant}
-                        </p>
-                      )}
+                  <div className="flex flex-col gap-4">
+                    <div className="flex items-start justify-between gap-4">
+                      <div>
+                        <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
+                          {loan.brand} {loan.model}
+                        </h2>
+                        {loan.storage_variant && (
+                          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                            {loan.storage_variant}
+                          </p>
+                        )}
+                      </div>
+                      <span
+                        className="rounded-full px-3 py-1 text-xs font-semibold"
+                        style={{
+                          background: loan.is_available ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
+                          color: loan.is_available ? '#16a34a' : '#dc2626',
+                        }}
+                      >
+                        {loan.is_available ? 'Available' : 'Unavailable'}
+                      </span>
                     </div>
-                    <span
-                      className="rounded-full px-3 py-1 text-xs font-semibold"
-                      style={{
-                        background: loan.is_available ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-                        color: loan.is_available ? '#16a34a' : '#dc2626',
-                      }}
-                    >
-                      {loan.is_available ? 'Available' : 'Unavailable'}
-                    </span>
+                    <label className="inline-flex items-center gap-3 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      <input
+                        type="checkbox"
+                        checked={loan.is_available ?? false}
+                        onChange={() => toggleAvailability(loan)}
+                        className="h-5 w-5 rounded border"
+                        style={{ borderColor: '#1574B5' }}
+                      />
+                      <span>{loan.is_available ? 'Mark unavailable' : 'Mark available'}</span>
+                    </label>
                   </div>
 
                   <div className="mt-4">
@@ -384,6 +557,21 @@ export default function LoansPage() {
 
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold mb-2">Phone Image</label>
+                {form.image_url && (
+                  <div className="mb-4 flex flex-col items-start gap-3">
+                    <div className="w-40 h-40 overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--bg-primary)]">
+                      <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setForm(f => ({ ...f, image_url: '' }))}
+                      className="rounded-full px-4 py-2 text-sm font-semibold text-white"
+                      style={{ background: '#ED2124' }}
+                    >
+                      Remove image
+                    </button>
+                  </div>
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -391,24 +579,7 @@ export default function LoansPage() {
                   className="w-full rounded-xl px-4 py-3 border cursor-pointer"
                   style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
                 />
-                {uploadingImage && <p className="text-sm mt-1 text-blue-400">Uploading...</p>}
-                {form.image_url && (
-                  <div className="mt-3 relative w-32 h-32">
-                    <img
-                      src={form.image_url}
-                      alt="Preview"
-                      className="w-full h-full object-cover rounded-xl border"
-                      style={{ borderColor: 'var(--border)' }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, image_url: '' }))}
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-red-500 text-white text-xs flex items-center justify-center"
-                    >
-                      ✕
-                    </button>
-                  </div>
-                )}
+                {uploadingImage && <p className="text-sm mt-1" style={{ color: '#1574B5' }}>Uploading...</p>}
               </div>
 
               <div className="md:col-span-2 flex flex-col gap-4 sm:flex-row justify-end">
@@ -423,7 +594,7 @@ export default function LoansPage() {
                 <button
                   type="submit"
                   className="rounded-2xl px-6 py-3 font-semibold text-white"
-                  style={{ background: 'var(--color-primary)' }}
+                  style={{ background: '#1574B5' }}
                 >
                   Save Loan
                 </button>
