@@ -2,7 +2,7 @@
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Plus, Pencil, Trash2, Phone, ChevronDown } from 'lucide-react'
+import { Plus, Pencil, Trash2 } from 'lucide-react'
 
 type Loan = {
   id: number
@@ -10,23 +10,28 @@ type Loan = {
   model: string
   storage_variant?: string
   device_price: number
-  daily_deposit?: number
-  daily_amount?: number
-  monthly_deposit?: number
-  monthly_amount?: number
+  daily_deposit: number
+  daily_amount: number
+  monthly_deposit: number
+  monthly_amount: number
   image_url?: string
-  is_available?: boolean
+  is_available: boolean
 }
 
-type LoanSettings = {
-  daily_deposit_percent: number
-  monthly_deposit_percent: number
-  min_loan_duration_days: number
-  max_loan_duration_days: number
-  contact_phone: string
+type LoanForm = {
+  brand: string
+  model: string
+  storage_variant: string
+  device_price: number | string
+  daily_deposit: number | string
+  daily_amount: number | string
+  monthly_deposit: number | string
+  monthly_amount: number | string
+  image_url: string
+  is_available: boolean
 }
 
-const INITIAL_FORM: Partial<Loan> = {
+const INITIAL_FORM: LoanForm = {
   brand: '',
   model: '',
   storage_variant: '',
@@ -39,106 +44,64 @@ const INITIAL_FORM: Partial<Loan> = {
   is_available: true,
 }
 
-function formatUGX(value?: number) {
-  if (value == null) return 'UGX 0'
-  return `UGX ${Number(value).toLocaleString()}`
+function formatUGX(value?: number | string) {
+  const amount = Number(value ?? 0) || 0
+  return `UGX ${amount.toLocaleString()}`
 }
 
 export default function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([])
-  const [loading, setLoading] = useState(false)
-  const [editingLoan, setEditingLoan] = useState<Loan | null>(null)
   const [showForm, setShowForm] = useState(false)
+  const [editingLoan, setEditingLoan] = useState<Loan | null>(null)
+  const [form, setForm] = useState<LoanForm>(INITIAL_FORM)
+  const [loading, setLoading] = useState(false)
   const [uploadingImage, setUploadingImage] = useState(false)
-  const [form, setForm] = useState<Partial<Loan>>(INITIAL_FORM)
-  const [settings, setSettings] = useState<LoanSettings>({
-    daily_deposit_percent: 10,
-    monthly_deposit_percent: 20,
-    min_loan_duration_days: 30,
-    max_loan_duration_days: 365,
-    contact_phone: '+256700000000',
-  })
-  const [settingsExpanded, setSettingsExpanded] = useState(false)
-  const [settingsSaved, setSettingsSaved] = useState(false)
 
   useEffect(() => {
     fetchLoans()
-    fetchSettings()
   }, [])
 
   async function fetchLoans() {
     setLoading(true)
-    const { data, error } = await supabase.from('loans').select('*').order('created_at', { ascending: false })
-    if (error) console.error('fetch loans error', error)
+    const { data, error } = await supabase.from('loans').select('*').order('brand', { ascending: true })
+    if (error) {
+      console.error('fetch loans error', error)
+    }
     setLoans((data || []) as Loan[])
     setLoading(false)
-  }
-
-  async function fetchSettings() {
-    const { data, error } = await supabase.from('loan_settings').select('*').eq('id', 1).single()
-    if (error) {
-      console.error('fetch settings error', error)
-      return
-    }
-    if (data) {
-      setSettings({
-        daily_deposit_percent: Number(data.daily_deposit_percent) || 10,
-        monthly_deposit_percent: Number(data.monthly_deposit_percent) || 20,
-        min_loan_duration_days: Number(data.min_loan_duration_days) || 30,
-        max_loan_duration_days: Number(data.max_loan_duration_days) || 365,
-        contact_phone: data.contact_phone || '+256700000000',
-      })
-    }
-  }
-
-  async function saveSettings() {
-    const payload = {
-      daily_deposit_percent: Number(settings.daily_deposit_percent) || 0,
-      monthly_deposit_percent: Number(settings.monthly_deposit_percent) || 0,
-      min_loan_duration_days: Number(settings.min_loan_duration_days) || 0,
-      max_loan_duration_days: Number(settings.max_loan_duration_days) || 0,
-      contact_phone: settings.contact_phone,
-    }
-    const { error } = await supabase.from('loan_settings').update(payload).eq('id', 1)
-    if (error) {
-      console.error('save settings error', error)
-      return
-    }
-    setSettingsSaved(true)
-    window.setTimeout(() => setSettingsSaved(false), 2000)
   }
 
   async function handleImageUpload(e: ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0]
     if (!file) return
+
     setUploadingImage(true)
     const ext = file.name.split('.').pop()
     const fileName = `loan-${Date.now()}.${ext}`
-    const { data, error } = await supabase.storage
-      .from('brand-assets')
-      .upload(fileName, file, { upsert: true })
+    const { data, error } = await supabase.storage.from('brand-assets').upload(fileName, file, { upsert: true })
+
     if (!error && data) {
-      const { data: urlData } = supabase.storage
-        .from('brand-assets')
-        .getPublicUrl(data.path)
-      setForm(f => ({ ...f, image_url: urlData.publicUrl }))
+      const { data: urlData } = supabase.storage.from('brand-assets').getPublicUrl(data.path)
+      setForm(prev => ({ ...prev, image_url: urlData.publicUrl }))
     }
+
     setUploadingImage(false)
   }
 
   async function saveLoan(e: FormEvent) {
     e.preventDefault()
+
     const payload = {
       brand: form.brand,
       model: form.model,
       storage_variant: form.storage_variant || null,
       device_price: Number(form.device_price) || 0,
-      daily_deposit: form.daily_deposit != null ? Number(form.daily_deposit) : null,
-      daily_amount: form.daily_amount != null ? Number(form.daily_amount) : null,
-      monthly_deposit: form.monthly_deposit != null ? Number(form.monthly_deposit) : null,
-      monthly_amount: form.monthly_amount != null ? Number(form.monthly_amount) : null,
+      daily_deposit: Number(form.daily_deposit) || 0,
+      daily_amount: Number(form.daily_amount) || 0,
+      monthly_deposit: Number(form.monthly_deposit) || 0,
+      monthly_amount: Number(form.monthly_amount) || 0,
       image_url: form.image_url || null,
-      is_available: form.is_available ?? true,
+      is_available: form.is_available,
     }
 
     if (editingLoan) {
@@ -154,13 +117,8 @@ export default function LoansPage() {
   }
 
   async function deleteLoan(id: number) {
-    if (!confirm('Delete this loan entry?')) return
+    if (!confirm('Delete this loan product?')) return
     await supabase.from('loans').delete().eq('id', id)
-    fetchLoans()
-  }
-
-  async function toggleAvailability(loan: Loan) {
-    await supabase.from('loans').update({ is_available: !loan.is_available }).eq('id', loan.id)
     fetchLoans()
   }
 
@@ -182,239 +140,97 @@ export default function LoansPage() {
   }
 
   function openNewLoan() {
-    setForm(INITIAL_FORM)
     setEditingLoan(null)
+    setForm(INITIAL_FORM)
     setShowForm(true)
   }
 
+  function removeImage() {
+    setForm(prev => ({ ...prev, image_url: '' }))
+  }
+
   return (
-    <div className="min-h-screen px-6 py-10" style={{ background: 'var(--bg-primary)' }}>
+    <div className="min-h-screen bg-slate-50 px-6 py-10">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold" style={{ color: 'var(--text-primary)' }}>
-              Smartphone Loans
-            </h1>
-            <p className="text-sm mt-2" style={{ color: 'var(--text-secondary)' }}>
-              Full CRUD management for phone loan plans and inventory.
-            </p>
+            <h1 className="text-3xl font-bold text-slate-900">Loan Products</h1>
+            <p className="mt-2 text-sm text-slate-500">Manage loan products and inventory.</p>
           </div>
+
           <button
             type="button"
             onClick={openNewLoan}
-            className="inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-white font-semibold transition-all"
-            style={{ background: '#1574B5' }}
+            className="rounded-xl bg-[#1574B5] px-5 py-3 text-white font-semibold hover:bg-[#125d8f] transition"
           >
             <Plus size={16} /> Add Product
           </button>
         </div>
 
-        <div className="mb-8 rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] shadow-sm overflow-hidden">
-          <button
-            type="button"
-            onClick={() => setSettingsExpanded(prev => !prev)}
-            className="w-full flex items-center justify-between px-6 py-5 text-left"
-            style={{ borderBottom: settingsExpanded ? '1px solid var(--border)' : 'none' }}
-          >
-            <div>
-              <p className="text-sm font-semibold uppercase tracking-[0.2em]" style={{ color: '#1574B5' }}>
-                Loan Settings
-              </p>
-              <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Configure global loan defaults and contact details.
-              </p>
-            </div>
-            <ChevronDown className={`transition-transform ${settingsExpanded ? 'rotate-180' : ''}`} stroke="#1574B5" />
-          </button>
-          {settingsExpanded && (
-            <div className="px-6 py-6 grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Daily deposit %
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={0.1}
-                  value={settings.daily_deposit_percent}
-                  onChange={e => setSettings(s => ({ ...s, daily_deposit_percent: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Monthly deposit %
-                </label>
-                <input
-                  type="number"
-                  min={0}
-                  step={0.1}
-                  value={settings.monthly_deposit_percent}
-                  onChange={e => setSettings(s => ({ ...s, monthly_deposit_percent: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Min duration (days)
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  value={settings.min_loan_duration_days}
-                  onChange={e => setSettings(s => ({ ...s, min_loan_duration_days: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Max duration (days)
-                </label>
-                <input
-                  type="number"
-                  min={1}
-                  value={settings.max_loan_duration_days}
-                  onChange={e => setSettings(s => ({ ...s, max_loan_duration_days: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Contact phone
-                </label>
-                <input
-                  type="text"
-                  value={settings.contact_phone}
-                  onChange={e => setSettings(s => ({ ...s, contact_phone: e.target.value }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div className="md:col-span-2 flex items-center gap-4">
-                <button
-                  type="button"
-                  onClick={saveSettings}
-                  className="rounded-2xl px-6 py-3 text-white font-semibold"
-                  style={{ background: '#1574B5' }}
-                >
-                  Save Settings
-                </button>
-                {settingsSaved && (
-                  <span className="text-sm font-semibold" style={{ color: '#16a34a' }}>
-                    Saved!
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
-        </div>
-
         {loading ? (
-          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {Array.from({ length: 4 }).map((_, index) => (
-              <div key={index} className="animate-pulse rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-6" />
+          <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+            {Array.from({ length: 6 }).map((_, index) => (
+              <div key={index} className="h-80 animate-pulse rounded-2xl bg-white shadow-sm border border-slate-200" />
             ))}
           </div>
         ) : loans.length === 0 ? (
-          <div className="rounded-3xl border border-[var(--border)] bg-[var(--bg-card)] p-12 text-center">
-            <p className="text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              No loans added yet.
-            </p>
-            <p className="mt-3" style={{ color: 'var(--text-secondary)' }}>
-              Click &ldquo;Add New Phone&rdquo; to get started.
-            </p>
+          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
+            <p className="text-xl font-semibold text-slate-900">No loan products yet</p>
+            <p className="mt-3 text-sm text-slate-500">Use the Add Product button to create the first loan.</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {loans.map(loan => (
-              <div key={loan.id} className="rounded-3xl overflow-hidden border border-[var(--border)] bg-[var(--bg-card)] shadow-sm">
-                <div className="relative h-[140px] bg-slate-100">
-                  <img
-                    src={loan.image_url || '/favicon.ico'}
-                    alt={`${loan.brand} ${loan.model}`}
-                    className="w-full h-full object-cover rounded-t-3xl"
-                    style={{ objectPosition: 'center' }}
-                  />
+              <div key={loan.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm">
+                <div className="h-52 bg-slate-100">
+                  {loan.image_url ? (
+                    <img src={loan.image_url} alt={`${loan.brand} ${loan.model}`} className="h-full w-full object-cover" />
+                  ) : (
+                    <div className="flex h-full items-center justify-center bg-slate-200 text-slate-500">No image</div>
+                  )}
                 </div>
-                <div className="p-6">
-                  <div className="flex flex-col gap-4">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <h2 className="text-xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                          {loan.brand} {loan.model}
-                        </h2>
-                        {loan.storage_variant && (
-                          <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                            {loan.storage_variant}
-                          </p>
-                        )}
-                      </div>
-                      <span
-                        className="rounded-full px-3 py-1 text-xs font-semibold"
-                        style={{
-                          background: loan.is_available ? 'rgba(34,197,94,0.15)' : 'rgba(239,68,68,0.15)',
-                          color: loan.is_available ? '#16a34a' : '#dc2626',
-                        }}
-                      >
-                        {loan.is_available ? 'Available' : 'Unavailable'}
-                      </span>
+                <div className="p-5 space-y-4">
+                  <div className="flex items-start justify-between gap-4">
+                    <div>
+                      <h2 className="text-xl font-semibold text-slate-900">{loan.brand} {loan.model}</h2>
+                      {loan.storage_variant ? <p className="text-sm text-slate-500">{loan.storage_variant}</p> : null}
                     </div>
-                    <label className="inline-flex items-center gap-3 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      <input
-                        type="checkbox"
-                        checked={loan.is_available ?? false}
-                        onChange={() => toggleAvailability(loan)}
-                        className="h-5 w-5 rounded border"
-                        style={{ borderColor: '#1574B5' }}
-                      />
-                      <span>{loan.is_available ? 'Mark unavailable' : 'Mark available'}</span>
-                    </label>
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${loan.is_available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
+                      {loan.is_available ? 'Available' : 'Unavailable'}
+                    </span>
                   </div>
 
-                  <div className="mt-4">
-                    <p className="text-2xl font-bold" style={{ color: 'var(--color-primary)' }}>
-                      {formatUGX(loan.device_price)}
-                    </p>
+                  <div>
+                    <p className="text-2xl font-bold text-slate-900">{formatUGX(loan.device_price)}</p>
                   </div>
 
-                  <div className="mt-6 space-y-3 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                    <div className="rounded-2xl bg-[var(--bg-primary)] p-4 border" style={{ borderColor: 'var(--border)' }}>
+                  <div className="space-y-2 text-sm text-slate-600">
+                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200">
                       <p className="font-semibold">Daily Plan</p>
-                      <p className="mt-1">Deposit: {loan.daily_deposit != null ? formatUGX(loan.daily_deposit) : 'N/A'}</p>
-                      <p>Amount: {loan.daily_amount != null ? formatUGX(loan.daily_amount) : 'N/A'}</p>
+                      <p className="mt-1">Deposit: {formatUGX(loan.daily_deposit)}</p>
+                      <p>Amount: {formatUGX(loan.daily_amount)}</p>
                     </div>
-                    <div className="rounded-2xl bg-[var(--bg-primary)] p-4 border" style={{ borderColor: 'var(--border)' }}>
+                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200">
                       <p className="font-semibold">Monthly Plan</p>
-                      <p className="mt-1">Deposit: {loan.monthly_deposit != null ? formatUGX(loan.monthly_deposit) : 'N/A'}</p>
-                      <p>Amount: {loan.monthly_amount != null ? formatUGX(loan.monthly_amount) : 'N/A'}</p>
+                      <p className="mt-1">Deposit: {formatUGX(loan.monthly_deposit)}</p>
+                      <p>Amount: {formatUGX(loan.monthly_amount)}</p>
                     </div>
                   </div>
                 </div>
-                <div className="flex items-center justify-between gap-3 border-t border-[var(--border)] px-6 py-4" style={{ background: 'var(--bg-primary)' }}>
+                <div className="p-5 border-t border-slate-200 bg-slate-50">
                   <button
                     type="button"
+                    className="w-full rounded-xl bg-[#1574B5] px-4 py-3 text-white font-semibold hover:bg-[#125d8f] transition"
                     onClick={() => openEdit(loan)}
-                    className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold transition-all"
-                    style={{ background: 'rgba(21,116,181,0.12)', color: 'var(--color-primary)' }}
                   >
-                    <Pencil size={16} /> Edit
+                    Edit
                   </button>
                   <button
                     type="button"
                     onClick={() => deleteLoan(loan.id)}
-                    className="inline-flex items-center gap-2 rounded-2xl px-4 py-2 text-sm font-semibold text-white"
-                    style={{ background: '#dc2626' }}
+                    className="mt-3 w-full rounded-xl bg-[#ED2124] px-4 py-3 text-white font-semibold hover:bg-[#c20f1d] transition"
                   >
-                    <Trash2 size={16} /> Delete
+                    Delete
                   </button>
                 </div>
               </div>
@@ -423,195 +239,164 @@ export default function LoansPage() {
         )}
       </div>
 
-      {showForm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 py-6 bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-3xl rounded-[28px] border border-[var(--border)] bg-[var(--bg-card)] p-8 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 mb-6">
+      {showForm ? (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
+          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200">
               <div>
-                <h2 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>
-                  {editingLoan ? 'Edit Loan' : 'Add New Loan'}
-                </h2>
-                <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Add or update a loan entry with pricing and availability.
-                </p>
+                <p className="text-sm uppercase tracking-[0.2em] text-[#1574B5]">Loan Product</p>
+                <h2 className="mt-2 text-2xl font-semibold text-slate-900">{editingLoan ? 'Edit Loan Product' : 'Add Loan Product'}</h2>
               </div>
-              <button
-                type="button"
-                onClick={() => { setShowForm(false); setEditingLoan(null); setForm(INITIAL_FORM) }}
-                className="text-xl text-[var(--text-primary)]"
-              >
-                ✕
-              </button>
+              <button type="button" onClick={() => setShowForm(false)} className="text-slate-500 hover:text-slate-900">Cancel</button>
             </div>
-            <form onSubmit={saveLoan} className="grid gap-6 md:grid-cols-2">
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Brand
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.brand || ''}
-                  onChange={e => setForm(f => ({ ...f, brand: e.target.value }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
 
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Model
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={form.model || ''}
-                  onChange={e => setForm(f => ({ ...f, model: e.target.value }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div className="md:col-span-2">
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Storage Variant
-                </label>
-                <input
-                  type="text"
-                  placeholder="e.g. 64GB"
-                  value={form.storage_variant || ''}
-                  onChange={e => setForm(f => ({ ...f, storage_variant: e.target.value }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Device Price UGX
-                </label>
-                <input
-                  type="number"
-                  value={form.device_price ?? 0}
-                  onChange={e => setForm(f => ({ ...f, device_price: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Daily Deposit UGX
-                </label>
-                <input
-                  type="number"
-                  value={form.daily_deposit ?? 0}
-                  onChange={e => setForm(f => ({ ...f, daily_deposit: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Daily Amount UGX
-                </label>
-                <input
-                  type="number"
-                  value={form.daily_amount ?? 0}
-                  onChange={e => setForm(f => ({ ...f, daily_amount: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Monthly Deposit UGX
-                </label>
-                <input
-                  type="number"
-                  value={form.monthly_deposit ?? 0}
-                  onChange={e => setForm(f => ({ ...f, monthly_deposit: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-primary)' }}>
-                  Monthly Amount UGX
-                </label>
-                <input
-                  type="number"
-                  value={form.monthly_amount ?? 0}
-                  onChange={e => setForm(f => ({ ...f, monthly_amount: Number(e.target.value) }))}
-                  className="w-full rounded-xl px-4 py-3 border"
-                  style={{ borderColor: 'var(--border)', background: 'var(--bg-primary)', color: 'var(--text-primary)' }}
-                />
-              </div>
-
-              <div className="md:col-span-2 flex items-center gap-4">
-                <label className="flex items-center gap-3">
+            <form onSubmit={saveLoan} className="mt-6 grid gap-6">
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Brand</span>
                   <input
-                    type="checkbox"
-                    checked={form.is_available ?? true}
-                    onChange={e => setForm(f => ({ ...f, is_available: e.target.checked }))}
-                    className="h-5 w-5 rounded border"
-                    style={{ borderColor: 'var(--border)' }}
+                    type="text"
+                    value={form.brand}
+                    onChange={e => setForm(prev => ({ ...prev, brand: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    required
                   />
-                  <span className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                    Available
-                  </span>
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Model</span>
+                  <input
+                    type="text"
+                    value={form.model}
+                    onChange={e => setForm(prev => ({ ...prev, model: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    required
+                  />
                 </label>
               </div>
 
-              <div className="md:col-span-2">
-                {form.image_url ? (
-                  <div className="mb-3">
-                    <p className="text-sm font-medium mb-1 text-gray-600">Current image</p>
-                    <img
-                      src={form.image_url}
-                      alt="Current"
-                      className="w-36 h-36 object-cover rounded-xl border border-gray-200 mb-2"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setForm(f => ({ ...f, image_url: '' }))}
-                      className="text-xs text-red-500 underline"
-                    >
-                      Remove image
-                    </button>
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Storage Variant</span>
+                  <input
+                    type="text"
+                    value={form.storage_variant}
+                    onChange={e => setForm(prev => ({ ...prev, storage_variant: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Device Price UGX</span>
+                  <input
+                    type="number"
+                    value={form.device_price}
+                    onChange={e => setForm(prev => ({ ...prev, device_price: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    min={0}
+                    required
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Daily Deposit UGX</span>
+                  <input
+                    type="number"
+                    value={form.daily_deposit}
+                    onChange={e => setForm(prev => ({ ...prev, daily_deposit: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    min={0}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Daily Amount UGX</span>
+                  <input
+                    type="number"
+                    value={form.daily_amount}
+                    onChange={e => setForm(prev => ({ ...prev, daily_amount: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    min={0}
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Monthly Deposit UGX</span>
+                  <input
+                    type="number"
+                    value={form.monthly_deposit}
+                    onChange={e => setForm(prev => ({ ...prev, monthly_deposit: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    min={0}
+                  />
+                </label>
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Monthly Amount UGX</span>
+                  <input
+                    type="number"
+                    value={form.monthly_amount}
+                    onChange={e => setForm(prev => ({ ...prev, monthly_amount: e.target.value }))}
+                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    min={0}
+                  />
+                </label>
+              </div>
+
+              <div className="grid gap-4 md:grid-cols-2 items-center">
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Image</span>
+                  <div className="mt-2 flex items-center gap-4">
+                    {form.image_url ? (
+                      <div className="relative">
+                        <img src={form.image_url} alt="Loan product" className="h-32 w-32 rounded-xl object-cover" />
+                        <button
+                          type="button"
+                          onClick={removeImage}
+                          className="absolute right-0 top-0 rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-900 shadow"
+                        >
+                          Remove
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-slate-100 text-sm text-slate-500">No image</div>
+                    )}
                   </div>
-                ) : null}
-                <label className="block text-sm font-medium mb-1">
-                  {form.image_url ? 'Replace image' : 'Upload image'}
                 </label>
-                <input type="file" accept="image/*" onChange={handleImageUpload} className="w-full" />
-                {uploadingImage && <p className="text-sm mt-1" style={{ color: '#1574B5' }}>Uploading...</p>}
+                <label className="block">
+                  <span className="text-sm font-semibold text-slate-700">Upload image</span>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="mt-2 block w-full text-sm text-slate-700"
+                  />
+                  {uploadingImage && <p className="mt-2 text-xs text-slate-500">Uploading...</p>}
+                </label>
               </div>
 
-              <div className="md:col-span-2 flex flex-col gap-4 sm:flex-row justify-end">
-                <button
-                  type="button"
-                  onClick={() => { setShowForm(false); setEditingLoan(null); setForm(INITIAL_FORM) }}
-                  className="rounded-2xl px-6 py-3 border font-semibold"
-                  style={{ borderColor: 'var(--border)', color: 'var(--text-primary)', background: 'var(--bg-primary)' }}
-                >
+              <label className="inline-flex items-center gap-3 text-sm font-semibold text-slate-700">
+                <input
+                  type="checkbox"
+                  checked={form.is_available}
+                  onChange={e => setForm(prev => ({ ...prev, is_available: e.target.checked }))}
+                  className="h-4 w-4 rounded border-slate-300 text-[#1574B5]"
+                />
+                Available
+              </label>
+
+              <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+                <button type="button" onClick={() => setShowForm(false)} className="rounded-2xl border border-slate-300 px-5 py-3 text-slate-700 hover:bg-slate-50 transition">
                   Cancel
                 </button>
-                <button
-                  type="submit"
-                  className="rounded-2xl px-6 py-3 font-semibold text-white"
-                  style={{ background: '#1574B5' }}
-                >
-                  Save Loan
+                <button type="submit" className="rounded-2xl bg-[#1574B5] px-5 py-3 text-white font-semibold hover:bg-[#125d8f] transition">
+                  Save
                 </button>
               </div>
             </form>
           </div>
         </div>
-      )}
+      ) : null}
     </div>
   )
 }
