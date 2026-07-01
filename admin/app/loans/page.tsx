@@ -556,17 +556,14 @@ export default function LoansPage() {
               </div>
 
               <div className="md:col-span-2">
-                <label className="block text-sm font-semibold mb-2">Phone Image</label>
+                <label className="block text-sm font-semibold mb-2">Upload new image (replaces current)</label>
                 {form.image_url && (
-                  <div className="mb-4 flex flex-col items-start gap-3">
-                    <div className="w-40 h-40 overflow-hidden rounded-3xl border border-[var(--border)] bg-[var(--bg-primary)]">
-                      <img src={form.image_url} alt="Preview" className="w-full h-full object-cover" />
-                    </div>
+                  <div className="mb-4">
+                    <img src={form.image_url} alt="Current image" className="w-32 h-32 object-cover rounded-lg mb-2 border" />
                     <button
                       type="button"
                       onClick={() => setForm(f => ({ ...f, image_url: '' }))}
-                      className="rounded-full px-4 py-2 text-sm font-semibold text-white"
-                      style={{ background: '#ED2124' }}
+                      className="text-xs text-red-500 underline"
                     >
                       Remove image
                     </button>
