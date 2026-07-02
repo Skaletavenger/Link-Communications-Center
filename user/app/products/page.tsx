@@ -157,7 +157,7 @@ export default function ProductsPage() {
                         <div key={p.id} onClick={() => setSelected(p)} className="cursor-pointer rounded-2xl overflow-hidden border transition-all hover:-translate-y-1" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', color: 'var(--text-primary)' }}>
                           <div className="relative overflow-hidden">
                             {mainImage ? (
-                              <img src={mainImage} alt={p.name} className="w-full h-48 object-cover" />
+                              <img src={mainImage} alt={p.name} className="w-full h-48 object-contain" style={{ background: 'var(--bg-card)' }} />
                             ) : (
                               <CameraPlaceholder />
                             )}
@@ -205,7 +205,7 @@ export default function ProductsPage() {
                         return (
                           <div key={phone.id} onClick={() => setSelected(phone)} className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group">
                             <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 border" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)', boxShadow: 'var(--card-shadow)' }}>
-                              {mainImage ? (<img src={mainImage} alt={phone.name} className="w-full h-full object-cover" />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-3"><span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{phone.brand}</span></div>)}
+                              {mainImage ? (<img src={mainImage} alt={phone.name} className="w-full h-full object-contain" style={{ background: 'var(--bg-card)' }} />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-3"><span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{phone.brand}</span></div>)}
                             </div>
 
                             <div className="px-1">
@@ -279,7 +279,7 @@ export default function ProductsPage() {
                     <img
                       src={selected.images?.[0] || selected.image}
                       alt={selected.name}
-                      className="w-full rounded-2xl object-cover"
+                      className="w-full rounded-2xl object-contain"
                       style={{ maxHeight: 360 }}
                     />
                   ) : (
