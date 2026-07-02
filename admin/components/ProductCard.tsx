@@ -26,7 +26,7 @@ export default function ProductCard({ product }: { product: Product }) {
     >
       <div className="h-64 overflow-hidden bg-card">
         {mainImage ? (
-          <img src={mainImage} alt={product.name} className="h-full w-full object-cover" />
+          <img src={mainImage} alt={product.name} className="h-full w-full object-contain bg-slate-50" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-[#131c32] text-secondary">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
