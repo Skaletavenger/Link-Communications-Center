@@ -50,14 +50,14 @@ export default function Navbar() {
             >
               Products <ChevronDown size={16} />
             </Link>
+            <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              Smartphone Loans
+            </Link>
             <Link href="/about" className="font-medium text-sm transition-colors duration-200" style={isActive('/about') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               About
             </Link>
             <Link href="/contact" className="font-medium text-sm transition-colors duration-200" style={isActive('/contact') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Contact
-            </Link>
-            <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
-              Smartphone Loans
             </Link>
           </div>
 
@@ -110,9 +110,9 @@ export default function Navbar() {
           <nav className="p-4 space-y-2">
             <MobileItem href="/" icon={<House />} label="Home" active={isActive('/')} onClick={() => setOpen(false)} />
             <MobileItem href="/products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
+            <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
             <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />
-            <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
 
             <div className="mt-6 text-center text-sm text-muted" style={{ color: 'var(--text-muted)' }}>
               <div className="border-t" style={{ borderColor: 'var(--border)' }} />
