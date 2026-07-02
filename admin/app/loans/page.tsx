@@ -182,9 +182,9 @@ export default function LoansPage() {
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {loans.map(loan => (
               <div key={loan.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-                <div className="h-52 bg-slate-100">
+                <div className="h-52 bg-slate-100 flex items-center justify-center p-3">
                   {loan.image_url ? (
-                    <img src={loan.image_url} alt={`${loan.brand} ${loan.model}`} className="h-full w-full object-cover" />
+                    <img src={loan.image_url} alt={`${loan.brand} ${loan.model}`} className="h-full w-full object-contain" />
                   ) : (
                     <div className="flex h-full items-center justify-center bg-slate-200 text-slate-500">No image</div>
                   )}
@@ -349,7 +349,7 @@ export default function LoansPage() {
                   <div className="mt-2 flex items-center gap-4">
                     {form.image_url ? (
                       <div className="relative">
-                        <img src={form.image_url} alt="Loan product" className="h-32 w-32 rounded-xl object-cover" />
+                        <img src={form.image_url} alt="Loan product" className="h-32 w-32 rounded-xl object-contain bg-slate-100 p-2" />
                         <button
                           type="button"
                           onClick={removeImage}
