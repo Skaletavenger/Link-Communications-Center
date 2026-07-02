@@ -143,7 +143,7 @@ export default function ProductsPage() {
                 {/* Image */}
                 <div className="relative overflow-hidden">
                   {mainImage ? (
-                    <img src={mainImage} alt={p.name} className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-500" />
+                    <img src={mainImage} alt={p.name} className="w-full h-48 object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <CameraPlaceholder />
                   )}
@@ -205,7 +205,7 @@ export default function ProductsPage() {
                       <img
                         src={mainImage}
                         alt={phone.name}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                        className="w-full h-full object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-3">
