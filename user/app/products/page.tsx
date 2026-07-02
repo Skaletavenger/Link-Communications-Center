@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import AirtelPayModal from '../../components/payment/AirtelPayModal'
-import SocialCards from '@/components/ui/card-fan-carousel'
+import ProductImageSlider from '../../components/ProductImageSlider'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
 import { useCart } from '@/lib/CartContext'
@@ -316,20 +316,8 @@ export default function ProductsPage() {
               <div className="flex flex-col md:flex-row gap-8">
                 {/* Images — card-fan-carousel */}
                 <div className="w-full md:w-1/2">
-                  {selected.images && selected.images.length > 1 ? (
-                    <SocialCards
-                      cards={selected.images.map((url: string, i: number) => ({
-                        imgUrl: url,
-                        alt: `${selected.name} image ${i + 1}`
-                      }))}
-                    />
-                  ) : selected.images?.[0] || selected.image ? (
-                    <img
-                      src={selected.images?.[0] || selected.image}
-                      alt={selected.name}
-                      className="w-full rounded-2xl object-contain"
-                      style={{ maxHeight: 360 }}
-                    />
+                  {selected.images && selected.images.length > 0 ? (
+                    <ProductImageSlider images={selected.images} name={selected.name} />
                   ) : (
                     <CameraPlaceholder />
                   )}
