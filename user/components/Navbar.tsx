@@ -43,6 +43,9 @@ export default function Navbar() {
 
           {/* center - desktop links */}
           <div className="hidden md:flex items-center gap-6">
+            <Link href="/" className="font-medium text-sm transition-colors duration-200" style={isActive('/') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              Home
+            </Link>
             <Link
               href="/products"
               className="flex items-center gap-1 font-medium text-sm transition-colors duration-200"
