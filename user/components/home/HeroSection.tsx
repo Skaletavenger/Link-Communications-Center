@@ -107,7 +107,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ color: isAccent ? 'var(--color-accent)' : 'var(--text-primary)' }}
+                style={{ color: isAccent ? 'var(--color-accent)' : '#ffffff' }}
               >
                 {word}
               </motion.span>
@@ -132,7 +132,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
             </span>
           </Link>
           <Link href={loggedIn ? '/products' : authHref}>
-            <span className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95" style={{ borderColor: 'var(--color-primary)', color: 'var(--text-primary)', background: 'transparent' }}>
+            <span className="inline-block px-8 py-4 rounded-xl font-bold text-lg cursor-pointer border-2 transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95" style={{ borderColor: 'var(--color-primary)', color: '#ffffff', background: 'transparent' }}>
               Learn More →
             </span>
           </Link>
