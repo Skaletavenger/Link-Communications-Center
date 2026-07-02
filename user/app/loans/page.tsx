@@ -72,12 +72,12 @@ export default function LoansPage() {
                 <div className="grid gap-6 md:grid-cols-3">
                   {brandLoans.map(loan => (
                     <div key={loan.id} className="rounded-2xl border border-slate-200 bg-white shadow-sm overflow-hidden">
-                      <div className="h-52 bg-slate-100">
+                      <div className="h-52 bg-slate-100 flex items-center justify-center p-3">
                         {loan.image_url ? (
                           <img
                             src={loan.image_url}
                             alt={`${loan.brand} ${loan.model}`}
-                            className="h-full w-full object-cover"
+                            className="h-full w-full object-contain"
                           />
                         ) : (
                           <div className="flex h-full items-center justify-center bg-slate-200 text-slate-500">No image</div>
