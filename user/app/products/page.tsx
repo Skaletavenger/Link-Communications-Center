@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
 import AirtelPayModal from '../../components/payment/AirtelPayModal'
-import LccAIAssistantSection from '../../components/home/LccAIAssistantSection'
 import SocialCards from '@/components/ui/card-fan-carousel'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
@@ -27,6 +26,19 @@ function getMainImage(p: Product) {
 }
 
 // ImageCarousel removed (not used)
+
+function SkeletonCard() {
+  return (
+    <div className="rounded-2xl overflow-hidden border animate-pulse" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)' }}>
+      <div className="w-full h-48" style={{ background: 'var(--bg-secondary)' }} />
+      <div className="p-5 space-y-3">
+        <div className="h-4 rounded w-3/4" style={{ background: 'var(--bg-secondary)' }} />
+        <div className="h-3 rounded w-1/2" style={{ background: 'var(--bg-secondary)' }} />
+        <div className="h-6 rounded w-1/3" style={{ background: 'var(--bg-secondary)' }} />
+      </div>
+    </div>
+  )
+}
 
 export default function ProductsPage() {
   const { addToCart } = useCart()
@@ -68,7 +80,6 @@ export default function ProductsPage() {
           <p style={{ color: 'var(--text-secondary)' }}>Browse our range of surveillance and communications equipment</p>
         </div>
 
-        <LccAIAssistantSection />
 
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <input className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
@@ -141,7 +152,9 @@ export default function ProductsPage() {
           {/* Main content */}
           <div className="flex-1">
             {!loaded ? (
-              <div className="text-sm" style={{ color: 'var(--text-secondary)' }}>Loading...</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {[...Array(6)].map((_, i) => <SkeletonCard key={i} />)}
+              </div>
             ) : otherProducts.length === 0 && phoneProducts.length === 0 ? (
               <div className="text-center py-24" style={{ color: 'var(--text-muted)' }}>
                 <p className="text-xl font-medium">No products found</p>
