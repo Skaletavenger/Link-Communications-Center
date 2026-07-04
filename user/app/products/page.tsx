@@ -203,9 +203,9 @@ export default function ProductsPage() {
                       const mainImage = getMainImage(p)
                       return (
                         <div key={p.id} onClick={() => setSelected(p)} className="cursor-pointer rounded-2xl overflow-hidden border transition-all hover:-translate-y-1" style={{ background: 'var(--bg-card)', border: '1px solid var(--border-color)', boxShadow: 'var(--card-shadow)', color: 'var(--text-primary)' }}>
-                          <div className="relative overflow-hidden">
+                          <div className="relative overflow-hidden h-48">
                             {mainImage ? (
-                              <img src={mainImage} alt={p.name} className="w-full h-48 object-contain" style={{ background: 'var(--bg-card)' }} />
+                              <Image src={mainImage} alt={p.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain" style={{ background: 'var(--bg-card)' }} />
                             ) : (
                               <CameraPlaceholder />
                             )}
@@ -253,7 +253,7 @@ export default function ProductsPage() {
                         return (
                           <div key={phone.id} onClick={() => setSelected(phone)} className="flex-shrink-0 w-72 md:w-80 snap-start cursor-pointer group">
                             <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 border" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-card)', boxShadow: 'var(--card-shadow)' }}>
-                              {mainImage ? (<img src={mainImage} alt={phone.name} className="w-full h-full object-contain" style={{ background: 'var(--bg-card)' }} />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-3"><span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{phone.brand}</span></div>)}
+                              {mainImage ? (<Image src={mainImage} alt={phone.name} fill sizes="(max-width: 768px) 80vw, 320px" className="object-contain" style={{ background: 'var(--bg-card)' }} />) : (<div className="w-full h-full flex flex-col items-center justify-center gap-3"><span className="text-sm font-medium" style={{ color: 'var(--text-muted)' }}>{phone.brand}</span></div>)}
                             </div>
 
                             <div className="px-1">
