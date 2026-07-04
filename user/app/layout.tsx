@@ -7,6 +7,7 @@ import { cn } from "@/lib/utils";
 import Navbar from '@/components/Navbar'
 import Breadcrumb from '@/components/Breadcrumb'
 import Footer from '@/components/Footer'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -34,6 +35,7 @@ export default function RootLayout({
             <Breadcrumb />
             <main>{children}</main>
             <Footer />
+            <SpeedInsights />
           </CartProvider>
         </ThemeProvider>
       </body>
