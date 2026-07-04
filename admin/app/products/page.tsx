@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import { useInventory, Product, formatUGX } from '../../lib/useInventory'
 
 const CATEGORIES = ['All', 'Surveillance Cameras', 'Access Control', 'Networking', 'Intercoms', 'Alarms', 'Phones', 'Other']
@@ -141,9 +142,9 @@ export default function ProductsPage() {
                 className="cursor-pointer bg-white dark:bg-white/5 border border-gray-200 dark:border-white/10 rounded-2xl overflow-hidden shadow-sm dark:shadow-none hover:border-[#1574B5]/40 hover:shadow-[0_20px_40px_rgba(21,116,181,0.15)] transition-all duration-300 hover:-translate-y-1 group"
               >
                 {/* Image */}
-                <div className="relative overflow-hidden">
+                <div className="relative overflow-hidden h-48">
                   {mainImage ? (
-                    <img src={mainImage} alt={p.name} className="w-full h-48 object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-500" />
+                    <Image src={mainImage} alt={p.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <CameraPlaceholder />
                   )}
@@ -202,10 +203,12 @@ export default function ProductsPage() {
                 >
                   <div className="relative w-full h-80 rounded-3xl overflow-hidden mb-5 bg-gray-100 dark:bg-white/5">
                     {mainImage ? (
-                      <img
+                      <Image
                         src={mainImage}
                         alt={phone.name}
-                        className="w-full h-full object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-700"
+                        fill
+                        sizes="(max-width: 768px) 80vw, 320px"
+                        className="object-contain bg-slate-50 group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
                       <div className="w-full h-full flex flex-col items-center justify-center gap-3">
@@ -296,11 +299,13 @@ export default function ProductsPage() {
                 return allImages.length > 0 ? (
                   <div className="relative w-full rounded-2xl overflow-hidden mb-6 border border-theme">
                     <div className="relative w-full h-[320px]">
-                      <img
+                      <Image
                         key={safeIndex}
                         src={allImages[safeIndex]}
                         alt={`${selected.name} view ${safeIndex + 1}`}
-                        className="w-full h-full object-contain transition-opacity duration-300 bg-card"
+                        fill
+                        sizes="(max-width: 768px) 100vw, 600px"
+                        className="object-contain transition-opacity duration-300 bg-card"
                       />
 
                       {allImages.length > 1 && (
@@ -341,16 +346,18 @@ export default function ProductsPage() {
                             key={i}
                             type="button"
                             onClick={() => setSlideIndex(i)}
-                            className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all"
+                            className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all"
                             style={{
                               borderColor: safeIndex === i ? '#1574B5' : 'transparent',
                               opacity: safeIndex === i ? 1 : 0.6
                             }}
                           >
-                            <img
+                            <Image
                               src={img}
                               alt={`thumb ${i + 1}`}
-                              className="w-full h-full object-cover"
+                              fill
+                              sizes="64px"
+                              className="object-cover"
                             />
                           </button>
                         ))}
