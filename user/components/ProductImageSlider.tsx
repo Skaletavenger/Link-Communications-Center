@@ -1,5 +1,6 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import Image from 'next/image'
 
 interface Props {
   images: string[]
@@ -45,11 +46,10 @@ export default function ProductImageSlider({ images, name }: Props) {
 
   if (allImages.length === 1) {
     return (
-      <div className="w-full rounded-2xl overflow-hidden mb-6 border"
+      <div className="relative w-full h-72 rounded-2xl overflow-hidden mb-6 border"
            style={{ borderColor: 'var(--border-color)' }}>
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={allImages[0]} alt={name}
-             className="w-full h-72 object-contain"
+        <Image src={allImages[0]} alt={name} fill sizes="(max-width: 768px) 100vw, 600px"
+             className="object-contain"
              style={{ background: 'var(--bg-card)' }}/>
       </div>
     )
@@ -75,9 +75,8 @@ export default function ProductImageSlider({ images, name }: Props) {
                    : 'translateX(100%)',
                  zIndex: i === current ? 1 : 0
                }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={`${name} view ${i + 1}`}
-                 className="w-full h-full object-contain"/>
+            <Image src={img} alt={`${name} view ${i + 1}`} fill sizes="(max-width: 768px) 100vw, 600px"
+                 className="object-contain"/>
           </div>
         ))}
 
@@ -106,14 +105,13 @@ export default function ProductImageSlider({ images, name }: Props) {
            style={{ background: 'var(--bg-secondary)' }}>
         {allImages.map((img, i) => (
           <button key={i} type="button" onClick={() => setCurrent(i)}
-                  className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all"
+                  className="relative flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border-2 transition-all"
                   style={{
                     borderColor: i === current ? '#1574B5' : 'transparent',
                     opacity: i === current ? 1 : 0.6
                   }}>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={img} alt={`thumb ${i + 1}`}
-                 className="w-full h-full object-cover"/>
+            <Image src={img} alt={`thumb ${i + 1}`} fill sizes="64px"
+                 className="object-cover"/>
           </button>
         ))}
       </div>
