@@ -3,6 +3,7 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
 import { Plus } from 'lucide-react'
+import Image from 'next/image'
 
 type DisplayItem = {
   id: string
@@ -202,9 +203,9 @@ export default function HomeDisplayPage() {
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {items.map(item => (
               <div key={item.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-                <div className="h-52 bg-slate-100 flex items-center justify-center p-3">
+                <div className="relative h-52 bg-slate-100 flex items-center justify-center p-3">
                   {item.image_url ? (
-                    <img src={item.image_url} alt={item.name} className="h-full w-full object-contain" />
+                    <Image src={item.image_url} alt={item.name} fill sizes="(max-width: 768px) 100vw, 33vw" className="object-contain p-3" />
                   ) : (
                     <div className="flex h-full w-full items-center justify-center text-slate-500">No image</div>
                   )}
@@ -291,8 +292,8 @@ export default function HomeDisplayPage() {
                   <span className="text-sm font-semibold text-slate-700">Image</span>
                   <div className="mt-2 flex items-center gap-4">
                     {form.image_url ? (
-                      <div className="relative">
-                        <img src={form.image_url} alt="Home display item" className="h-32 w-32 rounded-xl object-contain bg-slate-100 p-2" />
+                      <div className="relative h-32 w-32">
+                        <Image src={form.image_url} alt="Home display item" fill sizes="128px" className="rounded-xl object-contain bg-slate-100 p-2" />
                         <button
                           type="button"
                           onClick={removeImage}
