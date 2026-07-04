@@ -1,5 +1,6 @@
 'use client';
 import { Product } from '../types';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { formatUGX } from '../lib/useInventory';
 
