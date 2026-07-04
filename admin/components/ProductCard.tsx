@@ -25,9 +25,9 @@ export default function ProductCard({ product }: { product: Product }) {
       transition={{ duration: 0.45, ease: 'easeOut' }}
       className="overflow-hidden rounded-3xl border border-theme bg-card backdrop-blur-xl"
     >
-      <div className="h-64 overflow-hidden bg-card">
+      <div className="relative h-64 overflow-hidden bg-card">
         {mainImage ? (
-          <img src={mainImage} alt={product.name} className="h-full w-full object-contain bg-slate-50" />
+          <Image src={mainImage} alt={product.name} fill sizes="(max-width: 768px) 100vw, 400px" className="object-contain bg-slate-50" />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-[#131c32] text-secondary">
             <svg viewBox="0 0 24 24" className="h-10 w-10" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
