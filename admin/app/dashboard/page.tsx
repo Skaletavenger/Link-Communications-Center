@@ -6,6 +6,7 @@ import ThemeToggle from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
 import LogoUploadPanel from '../../components/LogoUploadPanel'
 import StatsPanel from '../../components/StatsPanel'
+import Image from 'next/image'
 
 type ContactMessage = {
   id: string
@@ -705,9 +706,9 @@ export default function DashboardPage() {
                 className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-4 border-b border-theme hover:bg-card transition-all items-center"
               >
                 {/* Image */}
-                <div className="w-12 h-12 rounded-lg bg-card flex items-center justify-center overflow-hidden">
+                <div className="relative w-12 h-12 rounded-lg bg-card flex items-center justify-center overflow-hidden">
                   {(p.images?.[0] || p.image) ? (
-                    <img src={p.images?.[0] || p.image} alt={p.name} className="w-full h-full object-cover" />
+                    <Image src={p.images?.[0] || p.image} alt={p.name} fill sizes="48px" className="object-cover" />
                   ) : (
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#1574B5" strokeWidth="1.5">
                       <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
