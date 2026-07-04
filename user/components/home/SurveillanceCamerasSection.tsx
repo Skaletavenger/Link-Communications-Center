@@ -79,6 +79,27 @@ export default function SurveillanceCamerasSection() {
   const fetchProducts = async () => {
     try {
       setLoading(true)
+
+      // Admin-curated homepage picks take priority (Admin > Home Display)
+      const { data: curated } = await supabase
+        .from('site_content')
+        .select('content')
+        .eq('id', 'home_display_surveillance')
+        .maybeSingle()
+
+      if (curated?.content) {
+        try {
+          const parsed = JSON.parse(curated.content) as Product[]
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setProducts(parsed)
+            setLoading(false)
+            return
+          }
+        } catch {
+          // fall through to catalog lookup
+        }
+      }
+
       const { data, error } = await supabase
         .from('products')
         .select('*')
@@ -200,12 +221,16 @@ export default function SurveillanceCamerasSection() {
                   transition={{ delay: index * 0.05, duration: 0.3 }}
                   whileHover={{ scale: 1.02 }}
                 >
-                  {/* Product Image Placeholder */}
+                  {/* Product Image */}
                   <div
-                    className="w-full h-48 rounded-md mb-4 flex items-center justify-center"
+                    className="w-full h-48 rounded-md mb-4 flex items-center justify-center overflow-hidden"
                     style={{ background: 'rgba(21, 116, 181, 0.1)' }}
                   >
-                    <Camera size={48} className="text-blue-400" />
+                    {product.image_url ? (
+                      <img src={product.image_url} alt={product.name} className="h-full w-full object-contain" />
+                    ) : (
+                      <Camera size={48} className="text-blue-400" />
+                    )}
                   </div>
 
                   {/* Product Name */}
