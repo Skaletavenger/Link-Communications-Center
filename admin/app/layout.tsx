@@ -3,6 +3,7 @@ import { ReactNode } from 'react';
 import dynamic from 'next/dynamic';
 import { Open_Sans } from 'next/font/google';
 import { ThemeProvider } from '../lib/ThemeContext';
+import { SpeedInsights } from '@vercel/speed-insights/next';
 
 const openSans = Open_Sans({
   subsets: ['latin'],
@@ -24,6 +25,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
       <body className={`${openSans.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SiteWrapper>{children}</SiteWrapper>
+          <SpeedInsights />
         </ThemeProvider>
       </body>
     </html>
