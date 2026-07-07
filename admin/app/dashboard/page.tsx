@@ -331,7 +331,6 @@ export default function DashboardPage() {
             >
               {showForm ? '✕ Cancel' : '+ Add Product'}
             </button>
-            <ThemeToggle />
             <button
               onClick={handleLogout}
               className="px-4 py-2 border border-theme text-secondary rounded-lg hover:bg-card transition-all"
