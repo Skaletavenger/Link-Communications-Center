@@ -1,58 +1,17 @@
 'use client'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext } from 'react'
 
-type Theme = 'dark' | 'light'
-
+// Dark mode has been removed. The app now always renders in light mode.
+// This context is kept as a lightweight no-op so existing imports of
+// ThemeProvider/useTheme elsewhere in the app don't need to change.
 const ThemeContext = createContext<{
-  theme: Theme
+  theme: 'light'
   toggleTheme: () => void
-}>({ theme: 'dark', toggleTheme: () => {} })
+}>({ theme: 'light', toggleTheme: () => {} })
 
-export function ThemeProvider({
-  children
-}: {
-  children: React.ReactNode
-}) {
-  const [theme, setTheme] = useState<Theme>('dark')
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-    const saved = localStorage.getItem('lcc_theme') as Theme
-    const initial = saved || 'dark'
-    setTheme(initial)
-    if (initial === 'dark') {
-      document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('light')
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.documentElement.classList.add('light')
-    }
-  }, [])
-
-  const toggleTheme = () => {
-    const next = theme === 'dark' ? 'light' : 'dark'
-    setTheme(next)
-    localStorage.setItem('lcc_theme', next)
-    if (next === 'dark') {
-      document.documentElement.classList.add('dark')
-      document.documentElement.classList.remove('light')
-    } else {
-      document.documentElement.classList.remove('dark')
-      document.documentElement.classList.add('light')
-    }
-  }
-
-  if (!mounted) {
-    return (
-      <div style={{ visibility: 'hidden' }}>
-        {children}
-      </div>
-    )
-  }
-
+export function ThemeProvider({ children }: { children: React.ReactNode }) {
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider value={{ theme: 'light', toggleTheme: () => {} }}>
       {children}
     </ThemeContext.Provider>
   )
