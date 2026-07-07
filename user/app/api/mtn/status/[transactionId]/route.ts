@@ -8,9 +8,12 @@ export async function GET(req: Request, { params }: { params: { transactionId: s
       return NextResponse.json({ error: 'Missing transactionId' }, { status: 400 })
     }
 
-    const MTN_USER_ID = process.env.MTN_COLLECTION_USER_ID
-    const MTN_API_KEY = process.env.MTN_COLLECTION_API_KEY
-    const MTN_SUBSCRIPTION_KEY = process.env.MTN_COLLECTION_SUBSCRIPTION_KEY
+    // Support both naming conventions - the ones actually set in Vercel
+    // (MTN_API_USER etc.) and the original MTN_COLLECTION_* names, so this
+    // works regardless of which was used when the env vars were added.
+    const MTN_USER_ID = process.env.MTN_API_USER || process.env.MTN_COLLECTION_USER_ID
+    const MTN_API_KEY = process.env.MTN_API_KEY || process.env.MTN_COLLECTION_API_KEY
+    const MTN_SUBSCRIPTION_KEY = process.env.MTN_SUBSCRIPTION_KEY || process.env.MTN_COLLECTION_SUBSCRIPTION_KEY
 
     if (!MTN_USER_ID || !MTN_API_KEY || !MTN_SUBSCRIPTION_KEY) {
       return NextResponse.json({ error: 'MTN credentials not configured' }, { status: 500 })
@@ -20,7 +23,7 @@ export async function GET(req: Request, { params }: { params: { transactionId: s
     // production once MTN approves production Collections API access —
     // previously this was hardcoded to the sandbox URL permanently.
     const MTN_BASE_URL = process.env.MTN_BASE_URL || 'https://sandbox.momodeveloper.mtn.com'
-    const MTN_TARGET_ENVIRONMENT = process.env.MTN_TARGET_ENVIRONMENT || 'sandbox'
+    const MTN_TARGET_ENVIRONMENT = process.env.MTN_ENVIRONMENT || process.env.MTN_TARGET_ENVIRONMENT || 'sandbox'
 
     // Get OAuth2 token
     const credentials = Buffer.from(`${MTN_USER_ID}:${MTN_API_KEY}`).toString('base64')
