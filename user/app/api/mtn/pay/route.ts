@@ -30,9 +30,15 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'MTN credentials not configured' }, { status: 500 })
     }
 
+    // MTN_BASE_URL and MTN_TARGET_ENVIRONMENT let this switch from sandbox to
+    // production once MTN approves production Collections API access —
+    // previously this was hardcoded to the sandbox URL permanently.
+    const MTN_BASE_URL = process.env.MTN_BASE_URL || 'https://sandbox.momodeveloper.mtn.com'
+    const MTN_TARGET_ENVIRONMENT = process.env.MTN_TARGET_ENVIRONMENT || 'sandbox'
+
     // Get OAuth2 token
     const credentials = Buffer.from(`${MTN_USER_ID}:${MTN_API_KEY}`).toString('base64')
-    const tokenRes = await fetch('https://sandbox.momodeveloper.mtn.com/collection/token/', {
+    const tokenRes = await fetch(`${MTN_BASE_URL}/collection/token/`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${credentials}`,
@@ -73,12 +79,12 @@ export async function POST(req: Request) {
       payeeNote: 'LCC Payment',
     }
 
-    const payRes = await fetch('https://sandbox.momodeveloper.mtn.com/collection/v1_0/requesttopay', {
+    const payRes = await fetch(`${MTN_BASE_URL}/collection/v1_0/requesttopay`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${accessToken}`,
         'X-Reference-Id': transactionId,
-        'X-Target-Environment': 'sandbox',
+        'X-Target-Environment': MTN_TARGET_ENVIRONMENT,
         'Ocp-Apim-Subscription-Key': MTN_SUBSCRIPTION_KEY,
         'Content-Type': 'application/json',
       },
