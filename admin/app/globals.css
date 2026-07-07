@@ -20,24 +20,6 @@
   --card-shadow: 0 2px 12px rgba(21,116,181,0.08);
 }
 
-/* DARK MODE */
-.dark {
-  --bg-primary: #0a0f1e;
-  --bg-secondary: #0d1428;
-  --bg-card: rgba(255,255,255,0.05);
-  --border-color: rgba(255,255,255,0.10);
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255,255,255,0.70);
-  --text-muted: rgba(255,255,255,0.40);
-  --accent: #1574B5;
-  --accent-hover: #1264a3;
-  --nav-bg: rgba(13,20,40,0.90);
-  --nav-border: rgba(255,255,255,0.08);
-  --nav-text: #ffffff;
-  --nav-link: rgba(255,255,255,0.75);
-  --card-shadow: none;
-}
-
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
