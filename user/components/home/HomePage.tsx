@@ -6,7 +6,6 @@ import CategoriesSection from './CategoriesSection'
 import ParallaxFeatureSection from './ParallaxFeatureSection'
 import HowItWorksSection from './HowItWorksSection'
 import CTASection from './CTASection'
-import LccAIAssistantSection from './LccAIAssistantSection'
 import { useHomeAuth } from './useHomeAuth'
 
 export default function HomePage() {
@@ -16,7 +15,6 @@ export default function HomePage() {
     <main className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <HeroSection productsHref={productsHref} authHref={authHref} loggedIn={loggedIn} />
       <SurveillanceCamerasSection />
-      <LccAIAssistantSection />
       <StatsBarSection />
       <CategoriesSection productsHref={productsHref} />
       <ParallaxFeatureSection />
