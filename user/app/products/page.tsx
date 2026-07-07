@@ -7,6 +7,7 @@ import ProductImageSlider from '../../components/ProductImageSlider'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
 import { useCart } from '@/lib/CartContext'
+import Image from 'next/image'
 
 function CameraPlaceholder() {
   return (
