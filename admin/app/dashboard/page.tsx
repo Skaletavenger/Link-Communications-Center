@@ -687,7 +687,7 @@ export default function DashboardPage() {
             <p className="text-sm mt-2">Click &quot;+ Add Product&quot; to add your first item.</p>
           </div>
         ) : (
-          <div className="bg-card border border-theme rounded-2xl overflow-hidden">
+          <div className="bg-card border border-theme rounded-2xl overflow-x-auto">
             {/* Table Header */}
             <div className="grid grid-cols-[60px_1fr_1fr_1fr_80px_80px_120px_100px] gap-4 px-4 py-3 border-b text-xs font-bold uppercase tracking-wider" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-secondary)' }}>
               <span>Image</span>
