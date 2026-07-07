@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import ThemeToggle from './ThemeToggle';
 import BrandLogo from './BrandLogo';
 
 const navItems = [
@@ -54,7 +53,6 @@ export default function Navbar() {
           })}
         </div>
 
-        <ThemeToggle />
       </div>
     </nav>
   );
