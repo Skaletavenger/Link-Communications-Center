@@ -15,50 +15,6 @@ interface Product {
   description?: string
 }
 
-const PLACEHOLDER_PRODUCTS = [
-  {
-    id: 'p1',
-    name: '2MP ColorVu Fixed Turret Camera',
-    price: 160000,
-    category: 'Outdoor Cameras',
-    description: 'Professional outdoor surveillance with ColorVu technology',
-  },
-  {
-    id: 'p2',
-    name: '4MP H.265 Bullet WiFi Kit',
-    price: 950000,
-    category: 'Camera Kits',
-    description: 'Complete WiFi camera kit with H.265 compression',
-  },
-  {
-    id: 'p3',
-    name: '2MP Indoor Fixed Dome Camera',
-    price: 90000,
-    category: 'Indoor Cameras',
-    description: 'Compact indoor dome camera for retail and offices',
-  },
-  {
-    id: 'p4',
-    name: '2MP Smart Hybrid Light Fixed Dome',
-    price: 165000,
-    category: 'Indoor Cameras',
-    description: 'Indoor dome with smart hybrid lighting',
-  },
-  {
-    id: 'p5',
-    name: '2MP 25X Speed Dome PTZ Camera',
-    price: 1300000,
-    category: 'PTZ Cameras',
-    description: 'Professional PTZ camera with 25X zoom',
-  },
-  {
-    id: 'p6',
-    name: '64-ch 2U 4K AcuSense NVR',
-    price: 5000000,
-    category: 'NVRs',
-    description: 'Enterprise-grade 64-channel NVR for large deployments',
-  },
-]
 
 const FILTER_TABS = ['All', 'Indoor Cameras', 'Outdoor Cameras', 'Camera Kits', 'PTZ Cameras', 'NVRs'] as const
 
@@ -80,7 +36,10 @@ export default function SurveillanceCamerasSection() {
     try {
       setLoading(true)
 
-      // Admin-curated homepage picks take priority (Admin > Home Display)
+      // This section only shows items the admin has explicitly curated in
+      // the "Home Display" admin tab. It intentionally does NOT fall back
+      // to the full product catalog or to demo placeholder products, so the
+      // homepage stays empty (section hidden) until something is curated.
       const { data: curated } = await supabase
         .from('site_content')
         .select('content')
@@ -90,32 +49,16 @@ export default function SurveillanceCamerasSection() {
       if (curated?.content) {
         try {
           const parsed = JSON.parse(curated.content) as Product[]
-          if (Array.isArray(parsed) && parsed.length > 0) {
-            setProducts(parsed)
-            setLoading(false)
-            return
-          }
+          setProducts(Array.isArray(parsed) ? parsed : [])
         } catch {
-          // fall through to catalog lookup
+          setProducts([])
         }
-      }
-
-      const { data, error } = await supabase
-        .from('products')
-        .select('*')
-        .or(`category.ilike.%surveillance%,category.ilike.%camera%,category.ilike.%nvr%,category.ilike.%ptz%`)
-        .limit(100)
-
-      if (error) throw error
-
-      if (data && data.length > 0) {
-        setProducts(data as Product[])
       } else {
-        setProducts(PLACEHOLDER_PRODUCTS as Product[])
+        setProducts([])
       }
     } catch (err) {
       console.error('Error fetching products:', err)
-      setProducts(PLACEHOLDER_PRODUCTS as Product[])
+      setProducts([])
     } finally {
       setLoading(false)
     }
@@ -147,6 +90,10 @@ export default function SurveillanceCamerasSection() {
 
   const handleLoadMore = () => {
     setPage((prev) => prev + 1)
+  }
+
+  if (!loading && products.length === 0) {
+    return null
   }
 
   return (
