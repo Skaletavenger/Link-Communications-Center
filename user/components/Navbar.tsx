@@ -2,10 +2,8 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
-import { useTheme } from '@/lib/ThemeContext'
 import { useCart } from '@/lib/CartContext'
 import BrandLogo from './BrandLogo'
-import ThemeToggle from './ThemeToggle'
 import {
   Menu,
   X,
@@ -21,8 +19,7 @@ import {
 
 export default function Navbar() {
   const path = usePathname() || '/'
-  useTheme()
-  const [open, setOpen] = useState(false)
+    const [open, setOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
   const { items, totalItems, removeFromCart, clearCart } = useCart()
 
@@ -66,7 +63,6 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-3">
-              <ThemeToggle />
               <button
                 type="button"
                 onClick={() => setCartOpen(true)}
@@ -83,7 +79,6 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-2 md:hidden">
-              <ThemeToggle />
               <button aria-label="open menu" onClick={() => setOpen(true)} className="p-2 rounded-md">
                 <Menu />
               </button>
@@ -103,7 +98,6 @@ export default function Navbar() {
               <BrandLogo />
             </Link>
             <div className="flex items-center gap-2">
-              <ThemeToggle />
               <button aria-label="close" onClick={() => setOpen(false)} className="p-2 rounded-md">
                 <X />
               </button>
