@@ -35,6 +35,10 @@ export async function POST(req: Request) {
     // previously this was hardcoded to the sandbox URL permanently.
     const MTN_BASE_URL = process.env.MTN_BASE_URL || 'https://sandbox.momodeveloper.mtn.com'
     const MTN_TARGET_ENVIRONMENT = process.env.MTN_TARGET_ENVIRONMENT || 'sandbox'
+    // MTN's sandbox environment only accepts EUR — confirmed on their
+    // developer docs ("The currency used in Sandbox is EUR"). Production
+    // uses UGX. Set MTN_CURRENCY=UGX in Vercel once live credentials are in place.
+    const MTN_CURRENCY = process.env.MTN_CURRENCY || 'EUR'
 
     // Get OAuth2 token
     const credentials = Buffer.from(`${MTN_USER_ID}:${MTN_API_KEY}`).toString('base64')
@@ -73,7 +77,7 @@ export async function POST(req: Request) {
         partyId: msisdn,
       },
       amount: String(amount),
-      currency: 'UGX',
+      currency: MTN_CURRENCY,
       externalId: reference,
       payerMessage: reference,
       payeeNote: 'LCC Payment',
