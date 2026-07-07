@@ -2,7 +2,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { useInventory, Product, formatUGX, CATEGORIES } from '../../lib/useInventory'
-import ThemeToggle from '../../components/ThemeToggle'
 import { supabase } from '../../lib/supabase'
 import LogoUploadPanel from '../../components/LogoUploadPanel'
 import StatsPanel from '../../components/StatsPanel'
