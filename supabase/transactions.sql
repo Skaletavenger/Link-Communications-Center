@@ -25,11 +25,16 @@ alter table transactions enable row level security;
 
 -- Allow the app (anon key) to insert and read its own payment attempts.
 -- Tighten this later if you add customer auth-based ownership checks.
-create policy if not exists "Allow insert from app" on transactions
+-- Note: CREATE POLICY doesn't support IF NOT EXISTS, so we drop-then-create
+-- to keep this script safely re-runnable.
+drop policy if exists "Allow insert from app" on transactions;
+create policy "Allow insert from app" on transactions
   for insert to anon with check (true);
 
-create policy if not exists "Allow read from app" on transactions
+drop policy if exists "Allow read from app" on transactions;
+create policy "Allow read from app" on transactions
   for select to anon using (true);
 
-create policy if not exists "Allow update from app" on transactions
+drop policy if exists "Allow update from app" on transactions;
+create policy "Allow update from app" on transactions
   for update to anon using (true);
