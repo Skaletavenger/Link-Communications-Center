@@ -41,6 +41,72 @@ function SkeletonCard() {
   )
 }
 
+function FilterFields({
+  priceMin, setPriceMin, priceMax, setPriceMax,
+  brandCounts, selectedBrands, setSelectedBrands,
+  typeCounts, selectedTypes, setSelectedTypes,
+  selectedAvailability, setSelectedAvailability,
+  toggleValue,
+}: {
+  priceMin: number, setPriceMin: (n: number) => void,
+  priceMax: number, setPriceMax: (n: number) => void,
+  brandCounts: [string, number][], selectedBrands: string[], setSelectedBrands: React.Dispatch<React.SetStateAction<string[]>>,
+  typeCounts: [string, number][], selectedTypes: string[], setSelectedTypes: React.Dispatch<React.SetStateAction<string[]>>,
+  selectedAvailability: string[], setSelectedAvailability: React.Dispatch<React.SetStateAction<string[]>>,
+  toggleValue: (list: string[], value: string) => string[],
+}) {
+  return (
+    <>
+      <details open className="mb-3">
+        <summary className="cursor-pointer font-medium">Price Range (UGX)</summary>
+        <div className="mt-3">
+          <input type="range" min={10000} max={10000000} value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} className="w-full" />
+          <div className="flex gap-2 mt-2">
+            <input type="number" value={priceMin} onChange={e => setPriceMin(Number(e.target.value) || 0)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
+            <input type="number" value={priceMax} onChange={e => setPriceMax(Number(e.target.value) || 10000000)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
+          </div>
+        </div>
+      </details>
+
+      <details open className="mb-3">
+        <summary className="cursor-pointer font-medium">Brand</summary>
+        <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          {brandCounts.length === 0 ? (
+            <p className="text-xs">No brands yet</p>
+          ) : brandCounts.map(([brand, count]) => (
+            <label key={brand} className="flex items-center gap-2 py-1">
+              <input type="checkbox" checked={selectedBrands.includes(brand)} onChange={() => setSelectedBrands(prev => toggleValue(prev, brand))} />
+              {brand} <span className="ml-auto text-xs">({count})</span>
+            </label>
+          ))}
+        </div>
+      </details>
+
+      <details open className="mb-3">
+        <summary className="cursor-pointer font-medium">Product Type</summary>
+        <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          {typeCounts.length === 0 ? (
+            <p className="text-xs">No products yet</p>
+          ) : typeCounts.map(([type, count]) => (
+            <label key={type} className="flex items-center gap-2 py-1">
+              <input type="checkbox" checked={selectedTypes.includes(type)} onChange={() => setSelectedTypes(prev => toggleValue(prev, type))} />
+              {type} <span className="ml-auto text-xs">({count})</span>
+            </label>
+          ))}
+        </div>
+      </details>
+
+      <details className="mb-3">
+        <summary className="cursor-pointer font-medium">Availability</summary>
+        <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
+          <label className="flex items-center gap-2 py-1"><input type="checkbox" checked={selectedAvailability.includes('in')} onChange={() => setSelectedAvailability(prev => toggleValue(prev, 'in'))} /> In Stock</label>
+          <label className="flex items-center gap-2 py-1"><input type="checkbox" checked={selectedAvailability.includes('out')} onChange={() => setSelectedAvailability(prev => toggleValue(prev, 'out'))} /> Out of Stock</label>
+        </div>
+      </details>
+    </>
+  )
+}
+
 export default function ProductsPage() {
   const { addToCart } = useCart()
   const [products, setProducts] = useState<Product[]>([])
@@ -54,6 +120,7 @@ export default function ProductsPage() {
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
   const [selectedTypes, setSelectedTypes] = useState<string[]>([])
   const [selectedAvailability, setSelectedAvailability] = useState<string[]>([])
+  const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const fetchProducts = async () => {
     const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
@@ -115,10 +182,25 @@ export default function ProductsPage() {
 
 
         <div className="flex flex-col md:flex-row gap-3 mb-8">
-          <input className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
-          <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-2">
+            <input className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
+            <button
+              type="button"
+              onClick={() => setMobileFiltersOpen(true)}
+              className="md:hidden shrink-0 inline-flex items-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold border"
+              style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+            >
+              Filters
+              {(selectedBrands.length + selectedTypes.length + selectedAvailability.length + (priceMin !== 10000 || priceMax !== 10000000 ? 1 : 0)) > 0 && (
+                <span className="inline-flex items-center justify-center w-5 h-5 rounded-full text-xs text-white" style={{ background: 'var(--color-primary)' }}>
+                  {selectedBrands.length + selectedTypes.length + selectedAvailability.length + (priceMin !== 10000 || priceMax !== 10000000 ? 1 : 0)}
+                </span>
+              )}
+            </button>
+          </div>
+          <div className="flex gap-2 flex-wrap overflow-x-auto pb-1">
             {CATEGORIES.map(c => (
-              <button key={c} onClick={() => setCategory(c)} className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all" style={{ borderColor: category === c ? 'transparent' : 'var(--border-color)', background: category === c ? 'rgba(21,116,181,0.22)' : 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</button>
+              <button key={c} onClick={() => setCategory(c)} className="px-4 py-2 rounded-xl text-sm font-semibold border transition-all whitespace-nowrap" style={{ borderColor: category === c ? 'transparent' : 'var(--border-color)', background: category === c ? 'rgba(21,116,181,0.22)' : 'var(--bg-card)', color: 'var(--text-primary)' }}>{c}</button>
             ))}
           </div>
         </div>
@@ -132,52 +214,14 @@ export default function ProductsPage() {
                 <div className="text-sm text-[var(--text-muted)]">{selectedBrands.length + selectedTypes.length + selectedAvailability.length + (priceMin !== 10000 || priceMax !== 10000000 ? 1 : 0)}</div>
               </div>
 
-              <details open className="mb-3">
-                <summary className="cursor-pointer font-medium">Price Range (UGX)</summary>
-                <div className="mt-3">
-                  <input type="range" min={10000} max={10000000} value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} className="w-full" />
-                  <div className="flex gap-2 mt-2">
-                    <input type="number" value={priceMin} onChange={e => setPriceMin(Number(e.target.value) || 0)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
-                    <input type="number" value={priceMax} onChange={e => setPriceMax(Number(e.target.value) || 10000000)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
-                  </div>
-                </div>
-              </details>
-
-              <details open className="mb-3">
-                <summary className="cursor-pointer font-medium">Brand</summary>
-                <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-                  {brandCounts.length === 0 ? (
-                    <p className="text-xs">No brands yet</p>
-                  ) : brandCounts.map(([brand, count]) => (
-                    <label key={brand} className="flex items-center gap-2">
-                      <input type="checkbox" checked={selectedBrands.includes(brand)} onChange={() => setSelectedBrands(prev => toggleValue(prev, brand))} />
-                      {brand} <span className="ml-auto text-xs">({count})</span>
-                    </label>
-                  ))}
-                </div>
-              </details>
-
-              <details open className="mb-3">
-                <summary className="cursor-pointer font-medium">Product Type</summary>
-                <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-                  {typeCounts.length === 0 ? (
-                    <p className="text-xs">No products yet</p>
-                  ) : typeCounts.map(([type, count]) => (
-                    <label key={type} className="flex items-center gap-2">
-                      <input type="checkbox" checked={selectedTypes.includes(type)} onChange={() => setSelectedTypes(prev => toggleValue(prev, type))} />
-                      {type} <span className="ml-auto text-xs">({count})</span>
-                    </label>
-                  ))}
-                </div>
-              </details>
-
-              <details className="mb-3">
-                <summary className="cursor-pointer font-medium">Availability</summary>
-                <div className="mt-3 space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-                  <label className="flex items-center gap-2"><input type="checkbox" checked={selectedAvailability.includes('in')} onChange={() => setSelectedAvailability(prev => toggleValue(prev, 'in'))} /> In Stock</label>
-                  <label className="flex items-center gap-2"><input type="checkbox" checked={selectedAvailability.includes('out')} onChange={() => setSelectedAvailability(prev => toggleValue(prev, 'out'))} /> Out of Stock</label>
-                </div>
-              </details>
+              <FilterFields
+                priceMin={priceMin} setPriceMin={setPriceMin}
+                priceMax={priceMax} setPriceMax={setPriceMax}
+                brandCounts={brandCounts} selectedBrands={selectedBrands} setSelectedBrands={setSelectedBrands}
+                typeCounts={typeCounts} selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes}
+                selectedAvailability={selectedAvailability} setSelectedAvailability={setSelectedAvailability}
+                toggleValue={toggleValue}
+              />
 
               <button onClick={() => { setSearch(''); setCategory('All'); setPriceMin(10000); setPriceMax(10000000); setSelectedBrands([]); setSelectedTypes([]); setSelectedAvailability([]) }} className="mt-4 w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-xl border font-medium" style={{ borderColor: 'var(--border)' }}>
                 Clear Filters
@@ -378,6 +422,45 @@ export default function ProductsPage() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </>
+      )}
+
+      {mobileFiltersOpen && (
+        <>
+          <div className="fixed inset-0 z-40 bg-black/60 md:hidden" onClick={() => setMobileFiltersOpen(false)} />
+          <div
+            className="fixed bottom-0 left-0 right-0 z-50 max-h-[85vh] overflow-y-auto rounded-t-3xl shadow-2xl md:hidden"
+            style={{ background: 'var(--bg-card)' }}
+          >
+            <div className="flex justify-center pt-4 pb-2">
+              <div className="w-12 h-1.5 rounded-full" style={{ background: 'var(--border)' }} />
+            </div>
+            <div className="px-5 pb-8">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>Filters</h3>
+                <button type="button" onClick={() => setMobileFiltersOpen(false)} className="text-sm font-semibold" style={{ color: 'var(--color-primary)' }}>
+                  Done
+                </button>
+              </div>
+
+              <FilterFields
+                priceMin={priceMin} setPriceMin={setPriceMin}
+                priceMax={priceMax} setPriceMax={setPriceMax}
+                brandCounts={brandCounts} selectedBrands={selectedBrands} setSelectedBrands={setSelectedBrands}
+                typeCounts={typeCounts} selectedTypes={selectedTypes} setSelectedTypes={setSelectedTypes}
+                selectedAvailability={selectedAvailability} setSelectedAvailability={setSelectedAvailability}
+                toggleValue={toggleValue}
+              />
+
+              <button
+                onClick={() => { setSearch(''); setCategory('All'); setPriceMin(10000); setPriceMax(10000000); setSelectedBrands([]); setSelectedTypes([]); setSelectedAvailability([]) }}
+                className="mt-2 w-full inline-flex items-center justify-center gap-2 px-3 py-3 rounded-xl border font-medium"
+                style={{ borderColor: 'var(--border)', color: 'var(--text-primary)' }}
+              >
+                Clear Filters
+              </button>
             </div>
           </div>
         </>
