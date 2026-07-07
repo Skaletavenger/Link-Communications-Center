@@ -27,7 +27,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={cn("dark", openSans.variable, "font-sans")}>
+    <html lang="en" className={cn(openSans.variable, "font-sans")}>
       <body className={`${openSans.variable} font-sans antialiased`}>
         <ThemeProvider>
           <CartProvider>
