@@ -2,7 +2,6 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { useState, useEffect, useMemo } from 'react'
-import AirtelPayModal from '../../components/payment/AirtelPayModal'
 import ProductImageSlider from '../../components/ProductImageSlider'
 import { supabase } from '../../lib/supabase'
 import { CATEGORIES, Product, ProductRow, formatUGX, toProduct } from '../../lib/inventory'
@@ -114,7 +113,6 @@ export default function ProductsPage() {
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
   const [selected, setSelected] = useState<Product | null>(null)
-  const [showAirtel, setShowAirtel] = useState(false)
   const [priceMin, setPriceMin] = useState(10000)
   const [priceMax, setPriceMax] = useState(10000000)
   const [selectedBrands, setSelectedBrands] = useState<string[]>([])
@@ -466,7 +464,6 @@ export default function ProductsPage() {
         </>
       )}
 
-      <AirtelPayModal open={showAirtel} onClose={() => setShowAirtel(false)} product={selected!} />
     </div>
   )
 }
