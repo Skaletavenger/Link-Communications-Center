@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
@@ -14,7 +14,7 @@ type StatusResult = {
   description?: string
 } | null
 
-export default function CheckoutSuccessPage() {
+function CheckoutSuccessContent() {
   const searchParams = useSearchParams()
   const orderTrackingId = searchParams.get('OrderTrackingId') || searchParams.get('orderTrackingId')
 
@@ -139,5 +139,19 @@ export default function CheckoutSuccessPage() {
         </Link>
       </motion.div>
     </div>
+  )
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center" style={{ background: 'var(--bg-primary)' }}>
+          <p style={{ color: 'var(--text-secondary)' }}>Loading…</p>
+        </div>
+      }
+    >
+      <CheckoutSuccessContent />
+    </Suspense>
   )
 }
