@@ -47,10 +47,24 @@ export async function getPesapalAccessToken(): Promise<string> {
     }),
   })
 
-  const data: PesapalTokenResponse = await res.json()
+  const rawText = await res.text()
+  let data: PesapalTokenResponse & { error?: { code?: string; message?: string } | string }
+  try {
+    data = JSON.parse(rawText)
+  } catch {
+    throw new Error(`Pesapal token request returned non-JSON response (HTTP ${res.status}): ${rawText.slice(0, 300)}`)
+  }
+
+  // Log the full response server-side so it shows up in Vercel logs for debugging,
+  // without exposing the raw body to the browser.
+  console.error('Pesapal RequestToken response:', JSON.stringify(data))
 
   if (!res.ok || !data.token) {
-    throw new Error(`Pesapal token request failed: ${data.message || res.statusText}`)
+    const errorDetail =
+      typeof data.error === 'string'
+        ? data.error
+        : data.error?.message || data.error?.code || data.message || `HTTP ${res.status} with no error detail in body`
+    throw new Error(`Pesapal token request failed: ${errorDetail}`)
   }
 
   // Pesapal tokens are valid for 5 minutes; cache for 4 to stay safe.
