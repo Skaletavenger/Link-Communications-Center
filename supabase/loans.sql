@@ -28,7 +28,17 @@ ALTER TABLE public.loans ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "public_read" ON public.loans
   FOR SELECT USING (true);
 
-CREATE POLICY "allow_all_authenticated" ON public.loans
-  FOR ALL USING (auth.role() IS NOT NULL);
+-- NOTE: this app has no real server-side admin authentication yet (the
+-- admin panel currently only checks a PIN client-side in JavaScript), so
+-- there is no Supabase Auth session to actually restrict writes to.
+-- The previous policy here used `auth.role() IS NOT NULL`, which looks
+-- like it restricts writes to logged-in users, but Supabase's anon key
+-- always evaluates auth.role() to 'anon' (never NULL) - so that policy
+-- was accidentally wide open to everyone, while *appearing* restricted.
+-- This is written honestly as public until real admin authentication
+-- exists (tracked separately) - see the transactions/site_content tables
+-- for the same pattern.
+CREATE POLICY "allow_all_writes" ON public.loans
+  FOR ALL USING (true) WITH CHECK (true);
 
 COMMIT;
