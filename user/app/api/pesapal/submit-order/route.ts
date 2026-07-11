@@ -1,8 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { supabase } from '../../../../lib/supabase'
 import { registerPesapalIPN, submitPesapalOrder } from '../../../../lib/pesapal'
+import { checkRateLimit, getClientIp } from '../../../../lib/rateLimit'
 
 export async function POST(req: NextRequest) {
+  const ip = getClientIp(req)
+  const { allowed, retryAfterSeconds } = await checkRateLimit(`pesapal:${ip}`, 5, 60)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many payment attempts. Please wait a moment and try again.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+    )
+  }
+
   try {
     const body = await req.json()
     const { amount, phone, productId, description } = body
