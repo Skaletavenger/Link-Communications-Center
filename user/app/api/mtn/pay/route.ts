@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server'
 import { supabase } from '../../../../lib/supabase'
+import { checkRateLimit, getClientIp } from '../../../../lib/rateLimit'
 
 type Body = {
   phone: string
@@ -14,6 +15,15 @@ function stripLeadingZero(phone: string) {
 }
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req)
+  const { allowed, retryAfterSeconds } = await checkRateLimit(`mtn:${ip}`, 5, 60)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many payment attempts. Please wait a moment and try again.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+    )
+  }
+
   try {
     const body: Body = await req.json()
     const { phone, amount, reference, productId = null, userId = null } = body
