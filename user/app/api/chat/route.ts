@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { checkRateLimit, getClientIp } from '../../../lib/rateLimit'
 
 const SYSTEM_PROMPT = `You are Link, a friendly AI shopping assistant for Link Communications Center, a tech store in Kampala Uganda that sells surveillance cameras, access control systems, and communication equipment. Be helpful, warm, and concise.`
 
@@ -7,6 +8,15 @@ type RequestBody = {
 }
 
 export async function POST(req: Request) {
+  const ip = getClientIp(req)
+  const { allowed, retryAfterSeconds } = await checkRateLimit(`chat:${ip}`, 10, 60)
+  if (!allowed) {
+    return NextResponse.json(
+      { error: 'Too many messages. Please wait a moment before trying again.' },
+      { status: 429, headers: { 'Retry-After': String(retryAfterSeconds) } }
+    )
+  }
+
   try {
     const body: RequestBody = await req.json()
     const message = body.message?.trim()
