@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '../../lib/AdminGuard'
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { useInventory, Product, formatUGX } from '../../lib/useInventory'
@@ -31,7 +32,7 @@ function SkeletonCard() {
   )
 }
 
-export default function ProductsPage() {
+function ProductsPage() {
   const { products, loaded } = useInventory()
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('All')
@@ -451,5 +452,13 @@ export default function ProductsPage() {
         </>
       )}
     </div>
+  )
+}
+
+export default function ProductsPageProtected() {
+  return (
+    <AdminGuard>
+      <ProductsPage />
+    </AdminGuard>
   )
 }
