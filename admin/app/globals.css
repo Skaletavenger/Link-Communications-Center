@@ -92,3 +92,13 @@ select:focus {
 .animate-spin-slow {
   animation: spin-slow 12s linear infinite;
 }
+
+/* Softly curved corners for any button (or button-styled input) that doesn't
+   already declare its own border-radius via a Tailwind rounded-* class.
+   Class-based utilities have higher specificity, so intentional pill/circle
+   buttons are unaffected. */
+button,
+input[type='button'],
+input[type='submit'] {
+  border-radius: 0.75rem;
+}
