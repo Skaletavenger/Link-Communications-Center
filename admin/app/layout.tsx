@@ -16,7 +16,8 @@ const SiteWrapper = dynamic(() => import('../components/SiteWrapper'), { ssr: fa
 
 export const metadata = {
   title: 'Link Communications Center',
-  description: 'Security and communications solutions'
+  description: 'Security and communications solutions',
+  robots: { index: false, follow: false }
 };
 
 export default function RootLayout({ children }: { children: ReactNode }) {
