@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '../../lib/AdminGuard'
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -6,7 +7,7 @@ import { supabase } from '../../lib/supabase'
 const DEFAULT_ABOUT =
   "Link Communications Center is Uganda's trusted provider of surveillance cameras, communications equipment, and smart phones. We offer quality products at affordable prices with expert installation and support services."
 
-export default function AboutPage() {
+function AboutPage() {
   const [content, setContent] = useState(DEFAULT_ABOUT)
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
@@ -82,5 +83,13 @@ export default function AboutPage() {
         </>
       )}
     </section>
+  )
+}
+
+export default function AboutPageProtected() {
+  return (
+    <AdminGuard>
+      <AboutPage />
+    </AdminGuard>
   )
 }
