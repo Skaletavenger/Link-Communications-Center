@@ -2,174 +2,133 @@
 import { FormEvent, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { supabase } from '../../../lib/supabase';
 
-const AUTH_KEY = 'lcc_admin_auth';
-const CORRECT_PASSWORD = 'LCC2026';
-const MAX_ATTEMPTS = 3;
-const LOCKOUT_SECONDS = 30;
+const LEGACY_AUTH_KEY = 'lcc_admin_auth';
 
 export default function DashboardLoginPage() {
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
-  const [attempts, setAttempts] = useState(0);
-  const [disabled, setDisabled] = useState(false);
-  const [countdown, setCountdown] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (sessionStorage.getItem(AUTH_KEY) === 'true') {
-      router.replace('/dashboard');
-    }
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session) return;
+      if (typeof window !== 'undefined' && sessionStorage.getItem(LEGACY_AUTH_KEY) === 'true') {
+        // Already fully logged in - go straight to the dashboard.
+        router.replace('/dashboard');
+      } else {
+        // The dashboard logged this session out (logout button / idle timeout),
+        // so finish the job on the Supabase side and show the form.
+        supabase.auth.signOut();
+      }
+    });
   }, [router]);
 
-  useEffect(() => {
-    if (!disabled || countdown <= 0) return;
-
-    const timer = window.setInterval(() => {
-      setCountdown((current) => {
-        if (current <= 1) {
-          setDisabled(false);
-          setAttempts(0);
-          setError('');
-          window.clearInterval(timer);
-          return 0;
-        }
-        return current - 1;
-      });
-    }, 1000);
-
-    return () => window.clearInterval(timer);
-  }, [disabled, countdown]);
-
-  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (loading) return;
 
-    if (disabled) {
+    setError('');
+    setLoading(true);
+
+    const { error: authError } = await supabase.auth.signInWithPassword({
+      email: email.trim(),
+      password,
+    });
+
+    if (authError) {
+      setError('Invalid email or password.');
+      setLoading(false);
       return;
     }
 
-    if (password === CORRECT_PASSWORD) {
-      if (typeof window !== 'undefined') {
-        sessionStorage.setItem(AUTH_KEY, 'true');
-        sessionStorage.setItem('lcc_last_active', Date.now().toString());
-      }
-      setError('');
-      setSuccess(true);
-      window.setTimeout(() => {
-        router.push('/dashboard');
-      }, 800);
-      return;
+    if (typeof window !== 'undefined') {
+      sessionStorage.setItem(LEGACY_AUTH_KEY, 'true');
+      sessionStorage.setItem('lcc_last_active', Date.now().toString());
     }
 
-    const nextAttempts = attempts + 1;
-    setAttempts(nextAttempts);
-    setPassword('');
-
-    if (nextAttempts >= MAX_ATTEMPTS) {
-      setError('Too many attempts. Please contact admin.');
-      setDisabled(true);
-      setCountdown(LOCKOUT_SECONDS);
-      return;
-    }
-
-    setError('Invalid access code. Try again.');
+    setSuccess(true);
+    window.setTimeout(() => {
+      router.push('/dashboard');
+    }, 500);
   };
 
   return (
-    <main className="relative min-h-screen overflow-hidden bg-[#f0f4ff] dark:bg-[#0a0f1e] px-6 py-10 text-gray-900 dark:text-white">
+    <main className="relative min-h-screen overflow-hidden bg-[#f0f4ff] px-6 py-10 text-gray-900">
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(21,116,181,0.18),transparent_26%),radial-gradient(circle_at_bottom_right,_rgba(155,92,255,0.14),transparent_35%)]" />
-      <div className="relative z-10 mx-auto flex min-h-screen max-w-screen-xl flex-col items-center justify-center text-center">
-        <div className="mb-8 space-y-3 text-gray-500 dark:text-gray-300">
-          <p className="text-sm uppercase tracking-[0.35em] text-[#73d5ff]">Link Communications Center</p>
-          <h1 className="text-4xl font-semibold tracking-tight">Admin Access</h1>
-        </div>
-
+      <div className="relative z-10 flex min-h-[80vh] items-center justify-center">
         <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={success ? { opacity: 1, scale: 1.02 } : { opacity: 1, scale: 1 }}
-          transition={{ duration: 0.55, ease: 'easeOut' }}
-          className="relative w-full max-w-[420px]"
+          initial={{ opacity: 0, y: 24 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4, ease: 'easeOut' }}
+          className="w-full max-w-md rounded-3xl border border-white/60 bg-white/80 p-8 shadow-xl backdrop-blur"
         >
-          <div className="absolute inset-0 rounded-[24px] bg-gradient-to-r from-[#1574B5] via-[#9B5CFF] to-[#1574B5] opacity-80 blur-2xl animate-spin-slow" />
-          <div className="relative overflow-hidden rounded-[24px] border border-gray-200 dark:border-white/10 bg-white dark:bg-white/5 px-8 py-12 backdrop-blur-xl shadow-2xl shadow-sky-500/10">
-            <div className="mb-8 flex items-center justify-center">
-              <motion.div
-                initial={{ rotate: 0, y: 0 }}
-                animate={success ? { rotate: 0, y: [0, -6, 0], scale: [1, 1.05, 1] } : { rotate: 0, y: 0 }}
-                transition={{ duration: 0.7, ease: 'easeOut' }}
-                className="flex h-20 w-20 items-center justify-center rounded-3xl bg-white/10 text-accent"
-              >
-                <svg viewBox="0 0 64 64" className="h-12 w-12" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M20 26V18a12 12 0 0124 0v8"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    transform={success ? 'translate(0,-4) rotate(-15 32 20)' : undefined}
-                  />
-                  <rect x="16" y="26" width="32" height="28" rx="6" stroke="currentColor" strokeWidth="4" />
-                  {success ? (
-                    <path d="M32 36v6" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
-                  ) : null}
-                </svg>
-              </motion.div>
+          <h1 className="text-2xl font-bold">Admin login</h1>
+          <p className="mt-2 text-sm text-gray-600">
+            Sign in with your administrator account to manage Link Communications Center.
+          </p>
+
+          <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">Email</label>
+              <input
+                type="email"
+                autoComplete="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@example.com"
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-base outline-none transition focus:border-[#1574B5]"
+              />
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="space-y-3 text-left">
-                <label htmlFor="access-code" className="block text-sm uppercase tracking-[0.24em] text-gray-700 dark:text-white/60">
-                  Access Code
-                </label>
-                <div className="relative">
-                  <input
-                    id="access-code"
-                    type={showPassword ? 'text' : 'password'}
-                    value={password}
-                    onChange={(event) => setPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-200 dark:border-white/10 bg-gray-50 dark:bg-white/5 px-4 py-4 text-gray-900 dark:text-white outline-none transition focus:border-[#1574B5] focus:ring-4 focus:ring-[#1574B5]/20 placeholder-gray-400 dark:placeholder-white/30"
-                    placeholder="Enter access code"
-                    autoComplete="current-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword((current) => !current)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-[#a8d8ff] hover:text-white"
-                    aria-label={showPassword ? 'Hide password' : 'Show password'}
-                  >
-                    {showPassword ? (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M17.94 17.94A10.94 10.94 0 0112 20c-5.18 0-9.44-3.17-11-7.5A10.94 10.94 0 014.06 6.06" />
-                        <path d="M1 1l22 22" />
-                      </svg>
-                    ) : (
-                      <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                        <circle cx="12" cy="12" r="3" />
-                      </svg>
-                    )}
-                  </button>
-                </div>
+            <div>
+              <label className="mb-2 block text-sm font-semibold text-gray-700">Password</label>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  autoComplete="current-password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="Your password"
+                  className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 pr-20 text-base outline-none transition focus:border-[#1574B5]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((v) => !v)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-sm font-semibold text-[#1574B5]"
+                >
+                  {showPassword ? 'Hide' : 'Show'}
+                </button>
               </div>
+            </div>
 
-              {error ? (
-                <p className={`text-sm ${attempts >= MAX_ATTEMPTS ? 'text-rose-300' : 'text-rose-400'}`}>{error}</p>
-              ) : null}
+            {error && (
+              <div className="rounded-2xl border-l-4 border-red-500 bg-red-50 p-3 text-sm text-red-700">
+                {error}
+              </div>
+            )}
 
-              <button
-                type="submit"
-                disabled={disabled}
-                className="w-full rounded-2xl bg-[#1574B5] px-4 py-4 text-navy font-semibold shadow-[0_20px_50px_-30px_rgba(21,116,181,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-              >
-                {disabled ? `Try again in ${countdown}s` : 'Login'}
-              </button>
-            </form>
+            {success && (
+              <div className="rounded-2xl border-l-4 border-green-500 bg-green-50 p-3 text-sm text-green-700">
+                Welcome back. Redirecting&hellip;
+              </div>
+            )}
 
-            <p className="mt-6 text-xs text-secondary">Link Communications Center — Admin Portal</p>
-          </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full rounded-2xl bg-[#1574B5] py-3.5 text-base font-semibold text-white transition hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              {loading ? 'Signing in\u2026' : 'Sign in'}
+            </button>
+          </form>
         </motion.div>
       </div>
     </main>
