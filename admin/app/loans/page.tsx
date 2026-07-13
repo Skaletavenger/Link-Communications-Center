@@ -1,4 +1,5 @@
 "use client"
+import AdminGuard from '../../lib/AdminGuard'
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -49,7 +50,7 @@ function formatUGX(value?: number | string) {
   return `UGX ${amount.toLocaleString()}`
 }
 
-export default function LoansPage() {
+function LoansPage() {
   const [loans, setLoans] = useState<Loan[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingLoan, setEditingLoan] = useState<Loan | null>(null)
@@ -398,5 +399,13 @@ export default function LoansPage() {
         </div>
       ) : null}
     </div>
+  )
+}
+
+export default function LoansPageProtected() {
+  return (
+    <AdminGuard>
+      <LoansPage />
+    </AdminGuard>
   )
 }
