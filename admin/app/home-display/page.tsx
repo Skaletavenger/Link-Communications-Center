@@ -1,4 +1,5 @@
 'use client'
+import AdminGuard from '../../lib/AdminGuard'
 
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react'
 import { supabase } from '../../lib/supabase'
@@ -39,7 +40,7 @@ function formatUGX(value?: number | string) {
   return `UGX ${amount.toLocaleString()}`
 }
 
-export default function HomeDisplayPage() {
+function HomeDisplayPage() {
   const [items, setItems] = useState<DisplayItem[]>([])
   const [showForm, setShowForm] = useState(false)
   const [editingItem, setEditingItem] = useState<DisplayItem | null>(null)
@@ -332,5 +333,13 @@ export default function HomeDisplayPage() {
         </div>
       ) : null}
     </div>
+  )
+}
+
+export default function HomeDisplayPageProtected() {
+  return (
+    <AdminGuard>
+      <HomeDisplayPage />
+    </AdminGuard>
   )
 }
