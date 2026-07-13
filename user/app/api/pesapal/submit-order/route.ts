@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { amount, phone, productId, description } = body
+    const { amount, phone, productId, description, name, email } = body
 
     if (!amount || Number(amount) <= 0) {
       return NextResponse.json({ error: 'A valid amount is required' }, { status: 400 })
@@ -29,6 +29,11 @@ export async function POST(req: NextRequest) {
 
     const reference = `lcc-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
 
+    const trimmedName = typeof name === 'string' ? name.trim() : ''
+    const nameParts = trimmedName ? trimmedName.split(/\s+/) : []
+    const firstName = nameParts[0] || ''
+    const lastName = nameParts.slice(1).join(' ')
+
     const order = await submitPesapalOrder({
       id: reference,
       amount: Number(amount),
@@ -37,6 +42,9 @@ export async function POST(req: NextRequest) {
       callbackUrl,
       notificationId,
       phoneNumber: phone || '',
+      email: typeof email === 'string' && email.trim() ? email.trim() : undefined,
+      firstName: firstName || undefined,
+      lastName: lastName || firstName || undefined,
     })
 
     // Record the attempt immediately so it shows up even if the customer
