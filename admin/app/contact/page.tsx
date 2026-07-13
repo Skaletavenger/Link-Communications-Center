@@ -1,8 +1,9 @@
 'use client';
+import AdminGuard from '../../lib/AdminGuard'
 import { motion, useInView } from 'framer-motion';
 import { useRef } from 'react';
 
-export default function Contact() {
+function Contact() {
   const ref = useRef<HTMLElement>(null);
   const inView = useInView(ref, { once: true, margin: '-100px' });
 
@@ -23,4 +24,12 @@ export default function Contact() {
       </form>
     </motion.section>
   );
+}
+
+export default function ContactProtected() {
+  return (
+    <AdminGuard>
+      <Contact />
+    </AdminGuard>
+  )
 }
