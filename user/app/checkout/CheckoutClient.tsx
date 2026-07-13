@@ -13,6 +13,8 @@ function parsePositiveNumber(value: string | null, fallback: number) {
 export default function CheckoutClient() {
   const searchParams = useSearchParams()
   const [phone, setPhone] = useState('')
+  const [fullName, setFullName] = useState('')
+  const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -30,6 +32,21 @@ export default function CheckoutClient() {
       return
     }
 
+    if (!fullName.trim()) {
+      setError('Please enter your full name.')
+      return
+    }
+
+    if (!phone.trim()) {
+      setError('Please enter your mobile money phone number.')
+      return
+    }
+
+    if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
+      setError('Please enter a valid email address or leave it empty.')
+      return
+    }
+
     setLoading(true)
     try {
       const res = await fetch('/api/pesapal/submit-order', {
@@ -38,6 +55,8 @@ export default function CheckoutClient() {
         body: JSON.stringify({
           amount: totalAmount,
           phone,
+          name: fullName.trim(),
+          email: email.trim(),
           productId,
           description: `${productName} x${quantity}`,
         }),
@@ -139,7 +158,20 @@ export default function CheckoutClient() {
               </h2>
 
               <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>
-                Phone number (optional)
+                Full name
+              </label>
+              <input
+                type="text"
+                title="Your full name"
+                placeholder="e.g. John Mukasa"
+                value={fullName}
+                onChange={e => setFullName(e.target.value)}
+                className="w-full rounded-3xl border px-4 py-3 text-base outline-none transition-all mb-4"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+              />
+
+              <label className="block text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>
+                Mobile money phone number
               </label>
               <input
                 type="tel"
@@ -153,6 +185,19 @@ export default function CheckoutClient() {
               <p className="mt-2 text-xs" style={{ color: 'var(--text-muted)' }}>
                 You&apos;ll choose MTN MoMo or Airtel Money and confirm payment on the next screen.
               </p>
+
+              <label className="block text-sm font-semibold mb-2 mt-4" style={{ color: 'var(--text-secondary)' }}>
+                Email (optional)
+              </label>
+              <input
+                type="email"
+                title="Email address for your receipt"
+                placeholder="you@example.com"
+                value={email}
+                onChange={e => setEmail(e.target.value)}
+                className="w-full rounded-3xl border px-4 py-3 text-base outline-none transition-all"
+                style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }}
+              />
 
               {error && (
                 <div className="mt-4 rounded-2xl border-l-4 border-red-500 bg-red-50 p-4 text-sm" style={{ color: '#9b1c1c' }}>
