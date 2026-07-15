@@ -7,32 +7,20 @@ import { Phone, Mail, MapPin, Clock } from 'lucide-react'
  * Update these with the real Link Communications Center handles.
  * WhatsApp/phone/email are wired to the numbers shown in the contact column.
  */
-const PHONE = '+256700123456'
+const PHONE = '+256757837184'
 const EMAIL = 'info@lcc.co.ug'
 const SOCIALS = [
   {
     name: 'Facebook',
-    href: 'https://facebook.com/linkcommunicationscenter',
+    href: 'https://www.facebook.com/Linkcomm2014/',
     bg: '#1877F2',
     path: 'M22 12.06C22 6.5 17.52 2 12 2S2 6.5 2 12.06c0 5 3.66 9.15 8.44 9.94v-7.03H7.9v-2.9h2.54V9.85c0-2.51 1.49-3.9 3.78-3.9 1.09 0 2.24.2 2.24.2v2.46h-1.26c-1.24 0-1.63.78-1.63 1.57v1.88h2.78l-.44 2.9h-2.34V22c4.78-.79 8.44-4.94 8.44-9.94z',
   },
   {
     name: 'Instagram',
-    href: 'https://instagram.com/linkcommunicationscenter',
+    href: 'https://www.instagram.com/the_link_communications/',
     bg: 'radial-gradient(circle at 30% 107%, #fdf497 0%, #fd5949 45%, #d6249f 60%, #285AEB 90%)',
     path: 'M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 1.62c-3.15 0-3.52.01-4.76.07-.9.04-1.39.19-1.71.32-.43.17-.74.37-1.06.69-.32.32-.52.63-.69 1.06-.13.32-.28.81-.32 1.71-.06 1.24-.07 1.61-.07 4.76s.01 3.52.07 4.76c.04.9.19 1.39.32 1.71.17.43.37.74.69 1.06.32.32.63.52 1.06.69.32.13.81.28 1.71.32 1.24.06 1.61.07 4.76.07s3.52-.01 4.76-.07c.9-.04 1.39-.19 1.71-.32.43-.17.74-.37 1.06-.69.32-.32.52-.63.69-1.06.13-.32.28-.81.32-1.71.06-1.24.07-1.61.07-4.76s-.01-3.52-.07-4.76c-.04-.9-.19-1.39-.32-1.71a2.86 2.86 0 0 0-.69-1.06 2.86 2.86 0 0 0-1.06-.69c-.32-.13-.81-.28-1.71-.32-1.24-.06-1.61-.07-4.76-.07zm0 2.76a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 8.74a3.44 3.44 0 1 0 0-6.88 3.44 3.44 0 0 0 0 6.88zm6.75-8.93a1.24 1.24 0 1 1-2.48 0 1.24 1.24 0 0 1 2.48 0z',
-  },
-  {
-    name: 'X',
-    href: 'https://x.com/linkcomms_ug',
-    bg: '#000000',
-    path: 'M18.9 2h3.3l-7.2 8.24L23.7 22h-6.63l-5.2-6.8L5.92 22H2.6l7.7-8.8L2.3 2h6.8l4.7 6.22L18.9 2zm-1.16 18h1.83L7.34 3.9H5.38L17.74 20z',
-  },
-  {
-    name: 'YouTube',
-    href: 'https://youtube.com/@linkcommunicationscenter',
-    bg: '#FF0000',
-    path: 'M23.5 6.9a3.02 3.02 0 0 0-2.12-2.14C19.5 4.25 12 4.25 12 4.25s-7.5 0-9.38.51A3.02 3.02 0 0 0 .5 6.9C0 8.8 0 12 0 12s0 3.2.5 5.1a3.02 3.02 0 0 0 2.12 2.14c1.88.51 9.38.51 9.38.51s7.5 0 9.38-.51a3.02 3.02 0 0 0 2.12-2.14C24 15.2 24 12 24 12s0-3.2-.5-5.1zM9.6 15.6V8.4l6.24 3.6-6.24 3.6z',
   },
   {
     name: 'WhatsApp',
@@ -98,7 +86,7 @@ export default function Footer() {
         <div>
           <h4 className="font-semibold mb-3" style={{ color: 'var(--text-primary)' }}>Contact Us</h4>
           <ul className="space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
-            <li><a href={`tel:${PHONE}`} className="flex items-center gap-2 hover:text-[var(--color-primary)]"><Phone size={14} /> +256 700 123456</a></li>
+            <li><a href={`tel:${PHONE}`} className="flex items-center gap-2 hover:text-[var(--color-primary)]"><Phone size={14} /> +256 757 837184</a></li>
             <li><a href={`mailto:${EMAIL}`} className="flex items-center gap-2 hover:text-[var(--color-primary)]"><Mail size={14} /> {EMAIL}</a></li>
             <li className="flex items-center gap-2"><MapPin size={14} /> Lions Shopping Center, Kampala</li>
             <li className="flex items-center gap-2"><Clock size={14} /> Mon–Sat: 9:00 AM–6:00 PM</li>
