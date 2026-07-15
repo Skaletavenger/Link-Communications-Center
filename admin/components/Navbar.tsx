@@ -1,7 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import BrandLogo from './BrandLogo';
+import { supabase } from '../lib/supabase';
+
+const AUTH_KEY = 'lcc_admin_auth';
 
 const navItems = [
   { href: '/products', label: 'Products' },
@@ -14,6 +18,24 @@ const navItems = [
 
 export default function Navbar() {
   const path = usePathname();
+  const [authed, setAuthed] = useState<boolean>(
+    () => typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === 'true'
+  );
+
+  useEffect(() => {
+    let mounted = true;
+    const check = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      const flag = typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === 'true';
+      if (mounted) setAuthed(Boolean(session) && flag);
+    };
+    check();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, [path]);
 
   return (
     <nav
@@ -29,30 +51,44 @@ export default function Navbar() {
         </Link>
 
         <div className="hidden md:flex gap-2 items-center">
-          {navItems.map((item) => {
-            const active = path === item.href;
-            return (
-              <Link
-                key={item.href}
-                href={item.href}
-                className="font-medium transition-colors duration-200 hover:opacity-80"
-                style={
-                  active
-                    ? {
-                        background: '#1574B5',
-                        color: '#ffffff',
-                        padding: '6px 14px',
-                        borderRadius: '8px'
-                      }
-                    : { color: 'var(--nav-link)' }
-                }
-              >
-                {item.label}
-              </Link>
-            );
-          })}
+          {authed ? (
+            navItems.map((item) => {
+              const active = path === item.href;
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className="font-medium transition-colors duration-200 hover:opacity-80"
+                  style={
+                    active
+                      ? {
+                          background: '#1574B5',
+                          color: '#ffffff',
+                          padding: '6px 14px',
+                          borderRadius: '8px'
+                        }
+                      : { color: 'var(--nav-link)' }
+                  }
+                >
+                  {item.label}
+                </Link>
+              );
+            })
+          ) : (
+            <Link
+              href="/dashboard/login"
+              className="font-semibold transition-opacity duration-200 hover:opacity-90"
+              style={{
+                background: '#1574B5',
+                color: '#ffffff',
+                padding: '8px 20px',
+                borderRadius: '8px'
+              }}
+            >
+              Login
+            </Link>
+          )}
         </div>
-
       </div>
     </nav>
   );
