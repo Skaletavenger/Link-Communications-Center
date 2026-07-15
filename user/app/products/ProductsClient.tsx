@@ -106,12 +106,12 @@ function FilterFields({
   )
 }
 
-export default function ProductsClient({ initialRows }: { initialRows: ProductRow[] }) {
+export default function ProductsClient({ initialRows, initialCategory }: { initialRows: ProductRow[]; initialCategory?: string }) {
   const { addToCart } = useCart()
   const [products, setProducts] = useState<Product[]>(() => initialRows.map(toProduct))
   const [loaded, setLoaded] = useState(initialRows.length > 0)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('All')
+  const [category, setCategory] = useState<string>(() => (initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : 'All'))
   const [selected, setSelected] = useState<Product | null>(null)
   const [priceMin, setPriceMin] = useState(10000)
   const [priceMax, setPriceMax] = useState(10000000)

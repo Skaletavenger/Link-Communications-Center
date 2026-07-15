@@ -11,7 +11,11 @@ export const metadata: Metadata = {
   alternates: { canonical: 'https://linkcommunicationscenter.com/products' },
 }
 
-export default async function ProductsPage() {
+export default async function ProductsPage({
+  searchParams,
+}: {
+  searchParams?: { category?: string }
+}) {
   const rows = await fetchAllProducts()
-  return <ProductsClient initialRows={rows} />
+  return <ProductsClient initialRows={rows} initialCategory={searchParams?.category} />
 }

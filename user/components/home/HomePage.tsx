@@ -3,12 +3,14 @@ import HeroSection from './HeroSection'
 import SurveillanceCamerasSection from './SurveillanceCamerasSection'
 import StatsBarSection from './StatsBarSection'
 import CategoriesSection from './CategoriesSection'
+import FeaturedProductsSection from './FeaturedProductsSection'
 import ParallaxFeatureSection from './ParallaxFeatureSection'
 import HowItWorksSection from './HowItWorksSection'
 import CTASection from './CTASection'
 import { useHomeAuth } from './useHomeAuth'
+import type { ProductRow } from '../../lib/inventory'
 
-export default function HomePage() {
+export default function HomePage({ featuredRows = [] }: { featuredRows?: ProductRow[] }) {
   const { loggedIn, authHref, productsHref } = useHomeAuth()
 
   return (
@@ -17,6 +19,7 @@ export default function HomePage() {
       <SurveillanceCamerasSection />
       <StatsBarSection />
       <CategoriesSection productsHref={productsHref} />
+      <FeaturedProductsSection rows={featuredRows} productsHref={productsHref} />
       <ParallaxFeatureSection />
       <HowItWorksSection />
       <CTASection />
