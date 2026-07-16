@@ -4,44 +4,65 @@ import { useMemo, useState } from 'react'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import { motion } from 'framer-motion'
+import { useCart } from '@/lib/CartContext'
 
 function parsePositiveNumber(value: string | null, fallback: number) {
   const parsed = Number(value)
   return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
+type LineItem = { id: string; name: string; price: number; quantity: number }
+
 export default function CheckoutClient() {
   const searchParams = useSearchParams()
+  const { items: cartItems } = useCart()
   const [phone, setPhone] = useState('')
   const [fullName, setFullName] = useState('')
   const [email, setEmail] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
-  const productName = searchParams.get('name')?.trim() || ''
-  const productId = searchParams.get('productId') || 'unknown'
-  const unitPrice = parsePositiveNumber(searchParams.get('price'), 0)
-  const quantity = Math.max(1, parsePositiveNumber(searchParams.get('quantity'), 1))
-  const totalAmount = useMemo(() => unitPrice * quantity, [unitPrice, quantity])
+  // "Buy now" links pass a single product via query params. When those are
+  // absent we fall back to the shopping cart (the "Proceed to Checkout" flow).
+  const queryName = searchParams.get('name')?.trim() || ''
+  const singleMode = Boolean(queryName)
+  const queryProductId = searchParams.get('productId') || 'unknown'
+  const queryUnitPrice = parsePositiveNumber(searchParams.get('price'), 0)
+  const queryQuantity = Math.max(1, parsePositiveNumber(searchParams.get('quantity'), 1))
+
+  const lineItems: LineItem[] = useMemo(() => {
+    if (singleMode) {
+      return [{ id: queryProductId, name: queryName, price: queryUnitPrice, quantity: queryQuantity }]
+    }
+    return cartItems.map(i => ({ id: i.id, name: i.name, price: i.price, quantity: i.quantity }))
+  }, [singleMode, queryProductId, queryName, queryUnitPrice, queryQuantity, cartItems])
+
+  const totalAmount = useMemo(
+    () => lineItems.reduce((sum, i) => sum + i.price * i.quantity, 0),
+    [lineItems]
+  )
+  const description = useMemo(
+    () => lineItems.map(i => `${i.name} x${i.quantity}`).join(', '),
+    [lineItems]
+  )
+  const orderProductId = singleMode ? queryProductId : lineItems.length === 1 ? lineItems[0].id : 'cart'
+  const hasOrder = lineItems.length > 0 && totalAmount > 0
 
   const handlePay = async () => {
     setError(null)
 
-    if (!unitPrice) {
-      setError('Product amount is missing or invalid.')
+    if (!hasOrder) {
+      setError('Your order is empty.')
       return
     }
-
     if (!fullName.trim()) {
       setError('Please enter your full name.')
       return
     }
-
     if (!phone.trim()) {
       setError('Please enter your mobile money phone number.')
       return
     }
-
     if (email.trim() && !/^\S+@\S+\.\S+$/.test(email.trim())) {
       setError('Please enter a valid email address or leave it empty.')
       return
@@ -57,8 +78,8 @@ export default function CheckoutClient() {
           phone,
           name: fullName.trim(),
           email: email.trim(),
-          productId,
-          description: `${productName} x${quantity}`,
+          productId: orderProductId,
+          description,
         }),
       })
       const data = await res.json()
@@ -67,8 +88,6 @@ export default function CheckoutClient() {
         setLoading(false)
         return
       }
-      // Pesapal\'s hosted page lets the customer pick MTN MoMo or Airtel Money
-      // and complete the payment there, then redirects back to our success page.
       window.location.href = data.redirectUrl
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : String(e))
@@ -76,15 +95,15 @@ export default function CheckoutClient() {
     }
   }
 
-  if (!productName || !unitPrice) {
+  if (!hasOrder) {
     return (
       <div className="min-h-screen flex flex-col items-center justify-center p-6" style={{ background: 'var(--bg-primary)' }}>
         <div className="rounded-[28px] border p-10 text-center" style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border-color)', boxShadow: 'var(--card-shadow)' }}>
           <h1 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
-            Checkout details missing
+            Your cart is empty
           </h1>
           <p className="mb-6" style={{ color: 'var(--text-secondary)' }}>
-            Please start from a product page and select a product to purchase.
+            Add a product to your cart or pick one from a product page to continue.
           </p>
           <Link href="/products">
             <button type="button" className="rounded-2xl bg-[#1574B5] px-6 py-3 font-semibold text-white hover:opacity-90">
@@ -127,27 +146,20 @@ export default function CheckoutClient() {
                 Order summary
               </h2>
 
-              <div className="space-y-5">
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Product</p>
-                    <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{productName}</p>
+              <div className="space-y-4">
+                {lineItems.map(item => (
+                  <div key={item.id} className="flex items-start justify-between gap-4">
+                    <div className="min-w-0">
+                      <p className="text-base font-semibold truncate" style={{ color: 'var(--text-primary)' }}>{item.name}</p>
+                      <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>UGX {item.price.toLocaleString()} x {item.quantity}</p>
+                    </div>
+                    <p className="text-base font-semibold whitespace-nowrap" style={{ color: '#1574B5' }}>UGX {(item.price * item.quantity).toLocaleString()}</p>
                   </div>
-                  <div>
-                    <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Unit price</p>
-                    <p className="text-lg font-semibold" style={{ color: '#1574B5' }}>UGX {unitPrice.toLocaleString()}</p>
-                  </div>
-                </div>
+                ))}
 
-                <div className="grid gap-4 sm:grid-cols-2">
-                  <div>
-                    <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Quantity</p>
-                    <p className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>{quantity}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm mb-2" style={{ color: 'var(--text-secondary)' }}>Total</p>
-                    <p className="text-3xl font-bold" style={{ color: '#1574B5' }}>UGX {totalAmount.toLocaleString()}</p>
-                  </div>
+                <div className="border-t pt-4 flex items-center justify-between" style={{ borderColor: 'var(--border-color)' }}>
+                  <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Total</p>
+                  <p className="text-3xl font-bold" style={{ color: '#1574B5' }}>UGX {totalAmount.toLocaleString()}</p>
                 </div>
               </div>
             </div>
@@ -221,21 +233,13 @@ export default function CheckoutClient() {
             <div className="p-6 rounded-[28px] border" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-secondary)' }}>
               <p className="text-sm font-semibold mb-2" style={{ color: 'var(--text-secondary)' }}>Pay securely</p>
               <h2 className="text-3xl font-bold mb-4" style={{ color: 'var(--text-primary)' }}>
-                Review & pay
+                Review &amp; pay
               </h2>
               <p className="text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
                 Choose MTN MoMo or Airtel Money on the next screen. Your payment is processed securely through Pesapal.
               </p>
 
               <div className="mt-8 space-y-4 rounded-[24px] border p-5" style={{ borderColor: 'var(--border-color)', background: 'var(--bg-primary)' }}>
-                <div>
-                  <p className="text-xs uppercase tracking-[0.3em] mb-1" style={{ color: 'var(--text-secondary)' }}>Brand colors</p>
-                  <div className="flex items-center gap-2">
-                    <span className="h-8 w-8 rounded-full" style={{ background: '#1574B5' }} />
-                    <span className="h-8 w-8 rounded-full" style={{ background: '#ED2124' }} />
-                    <span className="h-8 w-8 rounded-full" style={{ background: '#F47821' }} />
-                  </div>
-                </div>
                 <div>
                   <p className="text-xs uppercase tracking-[0.3em] mb-1" style={{ color: 'var(--text-secondary)' }}>Need help?</p>
                   <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
