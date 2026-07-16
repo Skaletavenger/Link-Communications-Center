@@ -4,6 +4,7 @@ import { usePathname } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import BrandLogo from './BrandLogo';
 import { supabase } from '../lib/supabase';
+import type { Session } from '@supabase/supabase-js';
 
 const AUTH_KEY = 'lcc_admin_auth';
 
@@ -25,13 +26,16 @@ export default function Navbar() {
 
   useEffect(() => {
     let mounted = true;
-    const check = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+    // Do NOT call supabase.auth.getSession()/auth methods *inside*
+    // onAuthStateChange - it deadlocks the auth lock and hangs sign-in.
+    const evaluate = (session: Session | null) => {
       const flag = typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === 'true';
       if (mounted) setAuthed(Boolean(session) && flag);
     };
-    check();
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(() => check());
+    supabase.auth.getSession().then(({ data: { session } }) => evaluate(session));
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      evaluate(session);
+    });
     return () => {
       mounted = false;
       subscription.unsubscribe();
