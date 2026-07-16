@@ -122,7 +122,7 @@ export default function Navbar() {
       {cartOpen && (
         <>
           <div className="fixed inset-0 z-40 bg-black/60" onClick={() => setCartOpen(false)} />
-          <div className="fixed right-0 top-0 z-50 h-full w-80 shadow-2xl" style={{ background: 'var(--bg-card)' }}>
+          <div className="fixed right-0 top-0 z-50 h-full w-80 shadow-2xl flex flex-col" style={{ background: 'var(--bg-card)' }}>
             <div className="flex items-center justify-between px-6 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
               <h2 className="text-lg font-bold" style={{ color: 'var(--text-primary)' }}>
                 Cart ({totalItems})
@@ -131,48 +131,54 @@ export default function Navbar() {
                 ✕
               </button>
             </div>
-            <div className="flex h-full flex-col justify-between">
-              <div className="overflow-y-auto px-6 py-4 space-y-4">
-                {items.length === 0 ? (
-                  <p className="text-center mt-10" style={{ color: 'var(--text-muted)' }}>
-                    Your cart is empty
-                  </p>
-                ) : (
-                  items.map(item => (
-                    <div key={item.id} className="flex gap-3 items-center">
-                      {item.image && (
-                        <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover" />
-                      )}
-                      <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
-                          {item.name}
-                        </p>
-                        <p className="text-xs" style={{ color: 'var(--color-primary)' }}>
-                          UGX {item.price.toLocaleString()} × {item.quantity}
-                        </p>
-                      </div>
-                      <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-500 text-lg">
-                        ✕
-                      </button>
+            <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
+              {items.length === 0 ? (
+                <p className="text-center mt-10" style={{ color: 'var(--text-muted)' }}>
+                  Your cart is empty
+                </p>
+              ) : (
+                items.map(item => (
+                  <div key={item.id} className="flex gap-3 items-center">
+                    {item.image && (
+                      <img src={item.image} alt={item.name} className="w-14 h-14 rounded-xl object-cover" />
+                    )}
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate" style={{ color: 'var(--text-primary)' }}>
+                        {item.name}
+                      </p>
+                      <p className="text-xs" style={{ color: 'var(--color-primary)' }}>
+                        UGX {item.price.toLocaleString()} × {item.quantity}
+                      </p>
                     </div>
-                  ))
-                )}
-              </div>
-              {items.length > 0 && (
-                <div className="border-t px-6 py-4" style={{ borderColor: 'var(--border)' }}>
-                  <p className="font-bold mb-3" style={{ color: 'var(--text-primary)' }}>
-                    Total: UGX {items.reduce((sum, i) => sum + i.price * i.quantity, 0).toLocaleString()}
-                  </p>
-                  <button
-                    onClick={() => { clearCart(); setCartOpen(false) }}
-                    className="w-full inline-flex items-center justify-center rounded-2xl px-4 py-3 font-bold text-white"
-                    style={{ background: 'var(--color-primary)' }}
-                  >
-                    Checkout →
-                  </button>
-                </div>
+                    <button onClick={() => removeFromCart(item.id)} className="text-red-400 hover:text-red-500 text-lg">
+                      ✕
+                    </button>
+                  </div>
+                ))
               )}
             </div>
+            {items.length > 0 && (
+              <div className="border-t px-6 py-4 space-y-3" style={{ borderColor: 'var(--border)' }}>
+                <p className="font-bold" style={{ color: 'var(--text-primary)' }}>
+                  Total: UGX {items.reduce((sum, i) => sum + i.price * i.quantity, 0).toLocaleString()}
+                </p>
+                <Link
+                  href="/checkout"
+                  onClick={() => setCartOpen(false)}
+                  className="w-full inline-flex items-center justify-center rounded-2xl px-4 py-3 font-bold text-white"
+                  style={{ background: 'var(--color-primary)' }}
+                >
+                  Proceed to Checkout →
+                </Link>
+                <button
+                  onClick={() => clearCart()}
+                  className="w-full text-sm font-medium py-1 hover:opacity-80"
+                  style={{ color: 'var(--text-muted)' }}
+                >
+                  Clear cart
+                </button>
+              </div>
+            )}
           </div>
         </>
       )}
