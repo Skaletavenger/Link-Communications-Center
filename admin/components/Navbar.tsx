@@ -12,6 +12,7 @@ const navItems = [
   { href: '/home-display', label: 'Home Display' },
   { href: '/loans', label: 'Loans' },
   { href: '/dashboard', label: 'Dashboard' },
+  { href: '/orders', label: 'Orders' },
   { href: '/about', label: 'About' },
   { href: '/contact', label: 'Contact' }
 ];
