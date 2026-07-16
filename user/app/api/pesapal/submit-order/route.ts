@@ -57,6 +57,9 @@ export async function POST(req: NextRequest) {
       reference,
       provider: 'pesapal',
       status: 'pending',
+      customer_name: trimmedName || null,
+      customer_email: typeof email === 'string' && email.trim() ? email.trim() : null,
+      description: typeof description === 'string' && description.trim() ? description.trim() : null,
     })
 
     if (dbError) {
