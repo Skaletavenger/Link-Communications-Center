@@ -15,6 +15,9 @@ type Order = {
   customer_email: string | null
   provider: string | null
   status: string | null
+  fulfillment_status: string | null
+  delivery_method: string | null
+  delivery_note: string | null
   created_at: string
 }
 
@@ -31,6 +34,14 @@ function statusLabel(status: string | null) {
   const s = status || 'pending'
   return STATUS_LABELS[s] || s
 }
+
+const FULFILLMENT_OPTIONS: Array<[string, string]> = [
+  ['received', 'Order received'],
+  ['processing', 'Processing'],
+  ['ready_for_pickup', 'Ready for pickup'],
+  ['out_for_delivery', 'Out for delivery'],
+  ['completed', 'Completed'],
+]
 
 function formatUGX(n: number | null) {
   return 'UGX ' + Number(n || 0).toLocaleString()
@@ -112,6 +123,23 @@ function OrdersPage() {
       setError(`Could not cancel order: ${error.message}`)
     } else {
       setNotice('Order cancelled.')
+      await load()
+    }
+    setBusyId(null)
+  }, [load])
+
+  const updateFulfillment = useCallback(async (o: Order, patch: { fulfillment_status?: string; delivery_method?: string }) => {
+    setBusyId(o.id)
+    setNotice('')
+    setError('')
+    const { error } = await supabase
+      .from('transactions')
+      .update({ ...patch, fulfillment_updated_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+      .eq('id', o.id)
+    if (error) {
+      setError(`Could not update delivery status: ${error.message}`)
+    } else {
+      setNotice('Delivery status updated - the customer can see this on the Track Order page.')
       await load()
     }
     setBusyId(null)
@@ -260,6 +288,7 @@ function OrdersPage() {
                   <th className="px-4 py-3 font-semibold">Amount</th>
                   <th className="px-4 py-3 font-semibold">Method</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Delivery</th>
                   <th className="px-4 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
@@ -289,6 +318,36 @@ function OrdersPage() {
                         >
                           {statusLabel(o.status)}
                         </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {o.status === 'completed' ? (
+                          <div className="space-y-1" style={{ minWidth: 150 }}>
+                            <select
+                              value={o.fulfillment_status || 'received'}
+                              disabled={busy}
+                              onChange={e => updateFulfillment(o, { fulfillment_status: e.target.value })}
+                              className="block w-full rounded-lg border px-2 py-1 text-xs"
+                              style={{ background: 'transparent', color: 'var(--text-primary, #111)', borderColor: 'rgba(120,120,120,0.3)' }}
+                            >
+                              {FULFILLMENT_OPTIONS.map(([v, l]) => (
+                                <option key={v} value={v}>{l}</option>
+                              ))}
+                            </select>
+                            <select
+                              value={o.delivery_method || ''}
+                              disabled={busy}
+                              onChange={e => e.target.value && updateFulfillment(o, { delivery_method: e.target.value })}
+                              className="block w-full rounded-lg border px-2 py-1 text-xs"
+                              style={{ background: 'transparent', color: 'var(--text-primary, #111)', borderColor: 'rgba(120,120,120,0.3)' }}
+                            >
+                              <option value="">Method…</option>
+                              <option value="pickup">Pickup at shop</option>
+                              <option value="delivery">Kampala delivery</option>
+                            </select>
+                          </div>
+                        ) : (
+                          <span className="text-xs text-muted">—</span>
+                        )}
                       </td>
                       <td className="px-4 py-3 whitespace-nowrap">
                         {o.status === 'pending' && (

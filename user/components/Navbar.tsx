@@ -13,6 +13,7 @@ import {
   Building2,
   Phone,
   Smartphone,
+  Package,
   ChevronRight,
   ShoppingCart,
 } from 'lucide-react'
@@ -52,6 +53,9 @@ export default function Navbar() {
             </Link>
             <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Smartphone Loans
+            </Link>
+            <Link href="/track" className="font-medium text-sm transition-colors duration-200" style={isActive('/track') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
+              Track Order
             </Link>
             <Link href="/about" className="font-medium text-sm transition-colors duration-200" style={isActive('/about') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               About
@@ -108,6 +112,7 @@ export default function Navbar() {
             <MobileItem href="/" icon={<House />} label="Home" active={isActive('/')} onClick={() => setOpen(false)} />
             <MobileItem href="/#products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
             <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
+            <MobileItem href="/track" icon={<Package />} label="Track Order" active={isActive('/track')} onClick={() => setOpen(false)} />
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
             <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />
 

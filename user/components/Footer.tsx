@@ -72,6 +72,7 @@ export default function Footer() {
           <ul className="space-y-2 text-sm" style={{ color: 'var(--text-muted)' }}>
             <li><Link href="/" className="hover:text-[var(--color-primary)]">Home</Link></li>
             <li><Link href="/#products" className="hover:text-[var(--color-primary)]">Products</Link></li>
+            <li><Link href="/track" className="hover:text-[var(--color-primary)]">Track Order</Link></li>
             <li><Link href="/about" className="hover:text-[var(--color-primary)]">About Us</Link></li>
             <li><Link href="/contact" className="hover:text-[var(--color-primary)]">Contact Us</Link></li>
             <li><Link href="/loans" className="hover:text-[var(--color-primary)]">Smartphone Loans</Link></li>
