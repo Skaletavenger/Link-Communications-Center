@@ -18,12 +18,13 @@ type Order = {
   fulfillment_status: string | null
   delivery_method: string | null
   delivery_note: string | null
+  archived: boolean | null
   created_at: string
 }
 
 const REFUND_ENDPOINT = 'https://linkcommunicationscenter.com/api/pesapal/refund'
 
-const FILTERS = ['all', 'pending', 'completed', 'refund_requested', 'reversed', 'cancelled', 'failed'] as const
+const FILTERS = ['all', 'pending', 'completed', 'refund_requested', 'reversed', 'cancelled', 'failed', 'binned'] as const
 
 const STATUS_LABELS: Record<string, string> = {
   refund_requested: 'Refund requested',
@@ -145,6 +146,23 @@ function OrdersPage() {
     setBusyId(null)
   }, [load])
 
+  const setArchived = useCallback(async (o: Order, archived: boolean) => {
+    setBusyId(o.id)
+    setNotice('')
+    setError('')
+    const { error } = await supabase
+      .from('transactions')
+      .update({ archived, updated_at: new Date().toISOString() })
+      .eq('id', o.id)
+    if (error) {
+      setError(`Could not update order: ${error.message}`)
+    } else {
+      setNotice(archived ? 'Order moved to bin. Find it under the Binned filter.' : 'Order restored.')
+      await load()
+    }
+    setBusyId(null)
+  }, [load])
+
   const refundOrder = useCallback(async (o: Order) => {
     if (!window.confirm(`Request a refund of ${formatUGX(o.amount)} to ${o.customer_name || o.phone || 'the customer'}? Pesapal will review the request and return the money to their original payment method.`)) return
     setBusyId(o.id)
@@ -184,17 +202,19 @@ function OrdersPage() {
     setBusyId(null)
   }, [load])
 
-  const filtered = useMemo(
-    () => (filter === 'all' ? orders : orders.filter(o => (o.status || 'pending') === filter)),
-    [orders, filter]
-  )
+  const filtered = useMemo(() => {
+    if (filter === 'binned') return orders.filter(o => o.archived)
+    const visible = orders.filter(o => !o.archived)
+    return filter === 'all' ? visible : visible.filter(o => (o.status || 'pending') === filter)
+  }, [orders, filter])
 
   const stats = useMemo(() => {
-    const completed = orders.filter(o => o.status === 'completed')
+    const visible = orders.filter(o => !o.archived)
+    const completed = visible.filter(o => o.status === 'completed')
     return {
-      total: orders.length,
+      total: visible.length,
       completed: completed.length,
-      pending: orders.filter(o => (o.status || 'pending') === 'pending').length,
+      pending: visible.filter(o => (o.status || 'pending') === 'pending').length,
       revenue: completed.reduce((s, o) => s + Number(o.amount || 0), 0),
     }
   }, [orders])
@@ -372,9 +392,15 @@ function OrdersPage() {
                             {busy ? 'Requesting…' : 'Refund'}
                           </button>
                         )}
-                        {o.status !== 'pending' && o.status !== 'completed' && (
-                          <span className="text-xs text-muted">—</span>
-                        )}
+                        <button
+                          type="button"
+                          disabled={busy}
+                          onClick={() => setArchived(o, !o.archived)}
+                          className="ml-2 rounded-lg px-3 py-1.5 text-xs font-semibold border transition hover:opacity-80 disabled:opacity-50"
+                          style={{ color: '#64748b', borderColor: 'rgba(100,116,139,0.4)' }}
+                        >
+                          {busy ? '…' : o.archived ? 'Restore' : 'Bin'}
+                        </button>
                       </td>
                     </tr>
                   )
@@ -386,7 +412,7 @@ function OrdersPage() {
 
         {!loading && filtered.length > 0 && (
           <p className="text-xs text-muted mt-3">
-            Showing {filtered.length} order{filtered.length === 1 ? '' : 's'}. Cancel is for unpaid (pending) orders; Refund sends a request to Pesapal for paid orders and the money returns to the customer&apos;s payment method once approved.
+            Showing {filtered.length} order{filtered.length === 1 ? '' : 's'}. Cancel is for unpaid (pending) orders; Refund sends a request to Pesapal for paid orders and the money returns to the customer&apos;s payment method once approved. Bin hides an order from this list and from customer tracking — restore it any time under the Binned filter.
           </p>
         )}
       </div>
