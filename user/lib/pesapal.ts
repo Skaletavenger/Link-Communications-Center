@@ -194,7 +194,8 @@ export async function getPesapalTransactionStatus(orderTrackingId: string) {
     error: unknown
     status: string
   }
-}\n
+}
+
 export type PesapalRefundParams = {
   confirmationCode: string
   amount: number
