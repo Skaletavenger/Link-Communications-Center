@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { supabase } from '../../lib/supabase'
-import { Search, MapPin, Store, Truck } from 'lucide-react'
+import { Search, MapPin, Store, Truck, ShoppingCart, Package, CheckCircle2 } from 'lucide-react'
 
 type OrderRow = {
   id: string
@@ -18,18 +18,20 @@ type OrderRow = {
   created_at: string
 }
 
-const PICKUP_STEPS: Array<[string, string]> = [
-  ['received', 'Order received'],
-  ['processing', 'Processing'],
-  ['ready_for_pickup', 'Ready for pickup'],
-  ['completed', 'Picked up'],
+type StepIcon = React.ComponentType<{ size?: number | string }>
+
+const PICKUP_STEPS: Array<[string, string, StepIcon]> = [
+  ['received', 'Order received', ShoppingCart],
+  ['processing', 'Processing', Package],
+  ['ready_for_pickup', 'Ready for pickup', Store],
+  ['completed', 'Picked up', CheckCircle2],
 ]
 
-const DELIVERY_STEPS: Array<[string, string]> = [
-  ['received', 'Order received'],
-  ['processing', 'Processing'],
-  ['out_for_delivery', 'Out for delivery'],
-  ['completed', 'Delivered'],
+const DELIVERY_STEPS: Array<[string, string, StepIcon]> = [
+  ['received', 'Order received', ShoppingCart],
+  ['processing', 'Processing', Package],
+  ['out_for_delivery', 'Out for delivery', Truck],
+  ['completed', 'Delivered', CheckCircle2],
 ]
 
 function formatUGX(n: number | null) {
@@ -43,33 +45,39 @@ function Timeline({ order }: { order: OrderRow }) {
   if (idx === -1) idx = current === 'completed' ? steps.length - 1 : 1
 
   return (
-    <div className="mt-4 flex items-start">
-      {steps.map(([v, label], i) => (
-        <div key={v} className="flex-1 flex flex-col items-center relative">
-          {i > 0 && (
+    <div className="mt-6 flex items-start">
+      {steps.map(([v, label, Icon], i) => {
+        const done = i < idx
+        const active = i === idx
+        return (
+          <div key={v} className="flex-1 flex flex-col items-center relative">
+            {i > 0 && (
+              <div
+                className="absolute top-7 right-1/2 w-full h-0.5"
+                style={{ background: i <= idx ? 'var(--color-primary)' : 'var(--border)' }}
+              />
+            )}
             <div
-              className="absolute top-[11px] right-1/2 w-full h-0.5"
-              style={{ background: i <= idx ? 'var(--color-primary)' : 'var(--border)' }}
-            />
-          )}
-          <div
-            className="w-6 h-6 rounded-full z-10 flex items-center justify-center text-[11px] font-bold"
-            style={
-              i <= idx
-                ? { background: 'var(--color-primary)', color: '#fff' }
-                : { background: 'var(--bg-secondary)', border: '2px solid var(--border)', color: 'var(--text-muted)' }
-            }
-          >
-            {i < idx ? '✓' : i === idx ? '•' : ''}
+              className="w-14 h-14 rounded-full z-10 flex items-center justify-center transition-colors"
+              style={
+                active
+                  ? { background: 'var(--color-primary)', border: '2px solid var(--color-primary)', color: '#ffffff' }
+                  : done
+                    ? { background: 'var(--bg-card)', border: '2px solid var(--color-primary)', color: 'var(--color-primary)' }
+                    : { background: 'var(--bg-card)', border: '2px solid var(--border)', color: 'var(--text-muted)' }
+              }
+            >
+              <Icon size={22} />
+            </div>
+            <span
+              className="mt-3 text-xs md:text-sm font-semibold text-center leading-tight px-1"
+              style={{ color: i <= idx ? 'var(--text-primary)' : 'var(--text-muted)' }}
+            >
+              {label}
+            </span>
           </div>
-          <span
-            className="mt-2 text-[11px] text-center leading-tight px-1"
-            style={{ color: i <= idx ? 'var(--text-primary)' : 'var(--text-muted)', fontWeight: i === idx ? 700 : 400 }}
-          >
-            {label}
-          </span>
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
