@@ -23,6 +23,7 @@ type Order = {
 }
 
 const REFUND_ENDPOINT = 'https://linkcommunicationscenter.com/api/pesapal/refund'
+const NOTIFY_ENDPOINT = 'https://linkcommunicationscenter.com/api/notify/order-status'
 
 const FILTERS = ['all', 'pending', 'completed', 'refund_requested', 'reversed', 'cancelled', 'failed', 'binned'] as const
 
@@ -65,6 +66,28 @@ function statusStyle(status: string | null): { bg: string; color: string } {
     default:
       return { bg: 'rgba(100,116,139,0.18)', color: '#64748b' }
   }
+}
+
+function waMessage(o: Order): string {
+  const ref = o.reference || o.id
+  const name = o.customer_name ? ' ' + o.customer_name.split(' ')[0] : ''
+  const base = `Hello${name}, this is Link Communications Center regarding your order ${ref}. `
+  if (o.status === 'cancelled') return base + 'Your order has been cancelled and you have not been charged. Contact us if you have any questions.'
+  if (o.status === 'reversed') return base + 'Your refund has been processed and will return to your original payment method.'
+  if (o.status === 'refund_requested') return base + 'Your refund request has been submitted to Pesapal and is being processed.'
+  if (o.status === 'pending') return base + 'Your payment is still pending. Please complete it so we can start processing your order.'
+  const f = o.fulfillment_status || 'received'
+  if (f === 'processing') return base + 'Your order is now being processed.'
+  if (f === 'ready_for_pickup') return base + 'Your order is ready for pickup at Lions Shopping Center, Namirembe Road, Kampala (Mon-Sat 9AM-6PM).'
+  if (f === 'out_for_delivery') return base + 'Your order is out for delivery within Kampala. Please keep your phone available.'
+  if (f === 'completed') return base + (o.delivery_method === 'pickup' ? 'Your order has been picked up. Thank you for shopping with us!' : 'Your order has been delivered. Thank you for shopping with us!')
+  return base + 'We have received your order and will keep you updated. Track it any time: https://linkcommunicationscenter.com/track'
+}
+
+function waLink(o: Order): string {
+  const digits = (o.phone || '').replace(/[^0-9]/g, '')
+  const intl = digits.startsWith('256') ? digits : digits.startsWith('0') ? '256' + digits.slice(1) : digits
+  return 'https://wa.me/' + intl + '?text=' + encodeURIComponent(waMessage(o))
 }
 
 function OrdersPage() {
@@ -111,6 +134,20 @@ function OrdersPage() {
     load()
   }, [load])
 
+  const notifyEmail = useCallback(async (orderId: string) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) return
+      await fetch(NOTIFY_ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session.access_token}` },
+        body: JSON.stringify({ orderId }),
+      })
+    } catch {
+      /* best-effort - WhatsApp button remains the manual fallback */
+    }
+  }, [])
+
   const cancelOrder = useCallback(async (o: Order) => {
     if (!window.confirm(`Cancel this order (${formatUGX(o.amount)} from ${o.customer_name || o.phone || 'customer'})? The customer has not paid, so no refund is needed.`)) return
     setBusyId(o.id)
@@ -124,6 +161,7 @@ function OrdersPage() {
       setError(`Could not cancel order: ${error.message}`)
     } else {
       setNotice('Order cancelled.')
+      notifyEmail(o.id)
       await load()
     }
     setBusyId(null)
@@ -141,6 +179,7 @@ function OrdersPage() {
       setError(`Could not update delivery status: ${error.message}`)
     } else {
       setNotice('Delivery status updated - the customer can see this on the Track Order page.')
+      if (patch.fulfillment_status) notifyEmail(o.id)
       await load()
     }
     setBusyId(null)
@@ -194,6 +233,7 @@ function OrdersPage() {
         setError(data.error || 'Refund request failed.')
       } else {
         setNotice(data.message || 'Refund request submitted to Pesapal.')
+        notifyEmail(o.id)
         await load()
       }
     } catch (e: unknown) {
@@ -391,6 +431,17 @@ function OrdersPage() {
                           >
                             {busy ? 'Requesting…' : 'Refund'}
                           </button>
+                        )}
+                        {o.phone && (
+                          <a
+                            href={waLink(o)}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 inline-block rounded-lg px-3 py-1.5 text-xs font-semibold border transition hover:opacity-80"
+                            style={{ color: '#16a34a', borderColor: 'rgba(22,163,74,0.4)' }}
+                          >
+                            WhatsApp
+                          </a>
                         )}
                         <button
                           type="button"
