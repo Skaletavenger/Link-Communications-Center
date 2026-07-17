@@ -44,7 +44,7 @@ export default function Navbar() {
               Home
             </Link>
             <Link
-              href="/products"
+              href="/#products"
               className="flex items-center gap-1 font-medium text-sm transition-colors duration-200"
               style={isActive('/products') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}
             >
@@ -106,7 +106,7 @@ export default function Navbar() {
 
           <nav className="p-4 space-y-2">
             <MobileItem href="/" icon={<House />} label="Home" active={isActive('/')} onClick={() => setOpen(false)} />
-            <MobileItem href="/products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
+            <MobileItem href="/#products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
             <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
             <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />

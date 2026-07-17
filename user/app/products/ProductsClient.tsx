@@ -106,7 +106,7 @@ function FilterFields({
   )
 }
 
-export default function ProductsClient({ initialRows, initialCategory }: { initialRows: ProductRow[]; initialCategory?: string }) {
+export default function ProductsClient({ initialRows, initialCategory, embedded = false }: { initialRows: ProductRow[]; initialCategory?: string; embedded?: boolean }) {
   const { addToCart } = useCart()
   const [products, setProducts] = useState<Product[]>(() => initialRows.map(toProduct))
   const [loaded, setLoaded] = useState(initialRows.length > 0)
@@ -171,10 +171,14 @@ export default function ProductsClient({ initialRows, initialCategory }: { initi
   const otherProducts = filtered.filter(p => p.category !== 'Phones')
 
   return (
-    <div className="min-h-screen pt-0" style={{ background: 'var(--bg-primary)' }}>
-      <div className="max-w-7xl mx-auto pt-24 pb-16 px-6">
+    <div className={embedded ? '' : 'min-h-screen pt-0'} style={{ background: 'var(--bg-primary)' }}>
+      <div className={`max-w-7xl mx-auto ${embedded ? 'pt-4' : 'pt-24'} pb-16 px-6`}>
         <div className="mb-10">
+          {embedded ? (
+            <h2 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Our Products</h2>
+          ) : (
           <h1 className="text-4xl font-bold mb-2" style={{ color: 'var(--text-primary)' }}>Our Products</h1>
+          )}
           <p style={{ color: 'var(--text-secondary)' }}>Browse our range of surveillance and communications equipment</p>
         </div>
 
