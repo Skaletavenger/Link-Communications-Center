@@ -18,7 +18,19 @@ type Order = {
   created_at: string
 }
 
-const FILTERS = ['all', 'pending', 'completed', 'failed', 'reversed'] as const
+const REFUND_ENDPOINT = 'https://linkcommunicationscenter.com/api/pesapal/refund'
+
+const FILTERS = ['all', 'pending', 'completed', 'refund_requested', 'reversed', 'cancelled', 'failed'] as const
+
+const STATUS_LABELS: Record<string, string> = {
+  refund_requested: 'Refund requested',
+  reversed: 'Refunded',
+}
+
+function statusLabel(status: string | null) {
+  const s = status || 'pending'
+  return STATUS_LABELS[s] || s
+}
 
 function formatUGX(n: number | null) {
   return 'UGX ' + Number(n || 0).toLocaleString()
@@ -30,9 +42,12 @@ function statusStyle(status: string | null): { bg: string; color: string } {
       return { bg: 'rgba(22,163,74,0.15)', color: '#16a34a' }
     case 'pending':
       return { bg: 'rgba(217,119,6,0.15)', color: '#d97706' }
+    case 'refund_requested':
+      return { bg: 'rgba(147,51,234,0.15)', color: '#9333ea' }
     case 'failed':
     case 'invalid':
       return { bg: 'rgba(220,38,38,0.15)', color: '#dc2626' }
+    case 'cancelled':
     case 'reversed':
       return { bg: 'rgba(100,116,139,0.18)', color: '#64748b' }
     default:
@@ -45,6 +60,8 @@ function OrdersPage() {
   const [productNames, setProductNames] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [notice, setNotice] = useState('')
+  const [busyId, setBusyId] = useState<string | null>(null)
   const [filter, setFilter] = useState<(typeof FILTERS)[number]>('all')
 
   const load = useCallback(async () => {
@@ -82,6 +99,63 @@ function OrdersPage() {
     load()
   }, [load])
 
+  const cancelOrder = useCallback(async (o: Order) => {
+    if (!window.confirm(`Cancel this order (${formatUGX(o.amount)} from ${o.customer_name || o.phone || 'customer'})? The customer has not paid, so no refund is needed.`)) return
+    setBusyId(o.id)
+    setNotice('')
+    setError('')
+    const { error } = await supabase
+      .from('transactions')
+      .update({ status: 'cancelled', updated_at: new Date().toISOString() })
+      .eq('id', o.id)
+    if (error) {
+      setError(`Could not cancel order: ${error.message}`)
+    } else {
+      setNotice('Order cancelled.')
+      await load()
+    }
+    setBusyId(null)
+  }, [load])
+
+  const refundOrder = useCallback(async (o: Order) => {
+    if (!window.confirm(`Request a refund of ${formatUGX(o.amount)} to ${o.customer_name || o.phone || 'the customer'}? Pesapal will review the request and return the money to their original payment method.`)) return
+    setBusyId(o.id)
+    setNotice('')
+    setError('')
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session) {
+        setError('Your session expired - please log in again.')
+        setBusyId(null)
+        return
+      }
+      // Backfilled orders keep their payment code in the description.
+      const codeMatch = (o.description || '').match(/payment code (\w+)/i)
+      const res = await fetch(REFUND_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          orderTrackingId: o.id,
+          confirmationCode: codeMatch ? codeMatch[1] : undefined,
+          remarks: 'Order cancelled by customer',
+        }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setError(data.error || 'Refund request failed.')
+      } else {
+        setNotice(data.message || 'Refund request submitted to Pesapal.')
+        await load()
+      }
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : String(e))
+    }
+    setBusyId(null)
+  }, [load])
+
   const filtered = useMemo(
     () => (filter === 'all' ? orders : orders.filter(o => (o.status || 'pending') === filter)),
     [orders, filter]
@@ -110,7 +184,7 @@ function OrdersPage() {
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-3xl font-bold text-primary">Orders</h1>
-            <p className="text-sm text-muted mt-1">Track customer orders and their payment status.</p>
+            <p className="text-sm text-muted mt-1">Track customer orders, cancel unpaid ones, and refund paid ones.</p>
           </div>
           <button
             type="button"
@@ -149,14 +223,19 @@ function OrdersPage() {
                   : { background: 'transparent', color: 'var(--text-primary, #111)', borderColor: 'rgba(120,120,120,0.3)' }
               }
             >
-              {f}
+              {f === 'refund_requested' ? 'Refund requested' : f === 'reversed' ? 'Refunded' : f}
             </button>
           ))}
         </div>
 
         {error && (
           <div className="rounded-2xl border-l-4 border-red-500 bg-red-50 p-4 text-sm text-red-700 mb-4">
-            Could not load orders: {error}
+            {error}
+          </div>
+        )}
+        {notice && (
+          <div className="rounded-2xl border-l-4 border-green-500 bg-green-50 p-4 text-sm text-green-700 mb-4">
+            {notice}
           </div>
         )}
 
@@ -168,7 +247,7 @@ function OrdersPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl bg-card border border-theme p-10 text-center text-muted">
-            No orders {filter !== 'all' ? `with status "${filter}"` : 'yet'}.
+            No orders {filter !== 'all' ? `with status "${statusLabel(filter)}"` : 'yet'}.
           </div>
         ) : (
           <div className="overflow-x-auto rounded-2xl bg-card border border-theme">
@@ -181,11 +260,13 @@ function OrdersPage() {
                   <th className="px-4 py-3 font-semibold">Amount</th>
                   <th className="px-4 py-3 font-semibold">Method</th>
                   <th className="px-4 py-3 font-semibold">Status</th>
+                  <th className="px-4 py-3 font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 {filtered.map(o => {
                   const ss = statusStyle(o.status)
+                  const busy = busyId === o.id
                   return (
                     <tr key={o.id} className="border-b border-theme last:border-0 align-top">
                       <td className="px-4 py-3 text-secondary whitespace-nowrap">
@@ -203,11 +284,38 @@ function OrdersPage() {
                       <td className="px-4 py-3 text-secondary capitalize">{o.provider || '—'}</td>
                       <td className="px-4 py-3">
                         <span
-                          className="inline-block rounded-full px-3 py-1 text-xs font-semibold capitalize"
+                          className="inline-block rounded-full px-3 py-1 text-xs font-semibold"
                           style={{ background: ss.bg, color: ss.color }}
                         >
-                          {o.status || 'pending'}
+                          {statusLabel(o.status)}
                         </span>
+                      </td>
+                      <td className="px-4 py-3 whitespace-nowrap">
+                        {o.status === 'pending' && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => cancelOrder(o)}
+                            className="rounded-lg px-3 py-1.5 text-xs font-semibold border transition hover:opacity-80 disabled:opacity-50"
+                            style={{ color: '#dc2626', borderColor: 'rgba(220,38,38,0.4)' }}
+                          >
+                            {busy ? 'Cancelling…' : 'Cancel'}
+                          </button>
+                        )}
+                        {o.status === 'completed' && (
+                          <button
+                            type="button"
+                            disabled={busy}
+                            onClick={() => refundOrder(o)}
+                            className="rounded-lg px-3 py-1.5 text-xs font-semibold border transition hover:opacity-80 disabled:opacity-50"
+                            style={{ color: '#9333ea', borderColor: 'rgba(147,51,234,0.4)' }}
+                          >
+                            {busy ? 'Requesting…' : 'Refund'}
+                          </button>
+                        )}
+                        {o.status !== 'pending' && o.status !== 'completed' && (
+                          <span className="text-xs text-muted">—</span>
+                        )}
                       </td>
                     </tr>
                   )
@@ -219,7 +327,7 @@ function OrdersPage() {
 
         {!loading && filtered.length > 0 && (
           <p className="text-xs text-muted mt-3">
-            Showing {filtered.length} order{filtered.length === 1 ? '' : 's'}. Statuses update automatically when Pesapal confirms payment.
+            Showing {filtered.length} order{filtered.length === 1 ? '' : 's'}. Cancel is for unpaid (pending) orders; Refund sends a request to Pesapal for paid orders and the money returns to the customer&apos;s payment method once approved.
           </p>
         )}
       </div>

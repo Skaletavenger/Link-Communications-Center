@@ -194,4 +194,40 @@ export async function getPesapalTransactionStatus(orderTrackingId: string) {
     error: unknown
     status: string
   }
+}\n
+export type PesapalRefundParams = {
+  confirmationCode: string
+  amount: number
+  username: string
+  remarks: string
+}
+
+// Request a refund for a completed transaction. Pesapal reviews refund
+// requests and, once approved, returns the money to the customer's original
+// payment method (MTN MoMo / Airtel Money / card).
+export async function refundPesapalTransaction(params: PesapalRefundParams) {
+  const token = await getPesapalAccessToken()
+
+  const res = await fetch(`${PESAPAL_BASE_URL}/api/Transactions/RefundRequest`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Accept: 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({
+      confirmation_code: params.confirmationCode,
+      amount: params.amount,
+      username: params.username.slice(0, 50),
+      remarks: params.remarks.slice(0, 200),
+    }),
+  })
+
+  const data = await res.json()
+
+  if (!res.ok || (data.status && String(data.status) !== '200')) {
+    throw new Error(`Pesapal refund request failed: ${data.message || res.statusText}`)
+  }
+
+  return data as { status: string; message: string }
 }
