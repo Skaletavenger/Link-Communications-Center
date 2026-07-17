@@ -152,7 +152,8 @@ export default function TrackClient() {
     const digits = q.replace(/[^0-9]/g, '')
     let query = supabase.from('transactions').select('*').order('created_at', { ascending: false }).limit(20)
     if (digits.length >= 9) {
-      query = query.or('reference.eq.' + q + ',phone.like.%' + digits.slice(-9))
+      const last9 = digits.slice(-9)
+      query = query.or('reference.eq.' + q + ',phone.like.*' + last9 + ',description.ilike.*' + last9 + '*')
     } else {
       query = query.eq('reference', q)
     }
