@@ -31,7 +31,7 @@ export default function Navbar() {
         className="fixed top-0 left-0 right-0 z-50 border-b"
         style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}
       >
-        <div className="max-w-7xl mx-auto px-6 py-3 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-6 py-3 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Link href="/" className="flex items-center">
               <BrandLogo />
@@ -39,7 +39,7 @@ export default function Navbar() {
           </div>
 
           {/* center - desktop links */}
-          <div className="hidden md:flex items-center gap-6">
+          <div className="hidden md:flex items-center flex-1 justify-evenly px-10">
             <Link href="/" className="font-medium text-sm transition-colors duration-200" style={isActive('/') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Home
             </Link>

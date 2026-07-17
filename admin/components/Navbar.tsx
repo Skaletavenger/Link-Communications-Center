@@ -50,12 +50,12 @@ export default function Navbar() {
         borderColor: 'var(--nav-border)'
       }}
     >
-      <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+      <div className="max-w-5xl mx-auto px-6 py-4 flex justify-between items-center">
         <Link href="/" className="flex items-center select-none shrink-0">
           <BrandLogo />
         </Link>
 
-        <div className="hidden md:flex gap-2 items-center">
+        <div className={`hidden md:flex items-center ${authed ? 'flex-1 justify-evenly px-10' : 'justify-end'}`}>
           {authed ? (
             navItems.map((item) => {
               const active = path === item.href;
