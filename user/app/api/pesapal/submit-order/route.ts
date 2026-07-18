@@ -15,7 +15,7 @@ export async function POST(req: NextRequest) {
 
   try {
     const body = await req.json()
-    const { amount, phone, productId, description, name, email } = body
+    const { amount, phone, productId, description, name, email, deliveryMethod, deliveryZone, deliveryFee, deliverySpeed, deliveryAddress } = body
 
     if (!amount || Number(amount) <= 0) {
       return NextResponse.json({ error: 'A valid amount is required' }, { status: 400 })
@@ -60,6 +60,11 @@ export async function POST(req: NextRequest) {
       customer_name: trimmedName || null,
       customer_email: typeof email === 'string' && email.trim() ? email.trim() : null,
       description: typeof description === 'string' && description.trim() ? description.trim() : null,
+      delivery_method: deliveryMethod === 'delivery' ? 'delivery' : 'pickup',
+      delivery_zone: typeof deliveryZone === 'string' && deliveryZone.trim() ? deliveryZone.trim() : null,
+      delivery_fee: Number(deliveryFee) > 0 ? Number(deliveryFee) : 0,
+      delivery_speed: deliverySpeed === 'express' ? 'express' : 'standard',
+      delivery_address: typeof deliveryAddress === 'string' && deliveryAddress.trim() ? deliveryAddress.trim() : null,
     })
 
     if (dbError) {
