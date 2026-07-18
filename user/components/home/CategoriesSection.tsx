@@ -60,7 +60,7 @@ type Props = {
   productsHref: string
 }
 
-export default function CategoriesSection({ productsHref: _productsHref }: Props) {
+export default function CategoriesSection({}: Props) {
   const router = useRouter()
 
   return (
