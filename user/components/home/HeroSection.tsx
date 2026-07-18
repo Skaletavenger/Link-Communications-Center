@@ -23,11 +23,29 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
   // phones where it destroys load performance, keep it on larger screens.
   const [showGlobe, setShowGlobe] = useState(false)
   useEffect(() => {
-    const mq = window.matchMedia('(min-width: 768px)')
-    const update = () => setShowGlobe(mq.matches)
-    update()
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
+    // Desktop only, and deferred: the Three.js globe (~600KB JS + 500KB
+    // texture) is decorative. We wait until the browser is idle so its heavy
+    // WebGL init runs AFTER the page is interactive, keeping Total Blocking
+    // Time near zero during load. Mobile never loads it at all.
+    if (!window.matchMedia('(min-width: 768px)').matches) return
+    let cancelled = false
+    const mount = () => { if (!cancelled) setShowGlobe(true) }
+    const w = window as unknown as {
+      requestIdleCallback?: (cb: () => void, opts?: { timeout: number }) => number
+      cancelIdleCallback?: (id: number) => void
+    }
+    let idleId = 0
+    let timerId = 0
+    if (typeof w.requestIdleCallback === 'function') {
+      idleId = w.requestIdleCallback(mount, { timeout: 3000 })
+    } else {
+      timerId = window.setTimeout(mount, 2500)
+    }
+    return () => {
+      cancelled = true
+      if (idleId && typeof w.cancelIdleCallback === 'function') w.cancelIdleCallback(idleId)
+      if (timerId) window.clearTimeout(timerId)
+    }
   }, [])
   const { scrollYProgress } = useScroll({
     target: sectionRef,
