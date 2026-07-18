@@ -7,9 +7,7 @@ import BrandLogo from './BrandLogo'
 import {
   Menu,
   X,
-  ChevronDown,
   House,
-  Box,
   Building2,
   Phone,
   Smartphone,
@@ -43,13 +41,6 @@ export default function Navbar() {
           <div className="hidden md:flex items-center flex-1 justify-evenly px-10">
             <Link href="/" className="font-medium text-sm transition-colors duration-200" style={isActive('/') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Home
-            </Link>
-            <Link
-              href="/#products"
-              className="flex items-center gap-1 font-medium text-sm transition-colors duration-200"
-              style={isActive('/products') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}
-            >
-              Products <ChevronDown size={16} />
             </Link>
             <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Smartphone Loans
@@ -110,7 +101,6 @@ export default function Navbar() {
 
           <nav className="p-4 space-y-2">
             <MobileItem href="/" icon={<House />} label="Home" active={isActive('/')} onClick={() => setOpen(false)} />
-            <MobileItem href="/#products" icon={<Box />} label="Products" active={isActive('/products')} onClick={() => setOpen(false)} />
             <MobileItem href="/loans" icon={<Smartphone />} label="Smartphone Loans" active={isActive('/loans')} onClick={() => setOpen(false)} />
             <MobileItem href="/track" icon={<Package />} label="Track Order" active={isActive('/track')} onClick={() => setOpen(false)} />
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />

@@ -237,6 +237,11 @@ export default function ContactPage(): JSX.Element {
                 <div className="text-sm font-semibold text-[var(--color-primary)]">TikTok</div>
                 <div className="text-sm text-[var(--text-muted)]">@linkcommunicationcentre</div>
               </a>
+              <a href="https://wa.me/256757837184" target="_blank" rel="noopener noreferrer" className="text-center group">
+                <div className="w-12 h-12 rounded-full bg-[#25D366] flex items-center justify-center text-white mx-auto group-hover:opacity-80 transition-opacity"><svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M17.47 14.38c-.29-.15-1.72-.85-1.98-.94-.27-.1-.46-.15-.65.15-.19.29-.75.94-.92 1.13-.17.19-.34.22-.63.07-.29-.15-1.23-.45-2.34-1.44-.87-.77-1.45-1.72-1.62-2.01-.17-.29-.02-.45.13-.6.13-.13.29-.34.44-.51.15-.17.19-.29.29-.48.1-.19.05-.36-.02-.51-.07-.15-.65-1.58-.9-2.16-.24-.57-.48-.49-.65-.5l-.56-.01c-.19 0-.51.07-.77.36-.27.29-1.01.99-1.01 2.42s1.04 2.8 1.18 2.99c.15.19 2.05 3.13 4.97 4.39.69.3 1.24.48 1.66.61.7.22 1.33.19 1.83.12.56-.08 1.72-.7 1.96-1.38.24-.68.24-1.26.17-1.38-.07-.12-.26-.19-.55-.34zM12.05 21.5h-.01a9.5 9.5 0 0 1-4.84-1.33l-.35-.2-3.6.94.96-3.51-.23-.36a9.46 9.46 0 0 1-1.45-5.05c0-5.24 4.27-9.5 9.52-9.5 2.54 0 4.93.99 6.72 2.79a9.42 9.42 0 0 1 2.78 6.72c0 5.24-4.27 9.5-9.5 9.5zM20.52 3.49A11.44 11.44 0 0 0 12.05 0C5.7 0 .53 5.16.53 11.5c0 2.02.53 4 1.54 5.74L.43 24l6.9-1.81a11.5 11.5 0 0 0 5.72 1.46h.01c6.34 0 11.5-5.16 11.51-11.5a11.42 11.42 0 0 0-3.35-8.15z" /></svg></div>
+                <div className="text-sm font-semibold text-[var(--color-primary)]">WhatsApp</div>
+                <div className="text-sm text-[var(--text-muted)]">+256 757 837184</div>
+              </a>
             </div>
           </div>
         </div>
