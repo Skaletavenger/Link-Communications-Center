@@ -11,7 +11,6 @@ const AUTH_KEY = 'lcc_admin_auth';
 
 const navItems = [
   { href: '/products', label: 'Products' },
-  { href: '/home-display', label: 'Home Display' },
   { href: '/loans', label: 'Loans' },
   { href: '/dashboard', label: 'Dashboard' },
   { href: '/orders', label: 'Orders' },
