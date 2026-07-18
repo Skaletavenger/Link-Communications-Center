@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import { usePathname } from 'next/navigation'
 import { useCart } from '@/lib/CartContext'
+import { useTheme } from '@/lib/ThemeContext'
 import BrandLogo from './BrandLogo'
 import {
   Menu,
@@ -15,6 +16,8 @@ import {
   ChevronRight,
   ChevronDown,
   ShoppingCart,
+  Sun,
+  Moon,
   Camera,
   Lock,
   Wifi,
@@ -37,6 +40,7 @@ export default function Navbar() {
   const [cartOpen, setCartOpen] = useState(false)
   const [exploreOpen, setExploreOpen] = useState(false)
   const { items, totalItems, removeFromCart, clearCart } = useCart()
+  const { theme, toggleTheme } = useTheme()
 
   const isActive = (p: string) => path === p
 
@@ -94,6 +98,15 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-3">
+              <button
+                type="button"
+                onClick={toggleTheme}
+                aria-label="Toggle dark mode"
+                className="w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-80"
+                style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}
+              >
+                {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
               <Link
                 href="/cart"
                 aria-label="Cart"
@@ -110,6 +123,9 @@ export default function Navbar() {
             </div>
 
             <div className="flex items-center gap-1 md:hidden">
+              <button type="button" onClick={toggleTheme} aria-label="Toggle dark mode" className="p-2 rounded-md" style={{ color: 'var(--text-primary)' }}>
+                {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+              </button>
               <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-md" style={{ color: 'var(--text-primary)' }}>
                 <ShoppingCart size={22} />
                 {totalItems > 0 && (

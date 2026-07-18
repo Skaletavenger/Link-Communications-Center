@@ -1,20 +1,42 @@
 'use client'
-import { createContext, useContext } from 'react'
+import { createContext, useContext, useEffect, useState } from 'react'
 
-// Dark mode has been removed. The app now always renders in light mode.
-// This context is kept as a lightweight no-op so existing imports of
-// ThemeProvider/useTheme elsewhere in the app don't need to change.
-const ThemeContext = createContext<{
-  theme: 'light'
-  toggleTheme: () => void
-}>({ theme: 'light', toggleTheme: () => {} })
+type Theme = 'light' | 'dark'
+
+const ThemeContext = createContext<{ theme: Theme; toggleTheme: () => void }>({
+  theme: 'light',
+  toggleTheme: () => {},
+})
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  return (
-    <ThemeContext.Provider value={{ theme: 'light', toggleTheme: () => {} }}>
-      {children}
-    </ThemeContext.Provider>
-  )
+  const [theme, setTheme] = useState<Theme>('light')
+
+  useEffect(() => {
+    let initial: Theme = 'light'
+    try {
+      const stored = localStorage.getItem('lcc-theme') as Theme | null
+      initial = stored || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light')
+    } catch {
+      /* ignore */
+    }
+    setTheme(initial)
+    document.documentElement.classList.toggle('dark', initial === 'dark')
+  }, [])
+
+  const toggleTheme = () => {
+    setTheme((prev) => {
+      const next: Theme = prev === 'dark' ? 'light' : 'dark'
+      try {
+        localStorage.setItem('lcc-theme', next)
+      } catch {
+        /* ignore */
+      }
+      document.documentElement.classList.toggle('dark', next === 'dark')
+      return next
+    })
+  }
+
+  return <ThemeContext.Provider value={{ theme, toggleTheme }}>{children}</ThemeContext.Provider>
 }
 
 export const useTheme = () => useContext(ThemeContext)
