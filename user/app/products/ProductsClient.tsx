@@ -121,8 +121,8 @@ export default function ProductsClient({ initialRows, initialCategory, embedded 
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false)
 
   const fetchProducts = async () => {
-    const { data } = await supabase.from('products').select('id,name,brand,model,category,price,stock_quantity,description,image,created_at').order('created_at', { ascending: false })
-    const rows = (data || []) as ProductRow[]
+    const { data } = await supabase.from('products').select('*').order('created_at', { ascending: false })
+    const rows = (data || []) as unknown as ProductRow[]
     setProducts(rows.map(toProduct))
     setLoaded(true)
   }
