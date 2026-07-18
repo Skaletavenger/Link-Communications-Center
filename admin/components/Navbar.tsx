@@ -5,7 +5,8 @@ import { useEffect, useState } from 'react';
 import BrandLogo from './BrandLogo';
 import { supabase } from '../lib/supabase';
 import type { Session } from '@supabase/supabase-js';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Sun, Moon } from 'lucide-react';
+import { useTheme } from '../lib/ThemeContext';
 
 const AUTH_KEY = 'lcc_admin_auth';
 
@@ -21,6 +22,7 @@ const navItems = [
 export default function Navbar() {
   const path = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { theme, toggleTheme } = useTheme();
   const [authed, setAuthed] = useState<boolean>(
     () => typeof window !== 'undefined' && sessionStorage.getItem(AUTH_KEY) === 'true'
   );
@@ -74,10 +76,15 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* mobile hamburger */}
-        <button type="button" aria-label="Menu" onClick={() => setMobileOpen(o => !o)} className="md:hidden p-2 rounded-lg" style={{ color: 'var(--nav-link)' }}>
-          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* right controls */}
+        <div className="flex items-center gap-1">
+          <button type="button" onClick={toggleTheme} aria-label="Toggle dark mode" className="p-2 rounded-lg" style={{ color: 'var(--nav-link)' }}>
+            {theme === 'dark' ? <Sun size={20} /> : <Moon size={20} />}
+          </button>
+          <button type="button" aria-label="Menu" onClick={() => setMobileOpen(o => !o)} className="md:hidden p-2 rounded-lg" style={{ color: 'var(--nav-link)' }}>
+            {mobileOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </div>
 
       {/* mobile panel */}

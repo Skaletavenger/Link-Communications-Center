@@ -22,8 +22,13 @@ export const metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="en" className={openSans.variable}>
+    <html lang="en" suppressHydrationWarning className={openSans.variable}>
       <body className={`${openSans.variable} font-sans antialiased`}>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{var t=localStorage.getItem('lcc-theme');if(t==='dark'||(!t&&window.matchMedia('(prefers-color-scheme: dark)').matches)){document.documentElement.classList.add('dark');}}catch(e){}})();`,
+          }}
+        />
         <ThemeProvider>
           <SiteWrapper>{children}</SiteWrapper>
           <SpeedInsights />
