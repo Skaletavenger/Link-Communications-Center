@@ -13,13 +13,29 @@ import {
   Smartphone,
   Package,
   ChevronRight,
+  ChevronDown,
   ShoppingCart,
+  Camera,
+  Lock,
+  Wifi,
+  Bell,
 } from 'lucide-react'
+
+const EXPLORE = [
+  { name: 'Surveillance Cameras', Icon: Camera },
+  { name: 'Access Control', Icon: Lock },
+  { name: 'Networking', Icon: Wifi },
+  { name: 'Intercoms', Icon: Phone },
+  { name: 'Alarms', Icon: Bell },
+  { name: 'Phones', Icon: Smartphone },
+]
+const catHref = (name: string) => `/?category=${encodeURIComponent(name)}#products`
 
 export default function Navbar() {
   const path = usePathname() || '/'
     const [open, setOpen] = useState(false)
   const [cartOpen, setCartOpen] = useState(false)
+  const [exploreOpen, setExploreOpen] = useState(false)
   const { items, totalItems, removeFromCart, clearCart } = useCart()
 
   const isActive = (p: string) => path === p
@@ -42,6 +58,26 @@ export default function Navbar() {
             <Link href="/" className="font-medium text-sm transition-colors duration-200" style={isActive('/') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Home
             </Link>
+
+            <div className="relative" onMouseEnter={() => setExploreOpen(true)} onMouseLeave={() => setExploreOpen(false)}>
+              <button type="button" onClick={() => setExploreOpen(o => !o)} className="flex items-center gap-1 font-medium text-sm transition-colors duration-200" style={{ color: 'var(--text-primary)' }}>
+                Explore <ChevronDown size={15} className="transition-transform" style={{ transform: exploreOpen ? 'rotate(180deg)' : 'none' }} />
+              </button>
+              {exploreOpen && (
+                <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 z-50">
+                  <div className="w-72 rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                    {EXPLORE.map(({ name, Icon }) => (
+                      <Link key={name} href={catHref(name)} onClick={() => setExploreOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm transition hover:bg-[var(--bg-secondary)]" style={{ color: 'var(--text-primary)' }}>
+                        <Icon size={18} style={{ color: 'var(--color-primary)' }} /> {name}
+                      </Link>
+                    ))}
+                    <Link href="/#products" onClick={() => setExploreOpen(false)} className="block px-4 py-3 text-sm font-semibold border-t" style={{ color: 'var(--color-primary)', borderColor: 'var(--border)' }}>
+                      View all products &rarr;
+                    </Link>
+                  </div>
+                </div>
+              )}
+            </div>
             <Link href="/loans" className="font-medium text-sm transition-colors duration-200" style={isActive('/loans') ? { color: 'var(--color-primary)', borderBottom: '2px solid var(--color-primary)', paddingBottom: '6px' } : { color: 'var(--text-primary)' }}>
               Smartphone Loans
             </Link>
@@ -104,6 +140,15 @@ export default function Navbar() {
             <MobileItem href="/track" icon={<Package />} label="Track Order" active={isActive('/track')} onClick={() => setOpen(false)} />
             <MobileItem href="/about" icon={<Building2 />} label="About" active={isActive('/about')} onClick={() => setOpen(false)} />
             <MobileItem href="/contact" icon={<Phone />} label="Contact Us" active={isActive('/contact')} onClick={() => setOpen(false)} />
+
+            <div className="pt-2">
+              <p className="px-3 pt-3 pb-1 text-xs font-semibold uppercase tracking-wide" style={{ color: 'var(--text-muted)' }}>Explore</p>
+              {EXPLORE.map(({ name, Icon }) => (
+                <Link key={name} href={catHref(name)} onClick={() => setOpen(false)} className="flex items-center gap-3 px-3 py-2.5 rounded-xl" style={{ color: 'var(--text-primary)' }}>
+                  <Icon size={18} style={{ color: 'var(--color-primary)' }} /> <span className="text-sm">{name}</span>
+                </Link>
+              ))}
+            </div>
 
             <div className="mt-6 text-center text-sm text-muted" style={{ color: 'var(--text-muted)' }}>
               <div className="border-t" style={{ borderColor: 'var(--border)' }} />
