@@ -151,12 +151,12 @@ function LoansPage() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 px-6 py-10">
+    <div className="min-h-screen bg-[var(--bg-secondary)] px-6 py-10">
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-8">
           <div>
-            <h1 className="text-3xl font-bold text-slate-900">Loan Products</h1>
-            <p className="mt-2 text-sm text-slate-500">Manage loan products and inventory.</p>
+            <h1 className="text-3xl font-bold text-[var(--text-primary)]">Loan Products</h1>
+            <p className="mt-2 text-sm text-[var(--text-muted)]">Manage loan products and inventory.</p>
           </div>
 
           <button
@@ -171,30 +171,30 @@ function LoansPage() {
         {loading ? (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {Array.from({ length: 6 }).map((_, index) => (
-              <div key={index} className="h-80 animate-pulse rounded-2xl bg-white shadow-sm border border-slate-200" />
+              <div key={index} className="h-80 animate-pulse rounded-2xl bg-[var(--bg-card)] shadow-sm border border-[var(--border-color)]" />
             ))}
           </div>
         ) : loans.length === 0 ? (
-          <div className="rounded-2xl border border-slate-200 bg-white p-12 text-center shadow-sm">
-            <p className="text-xl font-semibold text-slate-900">No loan products yet</p>
-            <p className="mt-3 text-sm text-slate-500">Use the Add Product button to create the first loan.</p>
+          <div className="rounded-2xl border border-[var(--border-color)] bg-[var(--bg-card)] p-12 text-center shadow-sm">
+            <p className="text-xl font-semibold text-[var(--text-primary)]">No loan products yet</p>
+            <p className="mt-3 text-sm text-[var(--text-muted)]">Use the Add Product button to create the first loan.</p>
           </div>
         ) : (
           <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
             {loans.map(loan => (
-              <div key={loan.id} className="rounded-2xl overflow-hidden border border-slate-200 bg-white shadow-sm">
-                <div className="h-52 bg-slate-100 flex items-center justify-center p-3">
+              <div key={loan.id} className="rounded-2xl overflow-hidden border border-[var(--border-color)] bg-[var(--bg-card)] shadow-sm">
+                <div className="h-52 bg-[var(--bg-secondary)] flex items-center justify-center p-3">
                   {loan.image_url ? (
                     <img src={loan.image_url} alt={`${loan.brand} ${loan.model}`} className="h-full w-full object-contain" />
                   ) : (
-                    <div className="flex h-full items-center justify-center bg-slate-200 text-slate-500">No image</div>
+                    <div className="flex h-full items-center justify-center bg-[var(--bg-secondary)] text-[var(--text-muted)]">No image</div>
                   )}
                 </div>
                 <div className="p-5 space-y-4">
                   <div className="flex items-start justify-between gap-4">
                     <div>
-                      <h2 className="text-xl font-semibold text-slate-900">{loan.brand} {loan.model}</h2>
-                      {loan.storage_variant ? <p className="text-sm text-slate-500">{loan.storage_variant}</p> : null}
+                      <h2 className="text-xl font-semibold text-[var(--text-primary)]">{loan.brand} {loan.model}</h2>
+                      {loan.storage_variant ? <p className="text-sm text-[var(--text-muted)]">{loan.storage_variant}</p> : null}
                     </div>
                     <span className={`rounded-full px-3 py-1 text-xs font-semibold ${loan.is_available ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800'}`}>
                       {loan.is_available ? 'Available' : 'Unavailable'}
@@ -202,23 +202,23 @@ function LoansPage() {
                   </div>
 
                   <div>
-                    <p className="text-2xl font-bold text-slate-900">{formatUGX(loan.device_price)}</p>
+                    <p className="text-2xl font-bold text-[var(--text-primary)]">{formatUGX(loan.device_price)}</p>
                   </div>
 
-                  <div className="space-y-2 text-sm text-slate-600">
-                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200">
+                  <div className="space-y-2 text-sm text-[var(--text-secondary)]">
+                    <div className="rounded-2xl bg-[var(--bg-secondary)] p-4 border border-[var(--border-color)]">
                       <p className="font-semibold">Daily Plan</p>
                       <p className="mt-1">Deposit: {formatUGX(loan.daily_deposit)}</p>
                       <p>Amount: {formatUGX(loan.daily_amount)}</p>
                     </div>
-                    <div className="rounded-2xl bg-slate-50 p-4 border border-slate-200">
+                    <div className="rounded-2xl bg-[var(--bg-secondary)] p-4 border border-[var(--border-color)]">
                       <p className="font-semibold">Monthly Plan</p>
                       <p className="mt-1">Deposit: {formatUGX(loan.monthly_deposit)}</p>
                       <p>Amount: {formatUGX(loan.monthly_amount)}</p>
                     </div>
                   </div>
                 </div>
-                <div className="p-5 border-t border-slate-200 bg-slate-50">
+                <div className="p-5 border-t border-[var(--border-color)] bg-[var(--bg-secondary)]">
                   <button
                     type="button"
                     className="w-full rounded-xl bg-[#1574B5] px-4 py-3 text-white font-semibold hover:bg-[#125d8f] transition"
@@ -242,34 +242,34 @@ function LoansPage() {
 
       {showForm ? (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 px-4 py-6">
-          <div className="w-full max-w-2xl rounded-3xl bg-white p-6 shadow-2xl">
-            <div className="flex items-center justify-between gap-4 pb-4 border-b border-slate-200">
+          <div className="w-full max-w-2xl rounded-3xl bg-[var(--bg-card)] p-6 shadow-2xl">
+            <div className="flex items-center justify-between gap-4 pb-4 border-b border-[var(--border-color)]">
               <div>
                 <p className="text-sm uppercase tracking-[0.2em] text-[#1574B5]">Loan Product</p>
-                <h2 className="mt-2 text-2xl font-semibold text-slate-900">{editingLoan ? 'Edit Loan Product' : 'Add Loan Product'}</h2>
+                <h2 className="mt-2 text-2xl font-semibold text-[var(--text-primary)]">{editingLoan ? 'Edit Loan Product' : 'Add Loan Product'}</h2>
               </div>
-              <button type="button" onClick={() => setShowForm(false)} className="text-slate-500 hover:text-slate-900">Cancel</button>
+              <button type="button" onClick={() => setShowForm(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)]">Cancel</button>
             </div>
 
             <form onSubmit={saveLoan} className="mt-6 grid gap-6">
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Brand</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Brand</span>
                   <input
                     type="text"
                     value={form.brand}
                     onChange={e => setForm(prev => ({ ...prev, brand: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     required
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Model</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Model</span>
                   <input
                     type="text"
                     value={form.model}
                     onChange={e => setForm(prev => ({ ...prev, model: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     required
                   />
                 </label>
@@ -277,21 +277,21 @@ function LoansPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Storage Variant</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Storage Variant</span>
                   <input
                     type="text"
                     value={form.storage_variant}
                     onChange={e => setForm(prev => ({ ...prev, storage_variant: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Device Price UGX</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Device Price UGX</span>
                   <input
                     type="number"
                     value={form.device_price}
                     onChange={e => setForm(prev => ({ ...prev, device_price: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     min={0}
                     required
                   />
@@ -300,22 +300,22 @@ function LoansPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Daily Deposit UGX</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Daily Deposit UGX</span>
                   <input
                     type="number"
                     value={form.daily_deposit}
                     onChange={e => setForm(prev => ({ ...prev, daily_deposit: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     min={0}
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Daily Amount UGX</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Daily Amount UGX</span>
                   <input
                     type="number"
                     value={form.daily_amount}
                     onChange={e => setForm(prev => ({ ...prev, daily_amount: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     min={0}
                   />
                 </label>
@@ -323,22 +323,22 @@ function LoansPage() {
 
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Monthly Deposit UGX</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Monthly Deposit UGX</span>
                   <input
                     type="number"
                     value={form.monthly_deposit}
                     onChange={e => setForm(prev => ({ ...prev, monthly_deposit: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     min={0}
                   />
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Monthly Amount UGX</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Monthly Amount UGX</span>
                   <input
                     type="number"
                     value={form.monthly_amount}
                     onChange={e => setForm(prev => ({ ...prev, monthly_amount: e.target.value }))}
-                    className="mt-2 w-full rounded-2xl border border-slate-300 bg-slate-50 px-4 py-3 text-slate-900"
+                    className="mt-2 w-full rounded-2xl border border-[var(--border-color)] bg-[var(--bg-secondary)] px-4 py-3 text-[var(--text-primary)]"
                     min={0}
                   />
                 </label>
@@ -346,48 +346,48 @@ function LoansPage() {
 
               <div className="grid gap-4 md:grid-cols-2 items-center">
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Image</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Image</span>
                   <div className="mt-2 flex items-center gap-4">
                     {form.image_url ? (
                       <div className="relative">
-                        <img src={form.image_url} alt="Loan product" className="h-32 w-32 rounded-xl object-contain bg-slate-100 p-2" />
+                        <img src={form.image_url} alt="Loan product" className="h-32 w-32 rounded-xl object-contain bg-[var(--bg-secondary)] p-2" />
                         <button
                           type="button"
                           onClick={removeImage}
-                          className="absolute right-0 top-0 rounded-full bg-white px-2 py-1 text-xs font-semibold text-slate-900 shadow"
+                          className="absolute right-0 top-0 rounded-full bg-[var(--bg-card)] px-2 py-1 text-xs font-semibold text-[var(--text-primary)] shadow"
                         >
                           Remove
                         </button>
                       </div>
                     ) : (
-                      <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-slate-100 text-sm text-slate-500">No image</div>
+                      <div className="flex h-32 w-32 items-center justify-center rounded-xl bg-[var(--bg-secondary)] text-sm text-[var(--text-muted)]">No image</div>
                     )}
                   </div>
                 </label>
                 <label className="block">
-                  <span className="text-sm font-semibold text-slate-700">Upload image</span>
+                  <span className="text-sm font-semibold text-[var(--text-primary)]">Upload image</span>
                   <input
                     type="file"
                     accept="image/*"
                     onChange={handleImageUpload}
-                    className="mt-2 block w-full text-sm text-slate-700"
+                    className="mt-2 block w-full text-sm text-[var(--text-primary)]"
                   />
-                  {uploadingImage && <p className="mt-2 text-xs text-slate-500">Uploading...</p>}
+                  {uploadingImage && <p className="mt-2 text-xs text-[var(--text-muted)]">Uploading...</p>}
                 </label>
               </div>
 
-              <label className="inline-flex items-center gap-3 text-sm font-semibold text-slate-700">
+              <label className="inline-flex items-center gap-3 text-sm font-semibold text-[var(--text-primary)]">
                 <input
                   type="checkbox"
                   checked={form.is_available}
                   onChange={e => setForm(prev => ({ ...prev, is_available: e.target.checked }))}
-                  className="h-4 w-4 rounded border-slate-300 text-[#1574B5]"
+                  className="h-4 w-4 rounded border-[var(--border-color)] text-[#1574B5]"
                 />
                 Available
               </label>
 
               <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
-                <button type="button" onClick={() => setShowForm(false)} className="rounded-2xl border border-slate-300 px-5 py-3 text-slate-700 hover:bg-slate-50 transition">
+                <button type="button" onClick={() => setShowForm(false)} className="rounded-2xl border border-[var(--border-color)] px-5 py-3 text-[var(--text-primary)] hover:bg-[var(--bg-secondary)] transition">
                   Cancel
                 </button>
                 <button type="submit" className="rounded-2xl bg-[#1574B5] px-5 py-3 text-white font-semibold hover:bg-[#125d8f] transition">
