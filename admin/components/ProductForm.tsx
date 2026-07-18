@@ -67,10 +67,41 @@ export default function ProductForm({ product, onSave, onCancel }: ProductFormPr
     const reader = new FileReader();
     reader.onload = () => {
       const result = reader.result;
-      if (typeof result === 'string') {
+      if (typeof result !== 'string') return;
+      // Compress before storing: uploaded photos are often several MB, and we
+      // keep images inline, so resize to max 1000px and export as WebP to keep
+      // the database rows (and the storefront payload) small.
+      const img = new window.Image();
+      img.onload = () => {
+        const maxDim = 1000;
+        let { width, height } = img;
+        if (width > maxDim || height > maxDim) {
+          const scale = maxDim / Math.max(width, height);
+          width = Math.round(width * scale);
+          height = Math.round(height * scale);
+        }
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          setPreview(result);
+          setForm((prev) => ({ ...prev, image: result }));
+          return;
+        }
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(0, 0, width, height);
+        ctx.drawImage(img, 0, 0, width, height);
+        const compressed = canvas.toDataURL('image/webp', 0.8);
+        const finalImage = compressed.length < result.length ? compressed : result;
+        setPreview(finalImage);
+        setForm((prev) => ({ ...prev, image: finalImage }));
+      };
+      img.onerror = () => {
         setPreview(result);
         setForm((prev) => ({ ...prev, image: result }));
-      }
+      };
+      img.src = result;
     };
     reader.readAsDataURL(file);
   }, [file]);

@@ -14,7 +14,10 @@ function serverClient() {
 export async function fetchAllProducts(): Promise<(ProductRow & { created_at?: string })[]> {
   const { data, error } = await serverClient()
     .from('products')
-    .select('*')
+    // Card views only need the main image; the full `images` gallery array is
+    // fetched per-product on the detail page. Excluding it keeps the home/list
+    // payload small.
+    .select('id,name,brand,model,category,price,stock_quantity,description,image,created_at')
     .order('created_at', { ascending: false })
   if (error) {
     console.error('fetchAllProducts failed:', error.message)
