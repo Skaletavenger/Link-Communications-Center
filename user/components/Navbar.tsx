@@ -58,9 +58,8 @@ export default function Navbar() {
 
           <div className="flex items-center gap-3">
             <div className="hidden md:flex items-center gap-3">
-              <button
-                type="button"
-                onClick={() => setCartOpen(true)}
+              <Link
+                href="/cart"
                 className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-80"
                 style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               >
@@ -70,7 +69,7 @@ export default function Navbar() {
                     {totalItems}
                   </span>
                 )}
-              </button>
+              </Link>
             </div>
 
             <div className="flex items-center gap-2 md:hidden">
