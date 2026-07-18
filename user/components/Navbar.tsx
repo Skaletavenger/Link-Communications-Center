@@ -108,8 +108,16 @@ export default function Navbar() {
               </Link>
             </div>
 
-            <div className="flex items-center gap-2 md:hidden">
-              <button aria-label="open menu" onClick={() => setOpen(true)} className="p-2 rounded-md">
+            <div className="flex items-center gap-1 md:hidden">
+              <Link href="/cart" aria-label="Cart" className="relative p-2 rounded-md" style={{ color: 'var(--text-primary)' }}>
+                <ShoppingCart size={22} />
+                {totalItems > 0 && (
+                  <span className="absolute top-0 right-0 w-4 h-4 rounded-full bg-[#ED2124] text-white text-[9px] font-bold flex items-center justify-center">
+                    {totalItems}
+                  </span>
+                )}
+              </Link>
+              <button aria-label="open menu" onClick={() => setOpen(true)} className="p-2 rounded-md" style={{ color: 'var(--text-primary)' }}>
                 <Menu />
               </button>
             </div>

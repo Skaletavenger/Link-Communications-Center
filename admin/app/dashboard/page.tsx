@@ -31,7 +31,7 @@ function Skeleton() {
     <div className="min-h-screen bg-primary p-6">
       <div className="max-w-7xl mx-auto">
         <div className="h-10 w-64 bg-card rounded-lg animate-pulse mb-8" />
-        <div className="grid grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
           {[...Array(4)].map((_, i) => <div key={i} className="h-24 bg-card rounded-xl animate-pulse" />)}
         </div>
         <div className="h-64 bg-card rounded-xl animate-pulse mb-6" />
@@ -319,7 +319,7 @@ export default function DashboardPage() {
 
       {/* Header */}
       <div className="border-b backdrop-blur-md sticky top-0 z-40" style={{ background: 'var(--nav-bg)', borderColor: 'var(--nav-border)' }}>
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex flex-wrap items-center justify-between gap-3">
           <div>
             <h1 className="text-2xl font-bold" style={{ color: 'var(--text-primary)' }}>Inventory Dashboard</h1>
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>Link Communications Center — Admin</p>
