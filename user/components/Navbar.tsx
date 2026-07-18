@@ -96,6 +96,7 @@ export default function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               <Link
                 href="/cart"
+                aria-label="Cart"
                 className="relative w-10 h-10 rounded-full flex items-center justify-center transition-all hover:opacity-80"
                 style={{ background: 'var(--bg-card)', color: 'var(--text-primary)' }}
               >
@@ -126,7 +127,7 @@ export default function Navbar() {
       </nav>
 
       {/* mobile drawer */}
-      <div className={`fixed inset-0 z-40 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open}>
+      <div className={`fixed inset-0 z-40 ${open ? '' : 'pointer-events-none'}`} aria-hidden={!open} {...(!open ? ({ inert: '' } as Record<string, string>) : {})}>
         {/* backdrop */}
         <div className={`absolute inset-0 bg-black/50 transition-opacity ${open ? 'opacity-60' : 'opacity-0'}`} onClick={() => setOpen(false)} />
 

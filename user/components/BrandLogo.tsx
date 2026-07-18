@@ -1,6 +1,7 @@
 'use client'
 
 import { useCallback, useEffect, useState } from 'react'
+import Image from 'next/image'
 import { supabase } from '../lib/supabase'
 import { getLogoVersionKey, resolveBrandLogoUrl } from '../lib/brandLogo'
 
@@ -74,11 +75,13 @@ export default function BrandLogo() {
 
   if (logoUrl) {
     return (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img
+      <Image
         key={logoUrl}
         src={logoUrl}
         alt="Link Communications Center"
+        width={220}
+        height={97}
+        priority
         className="h-10 w-auto max-w-[220px] object-contain object-left"
       />
     )

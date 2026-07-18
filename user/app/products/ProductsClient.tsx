@@ -59,10 +59,10 @@ function FilterFields({
       <details open className="mb-3">
         <summary className="cursor-pointer font-medium">Price Range (UGX)</summary>
         <div className="mt-3">
-          <input type="range" min={10000} max={10000000} value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} className="w-full" />
+          <input type="range" aria-label="Maximum price" min={10000} max={10000000} value={priceMax} onChange={e => setPriceMax(Number(e.target.value))} className="w-full" />
           <div className="flex gap-2 mt-2">
-            <input type="number" value={priceMin} onChange={e => setPriceMin(Number(e.target.value) || 0)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
-            <input type="number" value={priceMax} onChange={e => setPriceMax(Number(e.target.value) || 10000000)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
+            <input type="number" aria-label="Minimum price (UGX)" value={priceMin} onChange={e => setPriceMin(Number(e.target.value) || 0)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
+            <input type="number" aria-label="Maximum price (UGX)" value={priceMax} onChange={e => setPriceMax(Number(e.target.value) || 10000000)} className="w-1/2 rounded-lg px-3 py-2 border" style={{ borderColor: 'var(--border)' }} />
           </div>
         </div>
       </details>
@@ -185,7 +185,7 @@ export default function ProductsClient({ initialRows, initialCategory, embedded 
 
         <div className="flex flex-col md:flex-row gap-3 mb-8">
           <div className="flex gap-2">
-            <input className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
+            <input className="flex-1 rounded-xl px-4 py-3 outline-none border" style={{ background: 'var(--bg-card)', borderColor: 'var(--border-color)', color: 'var(--text-primary)' }} aria-label="Search products" placeholder="Search products..." value={search} onChange={e => setSearch(e.target.value)} />
             <button
               type="button"
               onClick={() => setMobileFiltersOpen(true)}
