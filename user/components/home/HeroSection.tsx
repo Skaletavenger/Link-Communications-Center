@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { animate } from 'animejs'
 import dynamic from 'next/dynamic'
 
@@ -19,6 +19,16 @@ type Props = {
 export default function HeroSection({ productsHref, authHref, loggedIn }: Props) {
   const sectionRef = useRef<HTMLElement>(null)
   const gridRef = useRef<HTMLDivElement>(null)
+  // The Three.js globe (~600KB JS + 500KB texture) is decorative; skip it on
+  // phones where it destroys load performance, keep it on larger screens.
+  const [showGlobe, setShowGlobe] = useState(false)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const update = () => setShowGlobe(mq.matches)
+    update()
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ['start start', 'end start'],
@@ -51,7 +61,7 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
       ref={sectionRef}
       className="home-hero relative min-h-screen overflow-hidden"
     >
-      <GlobeHero />
+      {showGlobe && <GlobeHero />}
 
       <div
         className="absolute inset-0 pointer-events-none"
