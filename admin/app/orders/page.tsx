@@ -19,6 +19,10 @@ type Order = {
   delivery_method: string | null
   delivery_note: string | null
   archived: boolean | null
+  delivery_zone: string | null
+  delivery_fee: number | null
+  delivery_speed: string | null
+  delivery_address: string | null
   created_at: string
 }
 
@@ -380,6 +384,13 @@ function OrdersPage() {
                         </span>
                       </td>
                       <td className="px-4 py-3">
+                        {o.delivery_method === 'delivery' && (o.delivery_zone || o.delivery_address) && (
+                          <div className="mb-2 text-xs" style={{ maxWidth: 190 }}>
+                            <div className="font-semibold text-primary">{o.delivery_speed === 'express' ? '⚡ Express · ' : ''}{o.delivery_zone || 'Delivery'}</div>
+                            {o.delivery_address && <div className="text-muted">{o.delivery_address}</div>}
+                            {typeof o.delivery_fee === 'number' && o.delivery_fee > 0 && <div className="text-muted">Fee: {formatUGX(o.delivery_fee)}</div>}
+                          </div>
+                        )}
                         {o.status === 'completed' ? (
                           <div className="space-y-1" style={{ minWidth: 150 }}>
                             <select
