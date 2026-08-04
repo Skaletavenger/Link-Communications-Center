@@ -22,6 +22,9 @@
   /* nav */
   --nav-bg: var(--bg-primary);
   --nav-border: var(--border);
+
+  /* solid opaque background for floating menus/dropdowns (needs to be legible over arbitrary page content) */
+  --menu-bg: #FFFFFF;
 }
 
 body {
@@ -145,6 +148,7 @@ html.dark {
   --nav-bg: rgba(10, 26, 48, 0.72);
   --nav-border: rgba(255, 255, 255, 0.10);
   --nav-link: #f5f8fc;
+  --menu-bg: rgba(8, 20, 38, 0.98);
 
   /* shadcn tokens */
   --background: oklch(0.21 0.03 250);
