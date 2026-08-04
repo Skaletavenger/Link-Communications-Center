@@ -69,7 +69,7 @@ export default function Navbar() {
               </button>
               {exploreOpen && (
                 <div className="absolute left-1/2 -translate-x-1/2 top-full pt-3 z-50">
-                  <div className="w-72 rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--bg-card)', borderColor: 'var(--border)' }}>
+                  <div className="w-72 rounded-2xl border shadow-xl overflow-hidden" style={{ background: 'var(--menu-bg)', borderColor: 'var(--border)' }}>
                     {EXPLORE.map(({ name, Icon }) => (
                       <Link key={name} href={catHref(name)} onClick={() => setExploreOpen(false)} className="flex items-center gap-3 px-4 py-3 text-sm transition hover:bg-[var(--bg-secondary)]" style={{ color: 'var(--text-primary)' }}>
                         <Icon size={18} style={{ color: 'var(--color-primary)' }} /> {name}
@@ -147,7 +147,7 @@ export default function Navbar() {
         {/* backdrop */}
         <div className={`absolute inset-0 bg-black/50 transition-opacity ${open ? 'opacity-60' : 'opacity-0'}`} onClick={() => setOpen(false)} />
 
-        <aside className={`absolute top-0 right-0 h-full bg-[var(--bg-card)] shadow-xl transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '85%', borderLeft: '1px solid var(--border)' }}>
+        <aside className={`absolute top-0 right-0 h-full bg-[var(--menu-bg)] shadow-xl transition-transform ${open ? 'translate-x-0' : 'translate-x-full'}`} style={{ width: '85%', borderLeft: '1px solid var(--border)' }}>
           <div className="flex items-center justify-between px-4 py-4 border-b" style={{ borderColor: 'var(--border)' }}>
             <Link href="/" className="flex items-center gap-3">
               <BrandLogo />
