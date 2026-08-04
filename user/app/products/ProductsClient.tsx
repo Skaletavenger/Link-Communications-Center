@@ -112,6 +112,11 @@ export default function ProductsClient({ initialRows, initialCategory, embedded 
   const [loaded, setLoaded] = useState(initialRows.length > 0)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState<string>(() => (initialCategory && CATEGORIES.includes(initialCategory) ? initialCategory : 'All'))
+  useEffect(() => {
+    if (initialCategory && CATEGORIES.includes(initialCategory)) {
+      setCategory(initialCategory)
+    }
+  }, [initialCategory])
   const [selected, setSelected] = useState<Product | null>(null)
   const [priceMin, setPriceMin] = useState(10000)
   const [priceMax, setPriceMax] = useState(10000000)
