@@ -2,6 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 import Link from 'next/link'
 import { useMemo } from 'react'
+import KineticText from '../ui/KineticText'
 import { ArrowRight } from 'lucide-react'
 import { ProductRow, toProduct, formatUGX } from '../../lib/inventory'
 
@@ -20,9 +21,7 @@ export default function FeaturedProductsSection({ rows, productsHref }: Props) {
       <div className="max-w-6xl mx-auto">
         <div className="flex items-end justify-between mb-10 gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--text-primary)' }}>
-              Featured Products
-            </h2>
+            <KineticText as="h2" text="Featured Products" className="text-3xl md:text-4xl font-extrabold" style={{ color: 'var(--text-primary)' }} />
             <p className="text-sm md:text-base mt-2" style={{ color: 'var(--text-muted)' }}>
               A quick look at what&apos;s in stock right now.
             </p>

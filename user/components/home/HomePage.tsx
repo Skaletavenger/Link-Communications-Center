@@ -1,5 +1,6 @@
 "use client"
 import HeroSection from './HeroSection'
+import KineticMarquee from '../ui/KineticMarquee'
 import SurveillanceCamerasSection from './SurveillanceCamerasSection'
 import StatsBarSection from './StatsBarSection'
 import CategoriesSection from './CategoriesSection'
@@ -16,6 +17,7 @@ export default function HomePage({ featuredRows = [], initialCategory }: { featu
   return (
     <main className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
       <HeroSection productsHref={productsHref} authHref={authHref} loggedIn={loggedIn} />
+      <KineticMarquee />
       <SurveillanceCamerasSection />
       <StatsBarSection />
       <CategoriesSection productsHref={productsHref} />

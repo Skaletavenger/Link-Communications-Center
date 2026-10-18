@@ -185,3 +185,19 @@ html.dark nav {
   backdrop-filter: blur(18px);
   -webkit-backdrop-filter: blur(18px);
 }
+
+/* ============================================================
+   Kinetic type
+   ============================================================ */
+.kinetic-glow {
+  animation: kineticGlow 3.2s ease-in-out 1.8s infinite;
+}
+
+@keyframes kineticGlow {
+  0%, 100% { text-shadow: 0 0 0 rgba(244, 120, 33, 0); }
+  50%      { text-shadow: 0 0 28px rgba(244, 120, 33, 0.55); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .kinetic-glow { animation: none; }
+}
