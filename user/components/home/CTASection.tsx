@@ -2,6 +2,7 @@
 
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import KineticText from '../ui/KineticText'
 
 const HEADING = 'Ready to get started?'
 const HEADING_WORDS = HEADING.split(' ')
@@ -46,21 +47,14 @@ export default function CTASection() {
       ))}
 
       <div className="relative z-10 max-w-3xl mx-auto text-center">
-        <h2 className="text-3xl md:text-5xl font-extrabold text-white mb-4 flex flex-wrap justify-center gap-x-2 gap-y-1">
-          {HEADING_WORDS.map((word, i) => (
-            <motion.span
-              key={`${word}-${i}`}
-              className="inline-block"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: i * 0.1, duration: 0.45, ease: 'easeOut' }}
-              style={{ willChange: 'transform' }}
-            >
-              {word}
-            </motion.span>
-          ))}
-        </h2>
+        <KineticText
+          as="h2"
+          by="char"
+          text={HEADING}
+          accentWords={[3]}
+          accentColor="#F47821"
+          className="text-3xl md:text-5xl font-extrabold text-white mb-4"
+        />
 
         <motion.p
           className="text-lg text-white/85 mb-10 leading-relaxed"

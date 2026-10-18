@@ -2,6 +2,7 @@
 
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
+import KineticText from '../ui/KineticText'
 import { Setting2, ShieldTick, TickCircle } from 'iconsax-react'
 
 const FEATURES = [
@@ -75,9 +76,7 @@ export default function ParallaxFeatureSection() {
         </motion.div>
 
         <div>
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--text-primary)' }}>
-            Expert Installation &amp; Support
-          </h2>
+          <KineticText as="h2" text="Expert Installation & Support" className="text-3xl md:text-4xl font-extrabold mb-4" style={{ color: 'var(--text-primary)' }} />
           <p className="text-base md:text-lg leading-relaxed mb-8" style={{ color: 'var(--text-secondary)' }}>
             From site survey to handover, our team delivers professional installation, configures
             remote monitoring, and backs every project with dependable after-sales warranty.

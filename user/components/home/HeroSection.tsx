@@ -5,10 +5,11 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { animate } from 'animejs'
 import dynamic from 'next/dynamic'
+import KineticText from '../ui/KineticText'
 
 const GlobeHero = dynamic(() => import('../GlobeHero'), { ssr: false })
 
-const HEADLINE = ['Connect.', 'Secure.', 'Communicate.']
+const HEADLINE = 'Connect. Secure. Communicate.'
 
 type Props = {
   productsHref: string
@@ -54,6 +55,9 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
 
   const gridY = useTransform(scrollYProgress, [0, 1], ['0%', '30%'])
   const contentY = useTransform(scrollYProgress, [0, 1], ['0%', '10%'])
+  // title-card "dolly out" as you scroll past the hero
+  const titleScale = useTransform(scrollYProgress, [0, 0.6], [1, 1.1])
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.55], [1, 0.1])
 
   useEffect(() => {
     const grid = gridRef.current
@@ -125,35 +129,39 @@ export default function HeroSection({ productsHref, authHref, loggedIn }: Props)
           SECURE. CONNECT. SUCCEED.
         </motion.div>
 
-        <h1 className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6">
-          {HEADLINE.map((word, i) => {
-            const isAccent = i === 2
-            return (
-              <motion.span
-                key={word}
-                className={`inline-block mr-3 md:mr-4 ${isAccent ? '' : ''}`}
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.12 * i, duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                style={{ color: isAccent ? 'var(--color-accent)' : '#ffffff' }}
-              >
-                {word}
-              </motion.span>
-            )
-          })}
-        </h1>
+        <motion.div style={{ scale: titleScale, opacity: titleOpacity, transformOrigin: '0% 50%', willChange: 'transform, opacity' }}>
+          <KineticText
+            as="h1"
+            text={HEADLINE}
+            by="char"
+            inView={false}
+            delay={0.25}
+            stagger={0.04}
+            accentWords={[2]}
+            className="text-4xl sm:text-5xl md:text-7xl font-extrabold leading-tight mb-6 text-white"
+          />
+          <motion.div
+            aria-hidden
+            className="mb-8 h-[3px] w-40 md:w-64 rounded-full origin-left"
+            style={{ background: 'linear-gradient(90deg, var(--color-accent), var(--color-primary), transparent)' }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ delay: 1.25, duration: 0.9, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </motion.div>
 
-        <motion.p
+        <KineticText
+          as="p"
+          by="word"
+          inView={false}
+          delay={1.0}
+          stagger={0.045}
+          blur={false}
+          text="Enterprise surveillance, access control, and communications — designed, installed, and supported across Uganda."
           className="text-lg md:text-xl max-w-2xl mb-10 leading-relaxed text-white/80"
-          initial={{ opacity: 0, y: 16 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4, duration: 0.55 }}
-        >
-          Enterprise surveillance, access control, and communications — designed, installed, and
-          supported across Uganda.
-        </motion.p>
+        />
 
-        <motion.div className="flex flex-wrap gap-4" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55, duration: 0.5 }} style={{ willChange: 'transform' }}>
+        <motion.div className="flex flex-wrap gap-4" initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 1.7, duration: 0.6, ease: [0.22, 1, 0.36, 1] }} style={{ willChange: 'transform' }}>
           <Link href={productsHref}>
             <span className="inline-block px-8 py-4 rounded-xl font-bold text-white text-lg cursor-pointer transition-all duration-200 hover:opacity-90 hover:scale-105 active:scale-95" style={{ background: 'var(--color-primary)' }}>
               🛒 Shop Now

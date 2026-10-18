@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
+import KineticText from '../ui/KineticText'
 import { supabase } from '@/lib/supabase'
 import { Camera, ShoppingCart } from 'lucide-react'
 
@@ -108,9 +109,7 @@ export default function SurveillanceCamerasSection() {
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-12">
           <div>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: 'var(--text-primary)' }}>
-              Surveillance Cameras
-            </h2>
+            <KineticText as="h2" text="Surveillance Cameras" className="text-3xl md:text-4xl font-extrabold mb-2" style={{ color: 'var(--text-primary)' }} />
             <p className="text-base md:text-lg" style={{ color: 'var(--text-secondary)' }}>
               Professional Hikvision cameras for homes, businesses, and enterprises across Uganda
             </p>
